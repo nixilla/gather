@@ -1,0 +1,117 @@
+version: "2"
+
+services:
+  db:
+    image: postgres:9.5.2
+
+  kernel:
+    stdin_open: true
+    tty: true
+    image: ehealthafrica/aether-kernel
+    environment:
+      CAS_SERVER_URL: https://ums-dev.ehealthafrica.org
+      CSRF_COOKIE_DOMAIN: .aether.local
+      DEBUG: "true"
+      HOSTNAME: kernel.aether.local
+
+      RDS_DB_NAME: aether
+      RDS_HOSTNAME: db
+      RDS_PASSWORD: ""
+      RDS_PORT: 5432
+      RDS_USERNAME: postgres
+
+      WEB_SERVER_PORT: 8000
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    command: start_dev
+
+  odk-importer:
+    image: ehealthafrica/aether-odk-importer
+    environment:
+      CAS_SERVER_URL: https://ums-dev.ehealthafrica.org
+      CSRF_COOKIE_DOMAIN: .aether.local
+      DEBUG: "true"
+      HOSTNAME: odk.aether.local
+
+      AETHER_KERNEL_TOKEN: a2d6bc20ad16ec8e715f2f42f54eb00cbbea2d24
+      AETHER_KERNEL_URL: http://kernel:8000
+      AETHER_KERNEL_URL_TEST: http://kernel-test:9000
+
+      RDS_DB_NAME: odk_importer
+      RDS_HOSTNAME: db
+      RDS_PASSWORD: ""
+      RDS_PORT: 5432
+      RDS_USERNAME: postgres
+
+      WEB_SERVER_PORT: 8443
+    depends_on:
+      - kernel
+      - db
+    ports:
+      - "8443:8443"
+    command: start_dev
+
+  ui:
+    stdin_open: true
+    tty: true
+    build: gather2-ui
+    image: ui
+    environment: &ui-environment
+      CAS_SERVER_URL: https://ums-dev.ehealthafrica.org
+      CSRF_COOKIE_DOMAIN: .gather2.local
+      DEBUG: "true"
+      HOSTNAME: ui.gather2.local
+      STATIC_ROOT: /code/gather2/ui/assets/bundles
+
+      GATHER_ORG_NAME: eHealth Africa
+
+      GATHER_CORE_TOKEN: a2d6bc20ad16ec8e715f2f42f54eb00cbbea2d24
+      GATHER_CORE_URL: http://kernel:8000
+      GATHER_CORE_URL_TEST: http://core-test:9000
+
+      GATHER_MODULES: "core,odk-importer,"
+
+      GATHER_ODK_TOKEN: d5184a044bb5acff89a76ec4e67d0fcddd5cd3a1
+      GATHER_ODK_URL: http://odk-importer:8443
+      GATHER_ODK_URL_TEST: http://odk-importer-test:9443
+
+      RDS_DB_NAME: ui
+      RDS_HOSTNAME: db
+      RDS_PASSWORD: ""
+      RDS_PORT: 5432
+      RDS_USERNAME: postgres
+
+      WEB_SERVER_PORT: 8080
+    volumes: &ui-volumes
+      #################################################
+      #                    WARNING                    #
+      # do not include the root folder as volume or   #
+      # `node_modules` folder will not be available   #
+      #                                               #
+      # - ./gather2-ui:/code # DO NOT UNCOMMENT!!!    #
+      #################################################
+
+      - ./gather2-ui/conf:/code/conf
+      - ./gather2-ui/gather2:/code/gather2
+      - ./gather2-common/gather2/common:/code/gather2/common
+
+      - ./gather2-ui/entrypoint.sh:/code/entrypoint.sh
+      - ./gather2-ui/manage.py:/code/manage.py
+      - ./gather2-ui/setup.py:/code/setup.py
+      - ./gather2-ui/package.json:/code/package.json
+    depends_on:
+      - db
+      - webpack
+    ports:
+      - "8080:8080"
+    command: start_dev
+
+  webpack:
+    image: ui
+    environment: *ui-environment
+    volumes: *ui-volumes
+    ports:
+      - "3000:3000"
+    command: start_webpack
