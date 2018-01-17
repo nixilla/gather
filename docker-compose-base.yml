@@ -61,7 +61,7 @@ services:
   # ---------------------------------
 
   odk-base:
-    image: ehealthafrica/aether-odk-importer
+    image: ehealthafrica/aether-odk
     stdin_open: true
     tty: true
     environment:
