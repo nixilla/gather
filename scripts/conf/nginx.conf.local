@@ -5,60 +5,55 @@
 
 
 # ------------------------------------------------------------------------------
-# Core
+# Gather
 # ------------------------------------------------------------------------------
 
 server {
   listen                    80;
   charset                   utf-8;
-  server_name               core.gather2.local;
+  server_name               gather.local;
   client_max_body_size      75M;
-
-  # Protected media
-  location /media-internal/ {
-    internal;  # Cannot be accessed from external calls
-    alias /media/core/;
-  }
 
   location / {
     # use docker network alias (is used by UMS as service name)
-    proxy_pass http://core.gather2.local:8000;
-    include    /etc/nginx/uwsgi_params;
-  }
-}
-
-# ------------------------------------------------------------------------------
-# CouchDB-Sync
-# ------------------------------------------------------------------------------
-
-server {
-  listen                    80;
-  charset                   utf-8;
-  server_name               sync.gather2.local;
-  client_max_body_size      75M;
-
-  # Protected media
-  location /media-internal/ {
-    internal;  # Cannot be accessed from external calls
-    alias /media/sync/;
-  }
-
-  location / {
-    # use docker network alias (is used by UMS as service name)
-    proxy_pass http://sync.gather2.local:8666;
+    proxy_pass http://gather.local:8000;
     include    /etc/nginx/uwsgi_params;
   }
 }
 
 
 # ------------------------------------------------------------------------------
-# ODK-Importer
+# Aether Kernel
 # ------------------------------------------------------------------------------
 
 server {
   listen                    80;
   charset                   utf-8;
-  server_name               odk.gather2.local;
+  server_name               kernel.aether.local;
+  client_max_body_size      75M;
+
+  # Protected media
+  location /media-internal/ {
+    internal;  # Cannot be accessed from external calls
+    alias /media/kernel/;
+  }
+
+  location / {
+    # use docker network alias (is used by UMS as service name)
+    proxy_pass http://kernel.aether.local:8001;
+    include    /etc/nginx/uwsgi_params;
+  }
+}
+
+
+# ------------------------------------------------------------------------------
+# Aether ODK
+# ------------------------------------------------------------------------------
+
+server {
+  listen                    80;
+  charset                   utf-8;
+  server_name               odk.aether.local;
   client_max_body_size      75M;
 
   # Protected media
@@ -69,31 +64,7 @@ server {
 
   location / {
     # use docker network alias (is used by UMS as service name)
-    proxy_pass http://odk.gather2.local:8443;
-    include    /etc/nginx/uwsgi_params;
-  }
-}
-
-
-# ------------------------------------------------------------------------------
-# UI
-# ------------------------------------------------------------------------------
-
-server {
-  listen                    80;
-  charset                   utf-8;
-  server_name               ui.gather2.local;
-  client_max_body_size      75M;
-
-  # Protected media
-  location /media-internal/ {
-    internal;  # Cannot be accessed from external calls
-    alias /media/ui/;
-  }
-
-  location / {
-    # use docker network alias (is used by UMS as service name)
-    proxy_pass http://ui.gather2.local:8080;
+    proxy_pass http://odk.aether.local:8002;
     include    /etc/nginx/uwsgi_params;
   }
 }

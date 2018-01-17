@@ -7,23 +7,23 @@ BRANCH="${TRAVIS_BRANCH}"
 IMAGE_REPO="387526361725.dkr.ecr.eu-west-1.amazonaws.com"
 
 if [ "${BRANCH}" == "develop" ]; then
-  export APPS=( core couchdb-sync odk-importer ui )
+  export APPS=( gather )
   export CLUSTER_NAME="ehealth-africa"
   export ENV="dev"
   export PREFIX="gather2"
 
 elif [ "${BRANCH}" == "staging" ]; then
-  export APPS=( core couchdb-sync odk-importer ui )
+  export APPS=( gather )
   export CLUSTER_NAME="ehealth-africa"
   export ENV="staging"
   export PREFIX="gather2"
 
 elif [ "${BRANCH}" == "master" ]; then
   echo "commit on master, setting ENV to production"
-  export APPS=( core odk-importer ui )
+  export APPS=( gather )
   export CLUSTER_NAME="ehealth-africa"
   export ENV="prod"
-  export PREFIX=( champs grid eha )
+  export PREFIX=( eocng champs grid eha )
 fi
 
 
