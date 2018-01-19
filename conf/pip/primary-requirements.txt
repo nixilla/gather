@@ -8,24 +8,31 @@
 #                                                                              #
 ################################################################################
 
-coverage
-django<2
+
+# Main libraries
+aether.common   # Aether common module
+django
 django-cas-ng
 django-cors-headers
-django-debug-toolbar
 django-ums-client
-django-webpack-loader
 djangorestframework
-flake8
-flake8-quotes
-mock
 psycopg2
-raven
 requests
 uwsgi
 
-# this is used for pulling down secrets from S3
-awscli
 
-# Aether common module
-aether.common
+# Development
+django-debug-toolbar
+django-webpack-loader
+
+
+# Server side
+awscli   # this is used for pulling down secrets from S3
+raven    # Sentry
+
+
+# Test libraries
+coverage
+flake8
+flake8-quotes
+mock
