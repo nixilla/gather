@@ -6,24 +6,11 @@ COMMIT="${TRAVIS_COMMIT}"
 BRANCH="${TRAVIS_BRANCH}"
 IMAGE_REPO="387526361725.dkr.ecr.eu-west-1.amazonaws.com"
 
-if [ "${BRANCH}" == "develop" ]; then
-  export APPS=( gather )
-  export CLUSTER_NAME="ehealth-africa"
-  export ENV="dev"
-  export PREFIX="gather2"
-
-elif [ "${BRANCH}" == "staging" ]; then
-  export APPS=( gather )
-  export CLUSTER_NAME="ehealth-africa"
-  export ENV="staging"
-  export PREFIX="gather2"
-
-elif [ "${BRANCH}" == "master" ]; then
-  echo "commit on master, setting ENV to production"
+if [ "${BRANCH}" == "gather-on-aether" ]; then
   export APPS=( gather )
   export CLUSTER_NAME="ehealth-africa"
   export ENV="prod"
-  export PREFIX=( eocng champs grid eha )
+  export PREFIX="gather2"
 fi
 
 

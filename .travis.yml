@@ -28,6 +28,12 @@ deploy:
     on:
       branch: develop
 
+ - provider: script
+    script: ./scripts/deploy.sh
+    skip_cleanup: true
+    on:
+      branch: gather-on-aether 
+
   - provider: script
     script: ./scripts/deploy.sh
     skip_cleanup: true
