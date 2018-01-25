@@ -28,7 +28,7 @@ deploy:
     on:
       branch: develop
 
- - provider: script
+  - provider: script
     script: ./scripts/deploy.sh
     skip_cleanup: true
     on:
