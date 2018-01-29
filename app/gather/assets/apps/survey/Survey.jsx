@@ -136,6 +136,8 @@ export default class Survey extends Component {
     const params = {
       mappingId: survey.id,
       fields: 'created,payload',
+      ruleSep: '$',
+      parseColumns: 'remove-prefix$payload.,replace$.$:$',
       format: 'csv',
       pageSize
     }
