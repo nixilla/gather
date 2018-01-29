@@ -24,7 +24,8 @@ RUN npm install --loglevel silent
 
 ENV PATH /code/node_modules/.bin:$PATH
 
-COPY ./ /code
+COPY ./app /code
+COPY ./conf /code/conf
 
 ################################################################################
 ## last setup steps
