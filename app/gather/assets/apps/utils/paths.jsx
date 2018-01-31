@@ -27,6 +27,10 @@ export const getSurveysAPIPath = ({app, id, withStats, ...params}) => {
   return buildAPIPath(source, `mappings${stats}`, id, {...params, projectId})
 }
 
+export const getProjectAPIPath = () => {
+  return '/gather/project/'
+}
+
 /**
  * Returns the API url to get the Surveyors data
  *

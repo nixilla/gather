@@ -6,6 +6,7 @@ from collections import namedtuple
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from solo.models import SingletonModel
 
 
 from ..settings import AETHER_APPS
@@ -154,6 +155,14 @@ class UserTokens(models.Model):
     class Meta:
         app_label = 'gather'
         default_related_name = 'app_tokens'
+
+
+class Project(SingletonModel):
+    '''
+    Database link to an Aether Kernel Project model
+    '''
+    project_id = models.UUIDField(default=uuid.uuid4)
+    project_name = models.TextField(max_length=50)
 
 
 class Survey(models.Model):

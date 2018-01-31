@@ -29,7 +29,7 @@ export default class SurveyDetail extends Component {
 
         <div className='survey-records'>
           <span className='record-number mr-1'>
-            <FormattedNumber value={survey.submissions} />
+            <FormattedNumber value={survey.submission_count} />
           </span>
           <FormattedMessage
             id='survey.detail.submissions'

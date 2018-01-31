@@ -51,7 +51,8 @@ export class SurveyForm extends Component {
       ...survey,
       definitionStringified: JSON.stringify(survey.definition || {}, 0, 2),
       errors: {},
-      isUpdating: false
+      isUpdating: false,
+      project: this.props.project
     }
 
     if (ODK_ACTIVE) {
@@ -77,7 +78,6 @@ export class SurveyForm extends Component {
 
         <form onSubmit={this.onSubmit.bind(this)} encType='multipart/form-data'>
           { this.renderName() }
-          { this.renderRevision() }
           { this.renderDefinition() }
           {
             ODK_ACTIVE &&
@@ -134,30 +134,6 @@ export class SurveyForm extends Component {
           onChange={this.onInputChange.bind(this)}
         />
         <ErrorAlert errors={errors.name} />
-      </div>
-    )
-  }
-
-  renderRevision () {
-    const survey = this.state
-    const {errors} = survey
-
-    return (
-      <div className={`form-group big-input ${errors.revision ? 'error' : ''}`}>
-        <label className='form-control-label title'>
-          <FormattedMessage
-            id='survey.form.revision'
-            defaultMessage='Revision' />
-        </label>
-        <input
-          name='revision'
-          type='text'
-          className='form-control'
-          required
-          value={survey.revision || ''}
-          onChange={this.onInputChange.bind(this)}
-        />
-        <ErrorAlert errors={errors.revision} />
       </div>
     )
   }
@@ -303,13 +279,12 @@ export class SurveyForm extends Component {
       return true
     }
 
-    const initialSurvey = clone(this.props.survey || { name: '', revision: '', definition: {} })
+    const initialSurvey = clone(this.props.survey || { name: '', definition: {} })
 
     try {
       const survey = {
         ...initialSurvey,
         name: this.state.name,
-        revision: this.state.revision,
         definition: JSON.parse(this.state.definitionStringified)
       }
 
@@ -337,7 +312,13 @@ export class SurveyForm extends Component {
     const {formatMessage} = this.props.intl
     const survey = {
       id: this.state.id,
-      name: this.state.name
+      name: this.state.name,
+      // FIXME: "revision" field refers to Aether mapping revisions.
+      // This should be auto-incremented every time the Survey/Mapping
+      // edited.
+      // See: https://jira.ehealthafrica.org/browse/AET-124
+      revision: '1',
+      project: this.props.project.id
     }
 
     // check if the definition comes from a file or from the textarea

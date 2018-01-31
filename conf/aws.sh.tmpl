@@ -31,8 +31,3 @@ check_odk() {
 check_kernel
 check_odk
 check_variable $ADMIN_PASSWORD "ADMIN password"
-
-# FIXME: This should be requested to the user by the app and saved in the DB.
-# So far just hardcoded it as an environment variable
-check_variable $AETHER_KERNEL_PROJECT_ID   "KERNEL project id"
-check_variable $AETHER_KERNEL_PROJECT_NAME "KERNEL project name"

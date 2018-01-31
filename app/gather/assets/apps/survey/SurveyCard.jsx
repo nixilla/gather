@@ -19,7 +19,7 @@ export default class SurveyCard extends Component {
 
           <p className='card-display text-center'>
             <span className='card-number'>
-              <FormattedNumber value={survey.submissions || 0} />
+              <FormattedNumber value={survey.submission_count || 0} />
             </span>
             <FormattedMessage
               id='survey.card.submissions'

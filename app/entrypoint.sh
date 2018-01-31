@@ -52,6 +52,13 @@ setup_db() {
 setup_initial_data() {
     # create initial superuser
     ./manage.py loaddata /code/conf/extras/initial.json
+    # Wait for kernel to become available
+    until $(curl --output /dev/null --silent --head $AETHER_KERNEL_URL); do
+        >&2 echo 'Waiting for Aether kernel...'
+        sleep 1
+    done
+    # Set up Aether and Gather projects and ensure that they are in sync
+    ./manage.py setup_aether_project
 }
 
 setup_prod() {

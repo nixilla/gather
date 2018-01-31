@@ -64,7 +64,7 @@ server {
 
   location / {
     # use docker network alias (is used by UMS as service name)
-    proxy_pass http://odk.aether.local:8002;
+    proxy_pass http://odk.aether.local:8443;
     include    /etc/nginx/uwsgi_params;
   }
 }

@@ -14,16 +14,20 @@ export default class SurveyDates extends Component {
           <span className='card-dates pr-2'>
             <span className='label mr-1'>
               <FormattedMessage
-                id='survey.dates.revision'
-                defaultMessage='revision' />
+                id='survey.dates.created'
+                defaultMessage='Created at' />
             </span>
-            { survey.revision }
+            <FormattedDate
+              value={survey.created}
+              year='numeric'
+              month='short'
+              day='numeric' />
           </span>
 
-          { survey.submissions === 0 && this.renderNoSubmissions() }
-          { survey.submissions > 0 && this.renderSubmissions() }
+          { survey.submission_count === 0 && this.renderNoSubmissions() }
+          { survey.submission_count > 0 && this.renderSubmissions() }
           {
-            survey.submissions > 0 &&
+            survey.submission_count > 0 &&
             this.props.showDuration &&
             this.renderSubmissionsDuration()
           }

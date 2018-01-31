@@ -63,7 +63,7 @@ export default class PaginationContainer extends Component {
 
   fetchData () {
     const {page, pageSize, search} = this.state
-    const url = `${this.props.url}${buildQueryString({page, pageSize, search})}`
+    const url = `${this.props.url}&${buildQueryString({page, pageSize, search})}`
 
     getData(url)
       .then((response) => {

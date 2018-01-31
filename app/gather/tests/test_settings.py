@@ -24,8 +24,3 @@ class SettingsTest(TestCase):
         self.assertTrue(settings.AETHER_ODK)
         self.assertIn('odk', settings.AETHER_APPS)
         self.assertEqual(settings.AETHER_APPS['odk']['url'], 'http://odk-test:9002')
-
-        # FIXME: This should be requested to the user by the app and saved in the DB.
-        # So far just hardcoded it as an environment variable
-        self.assertEqual(settings.PROJECT_NAME, 'Aether Sample Project')
-        self.assertEqual(settings.PROJECT_ID, 'd3ee41be-e696-424b-8b45-ab6a0d787f6a')

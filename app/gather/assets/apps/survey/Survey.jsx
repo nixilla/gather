@@ -116,7 +116,7 @@ export default class Survey extends Component {
         </div>
         <PaginationContainer
           pageSize={pageSize}
-          url={getSubmissionsAPIPath({mappingId: survey.id})}
+          url={getSubmissionsAPIPath({mapping: survey.id})}
           position='top'
           listComponent={SubmissionComponent}
           search
@@ -134,7 +134,7 @@ export default class Survey extends Component {
 
     const pageSize = MAX_PAGE_SIZE
     const params = {
-      mappingId: survey.id,
+      mapping: survey.id,
       fields: 'created,payload',
       ruleSep: '$',
       parseColumns: 'remove-prefix$payload.,replace$.$:$',

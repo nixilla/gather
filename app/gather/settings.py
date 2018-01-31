@@ -15,11 +15,6 @@ WSGI_APPLICATION = 'gather.wsgi.application'
 
 APP_NAME = 'Gather'
 
-# FIXME: This should be requested to the user by the app and saved in the DB.
-# So far just hardcoded it as an environment variable
-PROJECT_NAME = os.environ.get('AETHER_KERNEL_PROJECT_NAME')
-PROJECT_ID = os.environ.get('AETHER_KERNEL_PROJECT_ID')
-
 DATA_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50MB
 
 # Javascript/CSS Files:
@@ -32,6 +27,7 @@ WEBPACK_LOADER = {
 
 INSTALLED_APPS += [
     'webpack_loader',
+    'solo.apps.SoloAppConfig',
     'gather',
 ]
 
