@@ -167,7 +167,11 @@ module.exports = function (custom) {
         filename: './assets/bundles/webpack-stats.json'
       }),
 
-      new webpack.EnvironmentPlugin(['AETHER_MODULES']),
+      new webpack.EnvironmentPlugin([
+        'AETHER_MODULES',
+        'CSV_HEADER_RULES',
+        'CSV_HEADER_RULES_SEP'
+      ]),
       new webpack.DefinePlugin({
         'process.env': {
           'NODE_ENV': JSON.stringify(custom.production ? 'production' : 'development')

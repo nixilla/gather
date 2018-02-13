@@ -122,6 +122,9 @@ services:
       RDS_PORT: 5432
       RDS_USERNAME: postgres
 
+      CSV_HEADER_RULES: replace;.;:;
+      CSV_HEADER_RULES_SEP: ;
+
       WEB_SERVER_PORT: 8000
     volumes: &gather-volumes
       #################################################

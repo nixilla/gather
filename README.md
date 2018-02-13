@@ -62,6 +62,10 @@ of the most common ones with non default values. For more info take a look at th
 
 #### Gather
 
+- `CSV_HEADER_RULES`: `replace;.;:;` More CSV header labels parser rules, transforms header from `payload.None.a.b.c` to `a:b:c`.
+  Default rules are `remove-prefix;payload.,remove-prefix;None.,`, removes `payload.None.` prefixes.
+- `CSV_HEADER_RULES_SEP`: `;` rules divider. Default `:`. Include it if any of the rules uses `:`.
+  See more in `aether.common.drf.renderers.CustomCSVRenderer`.
 - `CAS_SERVER_URL`: `https://ums-dev.ehealthafrica.org` Used by UMS.
 - `HOSTNAME`: `gather.local` Used by UMS.
 - `RDS_DB_NAME`: `gather` Postgres database name.
