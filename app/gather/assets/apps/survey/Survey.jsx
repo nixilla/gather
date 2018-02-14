@@ -134,13 +134,14 @@ export default class Survey extends Component {
     const {total, allColumns, selectedColumns} = this.state
 
     const pageSize = MAX_PAGE_SIZE
+    const sep = CSV_HEADER_RULES_SEP
     const params = {
       mapping: survey.id,
       fields: 'created,payload',
       // remove "payload.None." prefix from headers labels
       // from "payload.None.a.b.c" to "a.b.c"
-      parseColumns: 'remove-prefix$payload.,remove-prefix$None.,' + CSV_HEADER_RULES,
-      ruleSep: CSV_HEADER_RULES_SEP,
+      parseColumns: `remove-prefix${sep}payload.,remove-prefix${sep}None.,${CSV_HEADER_RULES}`,
+      ruleSep: sep,
       format: 'csv',
       pageSize
     }
