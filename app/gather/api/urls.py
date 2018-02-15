@@ -25,3 +25,5 @@ for app_name in settings.AETHER_APPS:
              login_required(tokens_required(views.TokenProxyView.as_view(app_name=app_name))),
              name='{}-proxy'.format(app_name))
     )
+
+app_name = 'api'

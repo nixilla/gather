@@ -62,19 +62,10 @@ setup_initial_data() {
 }
 
 setup_prod() {
+  # check if vars exist
+  /code/conf/check_vars.sh
   # arguments: -u=admin -p=secretsecret -e=admin@gather2.org -t=01234656789abcdefghij
   ./manage.py setup_admin -p=$ADMIN_PASSWORD
-}
-
-setup_aws_requirements() {
-    envsubst < /code/conf/aws_cli_setup.sh.tmpl > /code/conf/aws_cli_setup.sh
-    chmod +x /code/conf/aws_cli_setup.sh
-    /code/conf/aws_cli_setup.sh
-
-    source ~/.bashrc
-    envsubst < /code/conf/aws.sh.tmpl > /code/conf/aws.sh
-    chmod +x /code/conf/aws.sh
-    /code/conf/aws.sh
 }
 
 test_lint() {
@@ -167,8 +158,6 @@ case "$1" in
     ;;
 
     start )
-        setup_aws_requirements
-        source ~/.bashrc
         setup_db
         setup_prod
 
