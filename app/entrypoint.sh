@@ -61,6 +61,16 @@ setup_initial_data() {
     ./manage.py setup_aether_project
 }
 
+setup_projects() {
+     # Wait for kernel to become available
+    until $(curl --output /dev/null --silent --head $AETHER_KERNEL_URL); do
+        >&2 echo 'Waiting for Aether kernel...'
+        sleep 1
+    done
+    # Set up Aether and Gather projects and ensure that they are in sync
+    ./manage.py setup_aether_project
+}
+
 setup_prod() {
   # check if vars exist
   /code/conf/check_vars.sh
@@ -160,7 +170,7 @@ case "$1" in
     start )
         setup_db
         setup_prod
-        setup_initial_data
+        setup_projects
 
         # remove previous files
         rm -r -f /code/gather/assets/bundles/*
