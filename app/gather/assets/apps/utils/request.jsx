@@ -34,7 +34,7 @@ export const request = (method, url, data = null, multipart = false) => {
     credentials: 'same-origin',
     headers: {
       'X-CSRFToken': csrfToken,
-      'X-METHOD': method  // See comment below
+      'X-METHOD': method // See comment below
     }
   }
 

@@ -63,8 +63,7 @@ export class SurveyorForm extends Component {
     const surveyor = this.state
     const isNew = (surveyor.id === undefined)
 
-    const title = (
-      isNew
+    const title = (isNew
       ? <FormattedMessage
         id='surveyor.form.title.add'
         defaultMessage='New surveyor' />
@@ -78,10 +77,9 @@ export class SurveyorForm extends Component {
             {this.props.surveyor.username}
           </span>
         </span>
-        )
+      )
     )
-    const dataQA = (
-      isNew
+    const dataQA = (isNew
       ? 'surveyor-add'
       : `surveyor-edit-${surveyor.id}`
     )

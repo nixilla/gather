@@ -63,8 +63,7 @@ export class SurveyForm extends Component {
   render () {
     const survey = this.state
     const {errors, isUpdating} = survey
-    const dataQA = (
-      (survey.id === undefined)
+    const dataQA = (survey.id === undefined
       ? 'survey-add'
       : `survey-edit-${survey.id}`
     )
