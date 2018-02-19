@@ -14,7 +14,7 @@ import SubmissionsList from '../submission/SubmissionsList'
 import SubmissionItem from '../submission/SubmissionItem'
 
 const TABLE_SIZE = 10
-const SEPARATOR = '¬¬¬'  // very uncommon string
+const SEPARATOR = '¬¬¬' // very uncommon string
 
 export default class Survey extends Component {
   constructor (props) {
@@ -34,7 +34,7 @@ export default class Survey extends Component {
       // use the initial submissions to extract the possible columns
       results.forEach(result => {
         Object.keys(flatten(result.payload, SEPARATOR))
-              .forEach(key => { allFlattenKeys.push(key) })
+          .forEach(key => { allFlattenKeys.push(key) })
       })
 
       this.state.allColumns = [ ...new Set(allFlattenKeys) ]
@@ -89,7 +89,7 @@ export default class Survey extends Component {
               <button
                 className={`tab ${pageSize !== 1 ? 'active' : ''}`}
                 onClick={() => { this.setState({ pageSize: TABLE_SIZE }) }}
-                >
+              >
                 <i className='fa fa-th-list mr-2' />
                 <FormattedMessage
                   id='survey.view.action.table'
@@ -100,7 +100,7 @@ export default class Survey extends Component {
               <button
                 className={`tab ${pageSize === 1 ? 'active' : ''}`}
                 onClick={() => { this.setState({ pageSize: 1 }) }}
-                >
+              >
                 <i className='fa fa-file mr-2' />
                 <FormattedMessage
                   id='survey.view.action.single'
@@ -159,7 +159,7 @@ export default class Survey extends Component {
           className='tab'
           href={getSubmissionsAPIPath(params)}
           download={`${survey.name}.csv`}
-          >
+        >
           <i className='fa fa-download mr-2' />
           <FormattedMessage
             id='survey.view.action.download'
@@ -177,7 +177,7 @@ export default class Survey extends Component {
           className='tab'
           id={dropdown}
           data-toggle='dropdown'
-          >
+        >
           <i className='fa fa-download mr-2' />
           <FormattedMessage
             id='survey.view.action.download'
@@ -187,7 +187,7 @@ export default class Survey extends Component {
         <div
           className='dropdown-menu'
           aria-labelledby={dropdown}
-          >
+        >
           <div className='dropdown-list'>
             {
               pages.map(page => (

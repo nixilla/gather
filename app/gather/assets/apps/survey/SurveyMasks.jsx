@@ -115,7 +115,7 @@ export class SurveyMasks extends Component {
           <button
             className={`btn badge ${currentMask.id !== -1 ? 'active' : ''} ${this.state.showColumns ? 'open' : ''} ${currentMask.id > 0 ? 'custom' : ''}`}
             onClick={() => { this.setState({ showColumns: !this.state.showColumns }) }}
-            >
+          >
             { currentMask.name }
             <i className='fa fa-angle-down ml-2' />
           </button>
@@ -140,7 +140,7 @@ export class SurveyMasks extends Component {
         <button
           className='close-filters'
           onClick={() => { this.setState({ showColumns: false }) }}
-          >
+        >
           <i className='fa fa-angle-up' />
         </button>
       </div>
@@ -286,8 +286,7 @@ export class SurveyMasks extends Component {
             this.setState({
               message: {
                 title: errorTitle,
-                body: (
-                  errors.non_field_errors
+                body: (errors.non_field_errors
                   ? <FormattedMessage
                     id='survey.mask.preset.save.error.duplicated'
                     defaultMessage='This mask name is already in use' />

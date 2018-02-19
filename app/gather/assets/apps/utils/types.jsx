@@ -105,8 +105,8 @@ export const getType = (value) => {
  * @param {string} key
  */
 export const cleanPropertyName = (key) => key
-  .replace(/_/g, ' ')                // convert `my_name_is` into `my name is`
-  .replace(/([A-Z]+)/g, ' $1')       // convert `myNameIs` into `my Name Is`
+  .replace(/_/g, ' ') //             convert `my_name_is` into `my name is`
+  .replace(/([A-Z]+)/g, ' $1') //    convert `myNameIs` into `my Name Is`
   .replace(/([A-Z][a-z])/g, ' $1')
 
 /**
@@ -137,10 +137,9 @@ export const flatten = (object, separator = '.') => {
     {},
     ...Object.keys(child).map(key => (
       isValidObject(child[key])
-      ? walker(child[key], path.concat([key]))
-      : { [path.concat([key]).join(separator)]: child[key] }
-      )
-    )
+        ? walker(child[key], path.concat([key]))
+        : { [path.concat([key]).join(separator)]: child[key] }
+    ))
   )
 
   return Object.assign({}, walker(object))
