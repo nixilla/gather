@@ -167,15 +167,15 @@ module.exports = function (custom) {
         filename: './assets/bundles/webpack-stats.json'
       }),
 
-      new webpack.EnvironmentPlugin([
-        'AETHER_MODULES',
-        'CSV_HEADER_RULES',
-        'CSV_HEADER_RULES_SEP'
-      ]),
       new webpack.DefinePlugin({
         'process.env': {
-          'NODE_ENV': JSON.stringify(custom.production ? 'production' : 'development')
+          NODE_ENV: JSON.stringify(custom.production ? 'production' : 'development')
         }
+      }),
+      new webpack.EnvironmentPlugin({
+        AETHER_MODULES: 'kernel',
+        CSV_HEADER_RULES: '',
+        CSV_HEADER_RULES_SEP: ':'
       })
     ].concat(custom.plugins),
 
