@@ -41,6 +41,11 @@ spec:
             secretKeyRef:
               name: dev-goa-secrets
               key: kernel_token 
+        - name: AETHER_ODK_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: dev-goa-secrets
+              key: odk_token
         - name: RDS_HOSTNAME
           valueFrom:
             secretKeyRef:
@@ -56,6 +61,11 @@ spec:
             secretKeyRef:
               name: dev-database 
               key: password
+        - name: ADMIN_PASSWORD 
+          valueFrom:
+            secretKeyRef:
+              name: dev-goa-secrets
+              key: odk_admin_password 
         volumeMounts:
         - mountPath: /var/www/static
           name: static-assets-volume

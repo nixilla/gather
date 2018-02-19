@@ -34,6 +34,11 @@ spec:
           value: "5432"
         - name: WEB_SERVER_PORT
           value: "8001"
+        - name: ADMIN_PASSWORD 
+          valueFrom:
+            secretKeyRef:
+              name: dev-goa-secrets
+              key: kernel_admin_password 
         - name: AETHER_KERNEL_TOKEN
           valueFrom:
             secretKeyRef:

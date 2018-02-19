@@ -160,6 +160,7 @@ case "$1" in
     start )
         setup_db
         setup_prod
+        setup_initial_data
 
         # remove previous files
         rm -r -f /code/gather/assets/bundles/*

@@ -35,6 +35,13 @@ spec:
           value: "8000"
         - name: AETHER_KERNEL_URL
           value: "https://kernel-dev-goa.gather2.org"
+        - name: AETHER_MODULES
+          value: kernel,odk
+        - name: ADMIN_PASSWORD 
+          valueFrom:
+            secretKeyRef:
+              name: dev-goa-secrets
+              key: odk_admin_password 
         - name: AETHER_KERNEL_TOKEN
           valueFrom:
             secretKeyRef:
