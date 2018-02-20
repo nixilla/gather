@@ -2,8 +2,13 @@ import React, { Component } from 'react'
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl'
 
 import { clone, deepEqual } from '../utils'
-import { deleteData, postData, putData, patchData } from '../utils/request'
-import { getSurveysAPIPath, getSurveysPath } from '../utils/paths'
+import { deleteData, postData, putData } from '../utils/request'
+import {
+  getMediaFileAPIPath,
+  getSurveysAPIPath,
+  getSurveysPath,
+  getXFormsAPIPath
+} from '../utils/paths'
 import { ODK_ACTIVE } from '../utils/env'
 import { ODK_APP } from '../utils/constants'
 
@@ -40,6 +45,40 @@ const MESSAGES = defineMessages({
   submitError: {
     defaultMessage: 'An error occurred while saving the survey “{name}”',
     id: 'survey.form.action.submit.error'
+  },
+
+  saveKernelSurvey: {
+    defaultMessage: 'Saving survey “{name}”',
+    id: 'survey.form.action.save.kernel.survey'
+  },
+  saveODKSurvey: {
+    defaultMessage: 'Saving survey “{name}” in ODK',
+    id: 'survey.form.action.save.odk.survey'
+  },
+  saveODKXForm: {
+    defaultMessage: 'Saving xform “{name}” in ODK',
+    id: 'survey.form.action.save.odk.xform'
+  },
+  saveODKMediaFile: {
+    defaultMessage: 'Saving media file “{name}” in ODK',
+    id: 'survey.form.action.save.odk.media.file'
+  },
+
+  deleteKernelSurvey: {
+    defaultMessage: 'Deleting survey “{name}”',
+    id: 'survey.form.action.delete.kernel.survey'
+  },
+  deleteODKSurvey: {
+    defaultMessage: 'Deleting survey “{name}” in ODK',
+    id: 'survey.form.action.delete.odk.survey'
+  },
+  deleteODKXForm: {
+    defaultMessage: 'Deleting xform “{name}” in ODK',
+    id: 'survey.form.action.delete.odk.xform'
+  },
+  handleDone: {
+    defaultMessage: 'Done!',
+    id: 'survey.form.action.handle.done'
   }
 })
 
@@ -52,6 +91,7 @@ export class SurveyForm extends Component {
       definitionStringified: JSON.stringify(survey.definition || {}, 0, 2),
       errors: {},
       isUpdating: false,
+      actionsInProgress: [],
       project: this.props.project
     }
 
@@ -237,6 +277,7 @@ export class SurveyForm extends Component {
   }
 
   renderUpdating () {
+    const {actionsInProgress} = this.state
     return (
       <div className='modal show'>
         <div className='modal-dialog modal-md'>
@@ -250,6 +291,14 @@ export class SurveyForm extends Component {
               <FormattedMessage
                 id='survey.form.action.updating'
                 defaultMessage='Saving data in progress…' />
+              <div className='mt-2'>
+                <ul>
+                  {
+                    actionsInProgress.length > 0 &&
+                    actionsInProgress.map((msg, index) => <li key={index}>{msg}</li>)
+                  }
+                </ul>
+              </div>
             </div>
           </div>
         </div>
@@ -343,11 +392,24 @@ export class SurveyForm extends Component {
     const saveMethod = (survey.id ? putData : postData)
     const url = getSurveysAPIPath({id: survey.id})
 
-    this.setState({ isUpdating: true })
+    this.setState({
+      isUpdating: true,
+      actionsInProgress: [
+        formatMessage(MESSAGES.saveKernelSurvey, {name: survey.name})
+      ]
+    })
     return saveMethod(url, survey, multipart)
       .then(response => {
         if (ODK_ACTIVE) {
-          this.setState({ id: response.id }) // update state with new id
+          this.setState({
+            id: response.id, // update state with new id
+            actionsInProgress: [
+              ...this.state.actionsInProgress,
+              formatMessage(MESSAGES.handleDone),
+              formatMessage(MESSAGES.saveODKSurvey, {name: survey.name})
+            ]
+          })
+
           return this.onSubmitODK(response)
         } else {
           this.backToView(response)
@@ -357,14 +419,27 @@ export class SurveyForm extends Component {
   }
 
   onDelete () {
+    const {formatMessage} = this.props.intl
     const {survey} = this.props
     const handleError = (error) => { this.handleError(error, 'delete') }
 
-    this.setState({ isUpdating: true })
+    this.setState({
+      isUpdating: true,
+      actionsInProgress: [
+        formatMessage(MESSAGES.deleteKernelSurvey, {name: survey.name})
+      ]
+    })
+
     return deleteData(getSurveysAPIPath({id: survey.id}))
       .then(() => {
         if (ODK_ACTIVE) {
           // remove it also in ODK
+          this.setState({ actionsInProgress: [
+            ...this.state.actionsInProgress,
+            formatMessage(MESSAGES.handleDone),
+            formatMessage(MESSAGES.deleteODKSurvey, {name: survey.name})
+          ] })
+
           return this.onDeleteODK()
         } else {
           this.backToList()
@@ -392,75 +467,77 @@ export class SurveyForm extends Component {
   }
 
   onSubmitODKXForms (odkSurvey) {
+    const {formatMessage} = this.props.intl
     this.setState({ odk: { ...this.state.odk, id: odkSurvey.mapping_id } }) // update state with new id
-    const patchUrl = getSurveysAPIPath({app: ODK_APP, id: odkSurvey.mapping_id})
 
-    // update ALL the existing xForms and create the new ones without FILE.
-    const xforms = this.state.odk.xforms || []
+    // creates/updates/deletes the xforms+media files sequentially
+    const actions = [] // list of actions to execute
 
-    const xFormsWithoutFiles = xforms
-      .filter(xform => (!xform.file || xform.id))
-      .map(xform => ({
-        ...xform,
-        // remove new media files (does not have `id`)
-        media_files: (xform.media_files || [])
-          .filter(mediaFile => mediaFile.id)
-          .map(mediaFile => mediaFile.id),
-        // remove possible new file
-        file: undefined
-      }))
+    const currentXForms = this.state.odk.xforms || []
+    // handle current xforms
+    currentXForms.forEach(xform => {
+      const mediaFiles = xform.media_files || []
 
-    // update ALL the xForms or Media Files (existing and new ones) with FILE.
-    // expected format:
-    // {
-    //    files: number of files (n+1)
-    //    id_0: xform id (update) or 0 (new)
-    //    file_0: linked file
-    //    type_0: xform|media
-    //    ...
-    //    id_n: xform id (update) or 0 (new)
-    //    file_n: linked file
-    //    type_n: xform|media
-    // }
-    const filesPayload = {
-      files: 0
-    }
-    xforms.forEach(xform => {
-      // include xform file
-      if (xform.file) {
-        const index = filesPayload.files
-        filesPayload[`id_${index}`] = xform.id || 0
-        filesPayload[`file_${index}`] = xform.file
-        filesPayload[`type_${index}`] = 'xform'
-        filesPayload.files = index + 1
-      }
-
-      // include media files
-      (xform.media_files || [])
-        .filter(mediaFile => mediaFile.file)
-        .forEach(mediaFile => {
-          const jndex = filesPayload.files
-          filesPayload[`id_${jndex}`] = xform.id
-          filesPayload[`file_${jndex}`] = mediaFile.file
-          filesPayload[`type_${jndex}`] = 'media'
-          filesPayload.files = jndex + 1
-        })
-    })
-    console.log(xFormsWithoutFiles)
-    // save xForms without files info
-    return patchData(patchUrl, { xforms: xFormsWithoutFiles })
-      .then(() => {
-        console.log(filesPayload)
-        if (filesPayload.files === 0) {
-          // nothing more to do, skip last call
-          this.backToView(odkSurvey)
-          return
-        }
-        // save xForms/Media files with files
-        return patchData(patchUrl, filesPayload, true)
-          .then(() => this.backToView(odkSurvey))
-          .catch(this.handleODKError.bind(this))
+      actions.push({
+        message: formatMessage(MESSAGES.saveODKXForm, {name: xform.title}),
+        method: xform.id ? putData : postData,
+        url: getXFormsAPIPath({ id: xform.id }),
+        data: {
+          ...xform,
+          xml_file: xform.file,
+          media_files: mediaFiles.map(mf => mf.id).filter(mf => mf),
+          mapping: odkSurvey.mapping_id
+        },
+        multipart: !!xform.file
       })
+
+      if (xform.id && mediaFiles.length > 0) {
+        mediaFiles
+          .filter(mf => mf.file)
+          .forEach(mf => {
+            actions.push({
+              message: formatMessage(MESSAGES.saveODKMediaFile, {name: mf.name}),
+              method: postData,
+              url: getMediaFileAPIPath({}),
+              data: {
+                name: mf.name,
+                media_file: mf.file,
+                xform: xform.id
+              },
+              multipart: true
+            })
+          })
+      }
+    })
+
+    // get the list of deleted xforms (they are not in the current list)
+    const formerXForms = this.props.odkSurvey.xforms || []
+    const deletedXforms = formerXForms.filter(former => !currentXForms.find(current => current.id === former.id))
+
+    // delete them
+    deletedXforms.forEach(xform => {
+      actions.push({
+        message: formatMessage(MESSAGES.deleteODKXForm, {name: xform.title}),
+        method: deleteData,
+        url: getXFormsAPIPath({ id: xform.id })
+      })
+    })
+
+    if (actions.length === 0) {
+      this.backToView(odkSurvey)
+      return
+    }
+
+    return Promise.all(actions.map(action => {
+      this.setState({ actionsInProgress: [
+        ...this.state.actionsInProgress,
+        formatMessage(MESSAGES.handleDone),
+        action.message
+      ] })
+
+      return action.method(action.url, action.data, action.multipart)
+    }))
+      .then(() => { this.backToView(odkSurvey) })
       .catch(this.handleODKError.bind(this))
   }
 
@@ -483,7 +560,17 @@ export class SurveyForm extends Component {
     const {formatMessage} = this.props.intl
 
     console.log(error.message)
-    this.setState({ isUpdating: false })
+    this.setState({ isUpdating: false, actionsInProgress: [] })
+
+    if (!error.message) {
+      console.log(error)
+      if (nestedProperty) {
+        this.setState({ errors: { [nestedProperty]: error } })
+      } else {
+        this.setState({ errors: error })
+      }
+      return
+    }
 
     return error.response
       .then(errors => {

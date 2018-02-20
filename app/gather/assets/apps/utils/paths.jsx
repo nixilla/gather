@@ -52,6 +52,16 @@ export const getXFormsAPIPath = ({id, ...params}) => {
 }
 
 /**
+ * Returns the API url to get the Media Files data
+ *
+ * @param {number}  id          - Media file id *
+ * @param {object}  params      - query string parameters
+ */
+export const getMediaFileAPIPath = ({id, ...params}) => {
+  return buildAPIPath(ODK_APP, 'media-files', id, params)
+}
+
+/**
  * Returns the API url to get the Submissions data by Survey
  *
  * @param {number}  id          - Submission id
