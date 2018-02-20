@@ -1,7 +1,12 @@
 import React, { Component } from 'react'
 
 import { FetchUrlsContainer, PaginationContainer } from '../components'
-import { getSubmissionsAPIPath, getSurveyorsAPIPath, getSurveysAPIPath, getProjectAPIPath } from '../utils/paths'
+import {
+  getProjectAPIPath,
+  getSubmissionsAPIPath,
+  getSurveyorsAPIPath,
+  getSurveysAPIPath
+} from '../utils/paths'
 import { ODK_ACTIVE } from '../utils/env'
 import { ODK_APP } from '../utils/constants'
 
@@ -15,32 +20,40 @@ export default class SurveyDispatcher extends Component {
 
     switch (action) {
       case 'add':
+        const addUrls = [
+          {
+            name: 'project',
+            url: getProjectAPIPath()
+          }
+        ]
+
         if (ODK_ACTIVE) {
-          const addUrls = [
+          const odkAddUrls = [
             {
               name: 'surveyors',
               url: getSurveyorsAPIPath({ page: 1, pageSize: 1000 })
-            },
-            {
-              name: 'project',
-              url: getProjectAPIPath()
             }
           ]
-          return <FetchUrlsContainer urls={addUrls} targetComponent={SurveyForm} />
+          // add odk urls to edit ones
+          odkAddUrls.forEach(url => addUrls.push(url))
         }
 
-        return <SurveyForm survey={{}} />
+        return <FetchUrlsContainer urls={addUrls} targetComponent={SurveyForm} />
 
       case 'edit':
         const editUrls = [
           {
             name: 'survey',
             url: getSurveysAPIPath({id: surveyId})
+          },
+          {
+            name: 'project',
+            url: getProjectAPIPath()
           }
         ]
 
         if (ODK_ACTIVE) {
-          const odkUrls = [
+          const odkEditUrls = [
             {
               name: 'odkSurvey',
               url: getSurveysAPIPath({ app: ODK_APP, id: surveyId }),
@@ -52,15 +65,11 @@ export default class SurveyDispatcher extends Component {
             {
               name: 'surveyors',
               url: getSurveyorsAPIPath({ page: 1, pageSize: 1000 })
-            },
-            {
-              name: 'project',
-              url: getProjectAPIPath()
             }
           ]
 
           // add odk urls to edit ones
-          odkUrls.forEach(url => editUrls.push(url))
+          odkEditUrls.forEach(url => editUrls.push(url))
         }
 
         return <FetchUrlsContainer urls={editUrls} targetComponent={SurveyForm} />
@@ -75,10 +84,6 @@ export default class SurveyDispatcher extends Component {
             // take the first 10 submissions to extract the table columns
             name: 'submissions',
             url: getSubmissionsAPIPath({mapping: surveyId, pageSize: 10})
-          },
-          {
-            name: 'project',
-            url: getProjectAPIPath()
           }
         ]
 
