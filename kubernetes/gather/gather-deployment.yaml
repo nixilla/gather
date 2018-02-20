@@ -27,6 +27,8 @@ spec:
           value: https://ums-dev.ehealthafrica.org
         - name: CSRF_COOKIE_DOMAIN
           value: .gather2.org
+        - name: CSRF_TRUSTED_ORIGINS
+          value: .gather2.org
         - name: RDS_DB_NAME
           value: gather
         - name: RDS_PORT
