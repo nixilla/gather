@@ -511,7 +511,7 @@ export class SurveyForm extends Component {
     })
 
     // get the list of deleted xforms (they are not in the current list)
-    const formerXForms = this.props.odkSurvey.xforms || []
+    const formerXForms = (this.props.odkSurvey && this.props.odkSurvey.xforms) || []
     const deletedXforms = formerXForms.filter(former => !currentXForms.find(current => current.id === former.id))
 
     // delete them
