@@ -1,9 +1,17 @@
 import requests
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
 from gather.api.models import Project
+
+AETHER_PROJECT_DATA = {
+    'revision': '1',
+    'name': 'Gather',
+    'salad_schema': '[]',
+    'jsonld_context': '[]',
+    'rdf_definition': '[]',
+}
 
 
 class Command(BaseCommand):
@@ -44,17 +52,10 @@ class Command(BaseCommand):
         )
 
     def post_aether_project(self):
-        project_data = {
-            'revision': '1',
-            'name': 'demo',
-            'salad_schema': '[]',
-            'jsonld_context': '[]',
-            'rdf_definition': '[]',
-        }
         return requests.post(
             url=self.projects_url,
             headers=self.request_headers,
-            data=project_data
+            data=AETHER_PROJECT_DATA,
         )
 
     def create_aether_project(self):
@@ -73,11 +74,6 @@ class Command(BaseCommand):
         self.stdout.write(msg.format(project_id))
 
     def check_matching_aether_project(self, gather_project_id):
-        msg = (
-            'Found an existing gather project, checking '
-            'if a matching Aether project already exists'
-        )
-        self.stdout.write(msg)
         response = Command.get_aether_project(
             self,
             project_id=gather_project_id,
@@ -91,8 +87,7 @@ class Command(BaseCommand):
                 'Could not find an existing Aether project matching '
                 'gather project id "{}"'
             )
-            self.stdout.write(msg.format(gather_project_id))
-            response.raise_for_status()
+            raise CommandError(msg.format(gather_project_id))
 
     def handle(self, *args, **options):
         gather_project = Project.objects.first()

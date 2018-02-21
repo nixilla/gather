@@ -15,7 +15,7 @@ spec:
         app: kernel
     spec:
       containers:
-      - name: kernel  
+      - name: kernel
         image: ehealthafrica/aether-kernel
         args:
         - start
@@ -34,30 +34,30 @@ spec:
           value: "5432"
         - name: WEB_SERVER_PORT
           value: "8001"
-        - name: ADMIN_PASSWORD 
+        - name: ADMIN_PASSWORD
           valueFrom:
             secretKeyRef:
               name: dev-goa-secrets
-              key: kernel_admin_password 
+              key: kernel_admin_password
         - name: AETHER_KERNEL_TOKEN
           valueFrom:
             secretKeyRef:
               name: dev-goa-secrets
-              key: kernel_token 
+              key: kernel_token
         - name: RDS_HOSTNAME
           valueFrom:
             secretKeyRef:
-              name: dev-database 
-              key: host 
-        - name: RDS_USERNAME 
+              name: dev-database
+              key: host
+        - name: RDS_USERNAME
           valueFrom:
             secretKeyRef:
-              name: dev-database 
-              key: user 
-        - name: RDS_PASSWORD 
+              name: dev-database
+              key: user
+        - name: RDS_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: dev-database 
+              name: dev-database
               key: password
         volumeMounts:
         - mountPath: /var/www/static
@@ -65,20 +65,20 @@ spec:
         stdin: true
         tty: true
       - name: nginx
-        image: nginx:alpine
+        image: nginx:stable-alpine
         ports:
         - containerPort: 80
         volumeMounts:
         - mountPath: /var/www/static
-          name: static-assets-volume    
-        - name: kernel-nginx-config 
+          name: static-assets-volume
+        - name: kernel-nginx-config
           mountPath: /etc/nginx/conf.d
       imagePullSecrets:
         - name: regsecret
       volumes:
         - name: static-assets-volume
           emptyDir: {}
-        - name: kernel-nginx-config 
+        - name: kernel-nginx-config
           configMap:
             name: kernel-nginx-config
       restartPolicy: Always

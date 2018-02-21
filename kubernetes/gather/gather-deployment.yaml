@@ -16,8 +16,8 @@ spec:
         app: gather
     spec:
       containers:
-      - name: gather  
-        image: 387526361725.dkr.ecr.eu-west-1.amazonaws.com/gather-on-aether-dev:latest 
+      - name: gather
+        image: 387526361725.dkr.ecr.eu-west-1.amazonaws.com/gather-on-aether-dev:latest
         args:
         - start
         ports:
@@ -39,29 +39,29 @@ spec:
           value: "https://kernel-dev-goa.gather2.org"
         - name: AETHER_MODULES
           value: kernel,odk
-        - name: ADMIN_PASSWORD 
+        - name: ADMIN_PASSWORD
           valueFrom:
             secretKeyRef:
               name: dev-goa-secrets
-              key: odk_admin_password 
+              key: odk_admin_password
         - name: AETHER_KERNEL_TOKEN
           valueFrom:
             secretKeyRef:
               name: dev-goa-secrets
-              key: kernel_token 
+              key: kernel_token
         - name: AETHER_ODK_TOKEN
           valueFrom:
             secretKeyRef:
               name: dev-goa-secrets
-              key: odk_token 
+              key: odk_token
         - name: AETHER_ODK_URL
           value: "https://odk-dev-goa.gather2.org"
-        - name: RDS_USERNAME 
+        - name: RDS_USERNAME
           valueFrom:
             secretKeyRef:
-              name: dev-database 
-              key: user 
-        - name: RDS_PASSWORD 
+              name: dev-database
+              key: user
+        - name: RDS_PASSWORD
           valueFrom:
             secretKeyRef:
               name: dev-database
@@ -69,28 +69,28 @@ spec:
         - name: RDS_HOSTNAME
           valueFrom:
             secretKeyRef:
-              name: dev-database 
-              key: host 
+              name: dev-database
+              key: host
         volumeMounts:
         - mountPath: /var/www/static
           name: static-assets-volume
         stdin: true
         tty: true
       - name: nginx
-        image: nginx:alpine
+        image: nginx:stable-alpine
         ports:
         - containerPort: 80
         volumeMounts:
         - mountPath: /var/www/static
-          name: static-assets-volume    
-        - name: gather-nginx-config 
+          name: static-assets-volume
+        - name: gather-nginx-config
           mountPath: /etc/nginx/conf.d
       imagePullSecrets:
         - name: regsecret
       volumes:
         - name: static-assets-volume
           emptyDir: {}
-        - name: gather-nginx-config 
+        - name: gather-nginx-config
           configMap:
             name: gather-nginx-config
       restartPolicy: Always

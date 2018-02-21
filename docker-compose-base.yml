@@ -14,7 +14,7 @@ services:
   # ---------------------------------
 
   nginx-base:
-    image: nginx:alpine
+    image: nginx:stable-alpine
     volumes:
       # config file
       - ./scripts/conf/nginx.conf.local:/etc/nginx/conf.d/default.conf
