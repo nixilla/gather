@@ -398,7 +398,7 @@ export class SurveyForm extends Component {
         formatMessage(MESSAGES.saveKernelSurvey, {name: survey.name})
       ]
     })
-    return saveMethod(url, survey, multipart)
+    return saveMethod(url, survey, {multipart})
       .then(response => {
         if (ODK_ACTIVE) {
           this.setState({
@@ -488,7 +488,7 @@ export class SurveyForm extends Component {
           media_files: mediaFiles.map(mf => mf.id).filter(mf => mf),
           mapping: odkSurvey.mapping_id
         },
-        multipart: !!xform.file
+        options: { multipart: !!xform.file }
       })
 
       if (xform.id && mediaFiles.length > 0) {
@@ -504,7 +504,7 @@ export class SurveyForm extends Component {
                 media_file: mf.file,
                 xform: xform.id
               },
-              multipart: true
+              options: { multipart: true }
             })
           })
       }
@@ -535,7 +535,7 @@ export class SurveyForm extends Component {
         action.message
       ] })
 
-      return action.method(action.url, action.data, action.multipart)
+      return action.method(action.url, action.data, action.options)
     }))
       .then(() => { this.backToView(odkSurvey) })
       .catch(this.handleODKError.bind(this))

@@ -1,7 +1,17 @@
 import 'whatwg-fetch'
 import jQuery from 'jquery'
 
-export const request = (method, url, data = null, multipart = false) => {
+const request = (
+  method = 'GET', //          GET, POST, PUT, PATCH, DELETE
+  url, //                     server url
+  // rest of options
+  {
+    payload = null, //        in case of POST, PUT, PATCH the payload
+    multipart = false, //     in case of POST, PUT, PATCH indicates if send as FormData
+    download = false, //      indicates if downloas the response as a file
+    fileName = 'download' //  in case of "download" the file name
+  }
+) => {
   const inspectResponse = (response) => {
     // According to fetch docs: https://github.github.io/fetch/
     // Note that the promise won't be rejected in case of HTTP 4xx or 5xx server responses.
@@ -11,10 +21,27 @@ export const request = (method, url, data = null, multipart = false) => {
 
     if (response.ok) {
       // `DELETE` method returns a 204 status code without response content
-      if (response.status !== 204) {
-        return response.json()
-      } else {
+      if (response.status === 204) {
         return {} // NO-CONTENT response
+      } else {
+        // file to download
+        if (download) {
+          return response
+            .blob()
+            .then(content => {
+              // triggers a file download by creating
+              // a link object and simulating a click event.
+              const a = document.createElement('a')
+              document.body.appendChild(a)
+              a.style = 'display: none'
+              a.download = fileName
+              a.href = window.URL.createObjectURL(content)
+              a.click()
+              window.URL.revokeObjectURL(url)
+            })
+        }
+
+        return response.json()
       }
     } else {
       const error = new Error(response.statusText)
@@ -38,13 +65,13 @@ export const request = (method, url, data = null, multipart = false) => {
     }
   }
 
-  if (data) {
+  if (payload) {
     if (multipart) {
       /* global FormData */
       const formData = new FormData()
       formData.append('csrfmiddlewaretoken', csrfToken)
-      Object.keys(data).forEach(key => {
-        const value = data[key]
+      Object.keys(payload).forEach(key => {
+        const value = payload[key]
         if (value !== null && value !== undefined) {
           if (Array.isArray(value)) {
             value.forEach(val => {
@@ -72,18 +99,47 @@ export const request = (method, url, data = null, multipart = false) => {
       }
     } else {
       options.headers['Content-Type'] = 'application/json'
-      options.body = JSON.stringify(data)
+      options.body = JSON.stringify(payload)
     }
   }
 
   return window.fetch(url, options).then(inspectResponse)
 }
 
-export const deleteData = (url) => request('DELETE', url)
-export const getData = (url) => request('GET', url)
-export const postData = (url, data, multipart = false) => request('POST', url, data, multipart)
-export const putData = (url, data, multipart = false) => request('PUT', url, data, multipart)
-export const patchData = (url, data, multipart = false) => request('PATCH', url, data, multipart)
+/**
+ * Request DELETE from an url.
+ */
+export const deleteData = (url, opts = {}) => (
+  request('DELETE', url, opts)
+)
+
+/**
+ * Request GET from an url.
+ */
+export const getData = (url, opts = {}) => (
+  request('GET', url, opts)
+)
+
+/**
+ * Request POST from an url.
+ */
+export const postData = (url, payload, opts = {}) => (
+  request('POST', url, {...opts, payload})
+)
+
+/**
+ * Request PUT from an url.
+ */
+export const putData = (url, payload, opts = {}) => (
+  request('PUT', url, {...opts, payload})
+)
+
+/**
+ * Request PATCH from an url.
+ */
+export const patchData = (url, payload, opts = {}) => (
+  request('PATCH', url, {...opts, payload})
+)
 
 /**
  * Request GET from an url, if fails then POST a default object and tries again.
@@ -93,13 +149,13 @@ export const patchData = (url, data, multipart = false) => request('PATCH', url,
  * independency it could not always be true. This tries to skip that issue.
  *
  * @param {string} url         - GET url
- * @param {string} forceUrl    - POST url used to create the object below
- * @param {object} defaultData - the default object
+ * @param {string} postUrl     - POST url used to create the object below
+ * @param {object} postPayload - the default object
  */
-export const forceGetData = (url, forceUrl, defaultData) => (
+export const forceGetData = (url, postUrl, postPayload) => (
   getData(url)
     // in case of error, try to create it and get again
-    .catch(() => postData(forceUrl, defaultData).then(() => getData(url)))
+    .catch(() => postData(postUrl, postPayload).then(() => getData(url)))
 )
 
 /*
@@ -128,5 +184,3 @@ export const fetchUrls = (urls) => Promise
   .then(responses => responses.reduce((payload, response, index) => {
     return {...payload, [urls[index].name]: response}
   }, {}))
-
-export default request

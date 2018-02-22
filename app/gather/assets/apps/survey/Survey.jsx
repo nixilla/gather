@@ -6,6 +6,7 @@ import { range } from '../utils'
 import { MAX_PAGE_SIZE, GATHER_APP } from '../utils/constants'
 import { CSV_HEADER_RULES, CSV_HEADER_RULES_SEP } from '../utils/env'
 import { getSurveysPath, getSurveysAPIPath, getSubmissionsAPIPath } from '../utils/paths'
+import { postData } from '../utils/request'
 import { flatten } from '../utils/types'
 
 import SurveyDetail from './SurveyDetail'
@@ -138,38 +139,50 @@ export default class Survey extends Component {
     const params = {
       mapping: survey.id,
       fields: 'created,payload',
-      // remove "payload.None." prefix from headers labels
-      // from "payload.None.a.b.c" to "a.b.c"
-      parseColumns: `remove-prefix${sep}payload.,remove-prefix${sep}None.,${CSV_HEADER_RULES}`,
-      ruleSep: sep,
+      // using different format than `json` will build the "post as get" API path
       format: 'csv',
       pageSize
+    }
+    const payload = {
+      // remove "payload.None." prefix from headers labels
+      // from "payload.None.a.b.c" to "a.b.c"
+      parse_columns: `remove-prefix${sep}payload.,remove-prefix${sep}None.,${CSV_HEADER_RULES}`,
+      rule_sep: sep
     }
 
     // restrict the columns to export with the selected columns
     if (selectedColumns.length !== allColumns.length) {
-      params.columns = 'created,' + selectedColumns
+      payload.columns = 'created,' + selectedColumns
         .map(key => 'payload.' + key.replace(new RegExp(SEPARATOR, 'g'), '.'))
         .join(',')
     }
 
+    const download = (options, fileName) => {
+      postData(getSubmissionsAPIPath(options), payload, {download: true, fileName})
+        .catch(err => { console.log(err) })
+    }
+
     if (total < pageSize) {
       return (
-        <a
+        <button
           className='tab'
-          href={getSubmissionsAPIPath(params)}
-          download={`${survey.name}.csv`}
+          onClick={() => { download(params, `${survey.name}.csv`) }}
         >
           <i className='fa fa-download mr-2' />
           <FormattedMessage
             id='survey.view.action.download'
             defaultMessage='Download' />
-        </a>
+        </button>
       )
     }
 
-    const pages = range(1, Math.ceil(total / pageSize) + 1)
     const dropdown = 'downloadLinkChoices'
+    const pages = range(1, Math.ceil(total / pageSize) + 1)
+      .map(index => ({
+        key: index,
+        options: { ...params, page: index },
+        fileName: `${survey.name}-${index}.csv`
+      }))
 
     return (
       <div className='dropdown'>
@@ -191,13 +204,13 @@ export default class Survey extends Component {
           <div className='dropdown-list'>
             {
               pages.map(page => (
-                <a
-                  key={page}
+                <button
+                  key={page.key}
                   className='dropdown-item'
-                  href={getSubmissionsAPIPath({...params, page})}
-                  download={`${survey.name}-${page}.csv`}>
-                  {`${survey.name}-${page}.csv`}
-                </a>
+                  onClick={() => { download(page.options, page.fileName) }}
+                >
+                  { page.fileName }
+                </button>
               ))
             }
           </div>

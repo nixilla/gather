@@ -84,38 +84,52 @@ export const getMasksAPIPath = ({id, ...params}) => {
 /**
  * Return the REST API url
  *
+ * If format is "json"
+ *
  * With    {id} -> {app}/{type}/{id}.json?{queryString}
  * Without {id} -> {app}/{type}.json?{queryString}
+ *
+ * If format is not "json" (special case that allows to use POST to fetch data)
+ *
+ * With    {id} -> {app}/{type}/{id}/details.{format}?{queryString}
+ * Without {id} -> {app}/{type}/fetch.{format}?{queryString}
  *
  * @param {string}  app         - app source: `kernel`, `odk` or `gather`
  * @param {string}  type        - item type
  * @param {number}  id          - item id
+ * @param {string}  format      - response format
  * @param {object}  params      - query string parameters
  */
-const buildAPIPath = (app, type, id, params = {}) => {
-  const suffix = id ? '/' + id : ''
-  const format = params.format || 'json'
-  const queryString = id ? '' : '?' + buildQueryString(params)
-  return `${API_PREFIX}/${app}/${type}${suffix}.${format}${queryString}`
+const buildAPIPath = (app, type, id, {format = 'json', ...params}) => {
+  const suffix = (
+    (id ? '/' + id : '') +
+    // suffix with the "post as get" friendly option
+    (format !== 'json' ? '/' + (id ? 'details' : 'fetch') : '')
+  )
+  const queryString = id ? '' : buildQueryString(params)
+  return `${API_PREFIX}/${app}/${type}${suffix}.${format}?${queryString}`
 }
 
 /**
  * Builds the query string based on arguments
  */
-export const buildQueryString = (params = {}) => Object.keys(params)
-  .filter(key => (
-    params[key] !== undefined &&
-    params[key] !== null &&
-    params[key].toString().trim() !== ''
-  ))
-  .map(key => ([
-    // transforms `key` from camelCase (js convention) into snake_case (python convention)
-    key.replace(/(.)([A-Z]+)/g, '$1_$2').toLowerCase(),
-    // encodes `value` to use it in URL addresses
-    encodeURIComponent(params[key])
-  ]))
-  .map(([key, value]) => `${key}=${value}`)
-  .join('&')
+export const buildQueryString = (params = {}) => (
+  Object
+    .keys(params)
+    .filter(key => (
+      params[key] !== undefined &&
+      params[key] !== null &&
+      params[key].toString().trim() !== ''
+    ))
+    .map(key => ([
+      // transforms `key` from camelCase (js convention) into snake_case (python convention)
+      key.replace(/(.)([A-Z]+)/g, '$1_$2').toLowerCase(),
+      // encodes `value` to use it in URL addresses
+      encodeURIComponent(params[key])
+    ]))
+    .map(([key, value]) => `${key}=${value}`)
+    .join('&')
+)
 
 /**
  * Returns the path to go to any Surveys page

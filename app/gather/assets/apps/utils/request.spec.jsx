@@ -2,7 +2,16 @@
 
 import assert from 'assert'
 import nock from 'nock'
-import {request, fetchUrls, forceGetData} from './request'
+
+import {
+  deleteData,
+  fetchUrls,
+  forceGetData,
+  getData,
+  patchData,
+  postData,
+  putData
+} from './request'
 
 describe('request utils', () => {
   describe('request', () => {
@@ -11,7 +20,7 @@ describe('request utils', () => {
         .get('/foo')
         .reply(200, {ok: true})
 
-      return request('get', 'http://localhost/foo')
+      return getData('http://localhost/foo')
         .then((body) => {
           assert(body.ok, 'GET request should return true')
         })
@@ -25,7 +34,7 @@ describe('request utils', () => {
         .post('/foo', {foo: 'bar'})
         .reply(200, {ok: true})
 
-      return request('post', 'http://localhost/foo', {foo: 'bar'})
+      return postData('http://localhost/foo', {foo: 'bar'})
         .then((body) => {
           assert(body.ok, 'POST request should return true')
         })
@@ -39,7 +48,7 @@ describe('request utils', () => {
         .put('/foo', {foo: 'bar'})
         .reply(200, {ok: true})
 
-      return request('put', 'http://localhost/foo', {foo: 'bar'})
+      return putData('http://localhost/foo', {foo: 'bar'})
         .then((body) => {
           assert(body.ok, 'PUT request should return true')
         })
@@ -57,7 +66,7 @@ describe('request utils', () => {
         .post('/foo')
         .reply(400, {ok: false, put: false})
 
-      return request('POST', 'http://localhost/foo', {foo: 'bar'}, true)
+      return postData('http://localhost/foo', {foo: 'bar'}, {multipart: true})
         .then((body) => {
           assert(body.ok, 'Fake PUT request should return true')
           assert(body.put)
@@ -72,7 +81,7 @@ describe('request utils', () => {
         .patch('/foo', {foo: 'bar'})
         .reply(200, {ok: true})
 
-      return request('patch', 'http://localhost/foo', {foo: 'bar'})
+      return patchData('http://localhost/foo', {foo: 'bar'})
         .then((body) => {
           assert(body.ok, 'PUT request should return true')
         })
@@ -86,7 +95,7 @@ describe('request utils', () => {
         .delete('/foo')
         .reply(200, {ok: true})
 
-      return request('delete', 'http://localhost/foo')
+      return deleteData('http://localhost/foo')
         .then((body) => {
           assert(body.ok, 'DELETE request should return true')
         })
@@ -100,7 +109,7 @@ describe('request utils', () => {
         .get('/foo')
         .reply(404, {ok: false, message: 'something went wrong'})
 
-      return request('get', 'http://localhost/foo')
+      return getData('http://localhost/foo')
         .then((body) => {
           assert(!body, 'Unexpected response')
         })
