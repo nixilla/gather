@@ -90,12 +90,7 @@ module.exports = function (custom) {
           exclude: /node_modules/,
           use: [
             { loader: 'react-hot-loader/webpack' },
-            {
-              loader: 'babel-loader',
-              options: {
-                presets: ['es2015', 'react', 'stage-2']
-              }
-            }
+            { loader: 'babel-loader' }
           ]
         },
         // font files

@@ -18,8 +18,8 @@
     "lint-js": "standard './gather/assets/apps/**/*.jsx'",
     "lint-scss": "sass-lint --config ./conf/extras/sass-lint.yml --verbose",
     "lint": "npm run lint-js && npm run lint-scss",
-    "mocha": "mocha --require ./gather/assets/tests/mocha.setup.js './gather/assets/apps/**/*.spec.jsx'",
-    "test": "npm run lint && npm run mocha",
+    "test-js": "jest",
+    "test": "npm run lint && npm run test-js",
     "webpack": "webpack --config ./gather/webpack.prod.js",
     "webpack-server": "node ./gather/webpack.server.js"
   },
@@ -27,19 +27,20 @@
   "dependencies": {},
   "devDependencies": {
     "babel-core": "~6.26.0",
+    "babel-jest": "~22.4.0",
     "babel-loader": "~7.1.0",
-    "babel-preset-es2015": "~6.24.0",
+    "babel-plugin-transform-object-rest-spread": "~6.26.0",
+    "babel-preset-env": "~1.6.0",
     "babel-preset-react": "~6.24.0",
-    "babel-preset-stage-2": "~6.24.0",
-    "bootstrap": "~4.0.0-beta.2",
+    "bootstrap": "~4.0.0",
     "css-loader": "~0.28.0",
     "extract-text-webpack-plugin": "~3.0.0",
     "file-loader": "~1.1.0",
     "font-awesome": "~4.7.0",
     "html5shiv": "~3.7.0",
+    "jest": "~22.4.0",
     "jquery": "~3.3.0",
     "jsdom": "~11.6.0",
-    "mocha": "~5.0.0",
     "moment": "~2.20.0",
     "nock": "~9.1.0",
     "node-fetch": "~2.0.0",
@@ -47,9 +48,11 @@
     "popper.js": "~1.12.0",
     "react": "~16.2.0",
     "react-dom": "~16.2.0",
+    "react-filtered-multiselect": "~0.5.0",
     "react-hot-loader": "~3.1.0",
     "react-intl": "~2.4.0",
-    "react-filtered-multiselect": "~0.5.0",
+    "react-test-renderer": "~16.2.0",
+    "regenerator-runtime": "~0.11.0",
     "sass-lint": "~1.12.0",
     "sass-loader": "~6.0.0",
     "standard": "~11.0.0",
@@ -59,5 +62,19 @@
     "webpack-bundle-tracker": "~0.2.0",
     "webpack-dev-server": "~2.11.0",
     "whatwg-fetch": "~2.0.0"
+  },
+
+  "babel": {
+    "presets": ["env", "react"],
+    "plugins": [
+      "babel-plugin-transform-object-rest-spread"
+    ]
+  },
+  "jest": {
+    "collectCoverage": true,
+    "coverageDirectory": "<rootDir>/bundles/.coverage",
+    "rootDir": "./gather/assets",
+    "setupFiles": ["<rootDir>/tests/jest.setup.jsx"],
+    "verbose": true
   }
 }

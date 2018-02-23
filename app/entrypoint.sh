@@ -88,7 +88,7 @@ test_coverage() {
 }
 
 test_js() {
-    npm run mocha
+    npm run test-js
 }
 
 
