@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: odk
-        image: ehealthafrica/aether-odk
+        image: ehealthafrica/aether-odk:0.5.1
         args:
         - start
         ports:

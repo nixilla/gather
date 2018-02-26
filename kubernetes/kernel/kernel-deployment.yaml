@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: kernel
-        image: ehealthafrica/aether-kernel
+        image: ehealthafrica/aether-kernel:0.5.1
         args:
         - start
         ports:
