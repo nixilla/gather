@@ -12,15 +12,10 @@ import {
 import { ODK_ACTIVE } from '../utils/env'
 import { ODK_APP } from '../utils/constants'
 
-import { ConfirmButton, ErrorAlert, HelpMessage } from '../components'
+import { ConfirmButton, ErrorAlert } from '../components'
 import SurveyODKForm from './SurveyODKForm'
 
 const MESSAGES = defineMessages({
-  definitionError: {
-    defaultMessage: 'This is not a valid JSON definition.',
-    id: 'survey.form.definition.error'
-  },
-
   cancelButton: {
     defaultMessage: 'Cancel',
     id: 'survey.form.action.cancel'
@@ -88,7 +83,6 @@ export class SurveyForm extends Component {
     const survey = clone(this.props.survey || {})
     this.state = {
       ...survey,
-      definitionStringified: JSON.stringify(survey.definition || {}, 0, 2),
       errors: {},
       isUpdating: false,
       actionsInProgress: [],
@@ -117,7 +111,6 @@ export class SurveyForm extends Component {
 
         <form onSubmit={this.onSubmit.bind(this)} encType='multipart/form-data'>
           { this.renderName() }
-          { this.renderDefinition() }
           {
             ODK_ACTIVE &&
             <SurveyODKForm
@@ -173,66 +166,6 @@ export class SurveyForm extends Component {
           onChange={this.onInputChange.bind(this)}
         />
         <ErrorAlert errors={errors.name} />
-      </div>
-    )
-  }
-
-  renderDefinition () {
-    const survey = this.state
-    const {errors} = survey
-
-    return (
-      <div>
-        <div className={`form-group ${errors.definition_file ? 'error' : ''}`}>
-          <label className='form-control-label title'>
-            <FormattedMessage
-              id='survey.form.definition'
-              defaultMessage='Definition (JSON format)' />
-          </label>
-          <HelpMessage>
-            <FormattedMessage
-              id='survey.form.definition.help'
-              defaultMessage='You can upload a file using the button below or type or paste the definition in the textarea.' />
-          </HelpMessage>
-          <div>
-            <label className='btn btn-secondary' htmlFor='definitionFile'>
-              <FormattedMessage
-                id='survey.form.definition.file'
-                defaultMessage='Upload definition file' />
-            </label>
-            <input
-              name='definitionFile'
-              id='definitionFile'
-              type='file'
-              className='hidden-file'
-              accept='.json'
-              onChange={this.onFileChange.bind(this)}
-            />
-            {
-              survey.definitionFile &&
-              <span className='form-item ml-4'>
-                <i className='fa fa-file mr-2' />
-                <span>{ survey.definitionFile.name }</span>
-                <button
-                  className='btn btn-sm icon-only btn-danger ml-2'
-                  onClick={this.removeFile.bind(this)}><i className='fa fa-close' /></button>
-              </span>
-            }
-            <ErrorAlert errors={errors.definition_file} />
-          </div>
-        </div>
-
-        <div className={`form-group ${errors.definition ? 'error' : ''}`}>
-          <textarea
-            name='definitionStringified'
-            className='form-control code'
-            disabled={survey.definitionFile !== undefined}
-            rows={10}
-            value={survey.definitionStringified}
-            onChange={this.onInputChange.bind(this)}
-          />
-          <ErrorAlert errors={errors.definition} />
-        </div>
       </div>
     )
   }
@@ -311,36 +244,14 @@ export class SurveyForm extends Component {
     this.setState({ [event.target.name]: event.target.value })
   }
 
-  onFileChange (event) {
-    event.preventDefault()
-    this.setState({ [event.target.name]: event.target.files.item(0) })
-  }
-
-  removeFile (event) {
-    event.preventDefault()
-    this.setState({ definitionFile: undefined })
-  }
-
   onCancelCondition () {
-    // check if there were changes
-    if (this.state.definitionFile !== undefined) {
-      return true
+    // Check if any changes have been made to the survey
+    const initialSurvey = clone(this.props.survey || { name: '' })
+    const survey = {
+      ...initialSurvey,
+      name: this.state.name
     }
-
-    const initialSurvey = clone(this.props.survey || { name: '', definition: {} })
-
-    try {
-      const survey = {
-        ...initialSurvey,
-        name: this.state.name,
-        definition: JSON.parse(this.state.definitionStringified)
-      }
-
-      return !deepEqual(initialSurvey, survey, true)
-    } catch (e) {
-      // let's suppose that the `definitionStringified` is wrong because it was modified
-      return true
-    }
+    return !deepEqual(initialSurvey, survey, true)
   }
 
   onCancel () {
@@ -359,34 +270,15 @@ export class SurveyForm extends Component {
 
     const {formatMessage} = this.props.intl
     const survey = {
+      definition: {},
       id: this.state.id,
       name: this.state.name,
       // FIXME: "revision" field refers to Aether mapping revisions.
       // This should be auto-incremented every time the Survey/Mapping
       // edited.
       // See: https://jira.ehealthafrica.org/browse/AET-124
-      revision: '1',
-      project: this.props.project.id
-    }
-
-    // check if the definition comes from a file or from the textarea
-    const {definitionFile, definitionStringified} = this.state
-    let multipart = false
-    if (definitionFile) {
-      multipart = true
-      survey.definition = '{}'
-      survey.definition_file = definitionFile
-    } else {
-      try {
-        survey.definition = JSON.parse(definitionStringified)
-      } catch (e) {
-        this.setState({
-          errors: {
-            definition: [formatMessage(MESSAGES.definitionError)]
-          }
-        })
-        return
-      }
+      project: this.props.project.id,
+      revision: '1'
     }
 
     const saveMethod = (survey.id ? putData : postData)
@@ -398,7 +290,7 @@ export class SurveyForm extends Component {
         formatMessage(MESSAGES.saveKernelSurvey, {name: survey.name})
       ]
     })
-    return saveMethod(url, survey, {multipart})
+    return saveMethod(url, survey)
       .then(response => {
         if (ODK_ACTIVE) {
           this.setState({

@@ -18,15 +18,6 @@ export default class SurveyDetail extends Component {
           <SurveyDates survey={survey} showDuration />
         </div>
 
-        <div className='survey-definition'>
-          <h5 className='title'>
-            <FormattedMessage
-              id='survey.detail.definition'
-              defaultMessage='Definition' />
-          </h5>
-          <pre>{JSON.stringify(survey.definition, 0, 2)}</pre>
-        </div>
-
         <div className='survey-records'>
           <span className='record-number mr-1'>
             <FormattedNumber value={survey.submission_count} />
