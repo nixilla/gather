@@ -30,6 +30,7 @@
 
 - git
 - [docker-compose](https://docs.docker.com/compose/)
+- Permission to the eHealthAfrica DockerHub repository - contact eHA DevOps
 
 *[Return to TOC](#table-of-contents)*
 
@@ -88,6 +89,10 @@ of the most common ones with non default values. For more info take a look at th
 ```bash
 docker-compose up --build    # this will update the cointainers if needed
 ```
+
+_If you get errors like:_
+```ERROR: pull access denied for <foo> repository does not exist or may require 'docker login' ```
+_verify you are logged into docker and have permission to the repository._
 
 This will start:
 
