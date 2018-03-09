@@ -71,6 +71,11 @@ const MESSAGES = defineMessages({
     defaultMessage: 'Deleting xform “{name}” in ODK',
     id: 'survey.form.action.delete.odk.xform'
   },
+  deleteODKMediaFile: {
+    defaultMessage: 'Deleting media file “{name}” in ODK',
+    id: 'survey.form.action.delete.odk.media.file'
+  },
+
   handleDone: {
     defaultMessage: 'Done!',
     id: 'survey.form.action.handle.done'
@@ -273,11 +278,11 @@ export class SurveyForm extends Component {
       definition: {},
       id: this.state.id,
       name: this.state.name,
+      project: this.props.project.id,
       // FIXME: "revision" field refers to Aether mapping revisions.
       // This should be auto-incremented every time the Survey/Mapping
       // edited.
       // See: https://jira.ehealthafrica.org/browse/AET-124
-      project: this.props.project.id,
       revision: '1'
     }
 
@@ -365,11 +370,11 @@ export class SurveyForm extends Component {
     // creates/updates/deletes the xforms+media files sequentially
     const actions = [] // list of actions to execute
 
+    const formerXForms = (this.props.odkSurvey && this.props.odkSurvey.xforms) || []
     const currentXForms = this.state.odk.xforms || []
+
     // handle current xforms
     currentXForms.forEach(xform => {
-      const mediaFiles = xform.media_files || []
-
       actions.push({
         message: formatMessage(MESSAGES.saveODKXForm, {name: xform.title}),
         method: xform.id ? putData : postData,
@@ -377,33 +382,52 @@ export class SurveyForm extends Component {
         data: {
           ...xform,
           xml_file: xform.file,
-          media_files: mediaFiles.map(mf => mf.id).filter(mf => mf),
           mapping: odkSurvey.mapping_id
         },
         options: { multipart: !!xform.file }
       })
 
-      if (xform.id && mediaFiles.length > 0) {
-        mediaFiles
-          .filter(mf => mf.file)
-          .forEach(mf => {
-            actions.push({
-              message: formatMessage(MESSAGES.saveODKMediaFile, {name: mf.name}),
-              method: postData,
-              url: getMediaFileAPIPath({}),
-              data: {
-                name: mf.name,
-                media_file: mf.file,
-                xform: xform.id
-              },
-              options: { multipart: true }
-            })
-          })
+      if (!xform.id) {
+        // new one, nothing else to do
+        return
       }
+
+      const mediaFiles = xform.media_files || []
+
+      // create new media files
+      mediaFiles
+        .filter(mf => mf.file)
+        .forEach(mf => {
+          actions.push({
+            message: formatMessage(MESSAGES.saveODKMediaFile, {name: mf.name}),
+            method: postData,
+            url: getMediaFileAPIPath({}),
+            data: {
+              name: mf.name,
+              media_file: mf.file,
+              xform: xform.id
+            },
+            options: { multipart: true }
+          })
+        })
+
+      // get the list of deleted media files (they are not in the current list)
+      const formerXForm = formerXForms.find(former => xform.id === former.id)
+      const deletedMediaFiles = (formerXForm.media_files || [])
+        .filter(former => !mediaFiles.find(current => current.id === former.id))
+
+      // delete missing media files
+      deletedMediaFiles
+        .forEach(mf => {
+          actions.push({
+            message: formatMessage(MESSAGES.deleteODKMediaFile, {name: mf.name}),
+            method: deleteData,
+            url: getMediaFileAPIPath({ id: mf.id })
+          })
+        })
     })
 
     // get the list of deleted xforms (they are not in the current list)
-    const formerXForms = (this.props.odkSurvey && this.props.odkSurvey.xforms) || []
     const deletedXforms = formerXForms.filter(former => !currentXForms.find(current => current.id === former.id))
 
     // delete them
