@@ -1,17 +1,36 @@
 from django.conf import settings
+from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.urls import include, path, re_path
 from django.views.generic import TemplateView
-
-from aether.common.conf.urls import generate_urlpatterns
 
 # Any entry here needs the decorator `tokens_required` if it's going to execute
 # AJAX request to any of the other apps
 from .api.decorators import tokens_required
 from .api.views import empty
+from .views import health
 
 
-urlpatterns = generate_urlpatterns(kernel=True) + [
+auth_urls = 'rest_framework.urls'
+if settings.CAS_SERVER_URL:  # pragma: no cover
+    import django_cas_ng.views
+
+    auth_urls = ([
+        path('login/', django_cas_ng.views.login, name='login'),
+        path('logout/', django_cas_ng.views.logout, name='logout'),
+    ], 'rest_framework')
+
+
+urlpatterns = [
+
+    # `health` endpoint
+    path('health', health, name='health'),
+
+    # `admin` section
+    path('admin/', admin.site.urls),
+
+    # `accounts` management
+    path('accounts/', include(auth_urls, namespace='rest_framework')),
 
     # ----------------------
     # API
@@ -43,3 +62,11 @@ if settings.AETHER_ODK:  # pragma: no cover
                 login_required(tokens_required(TemplateView.as_view(template_name='pages/surveyors.html'))),
                 name='surveyors'),
     ]
+
+if settings.DEBUG:  # pragma: no cover
+    if 'debug_toolbar' in settings.INSTALLED_APPS:
+        import debug_toolbar
+
+        urlpatterns += [
+            path('__debug__/', include(debug_toolbar.urls)),
+        ]

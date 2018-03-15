@@ -10,13 +10,12 @@
 
 
 # Main libraries
-aether.common   # Aether common module
 django
 django-cas-ng
 django-cors-headers
+django-solo
 django-ums-client
 djangorestframework
-django-solo
 psycopg2-binary
 requests
 uwsgi
