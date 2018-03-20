@@ -2,7 +2,12 @@ import React, { Component } from 'react'
 import { FormattedMessage } from 'react-intl'
 
 import { flatten, inflate } from '../utils/types'
-import { JSONViewer, FullDateTime } from '../components'
+import {
+  JSONViewer,
+  FullDateTime,
+  LinksList,
+  normalizeLinksList
+} from '../components'
 
 export default class SubmissionsList extends Component {
   render () {
@@ -69,31 +74,29 @@ export default class SubmissionsList extends Component {
             <tr key={index}>
               {
                 (index === 0) &&
-                <th rowSpan={rows || 1} />
-              }
-              {
-                (index === 0) &&
-                <th rowSpan={rows || 1}>
-                  <FormattedMessage
-                    id='submission.list.table.date'
-                    defaultMessage='Submitted' />
-                </th>
-              }
-              {
-                (index === 0) &&
-                <th rowSpan={rows || 1}>
-                  <FormattedMessage
-                    id='submission.list.table.revision'
-                    defaultMessage='Revision' />
-                </th>
-              }
-              {
-                (index === 0) &&
-                <th rowSpan={rows || 1}>
-                  <FormattedMessage
-                    id='submission.list.table.survey.revision'
-                    defaultMessage='Survey revision' />
-                </th>
+                <React.Fragment>
+                  <th rowSpan={rows || 1} />
+                  <th rowSpan={rows || 1}>
+                    <FormattedMessage
+                      id='submission.list.table.date'
+                      defaultMessage='Submitted' />
+                  </th>
+                  <th rowSpan={rows || 1}>
+                    <FormattedMessage
+                      id='submission.list.table.revision'
+                      defaultMessage='Revision' />
+                  </th>
+                  <th rowSpan={rows || 1}>
+                    <FormattedMessage
+                      id='submission.list.table.survey.revision'
+                      defaultMessage='Survey revision' />
+                  </th>
+                  <th rowSpan={rows || 1}>
+                    <FormattedMessage
+                      id='submission.list.table.attachments'
+                      defaultMessage='Attachments' />
+                  </th>
+                </React.Fragment>
               }
 
               {
@@ -117,6 +120,7 @@ export default class SubmissionsList extends Component {
   renderSubmission (submission, index) {
     const {columns, separator} = this.props
     const flattenPayload = flatten({...submission.payload}, separator)
+    const links = normalizeLinksList(submission.attachments)
 
     return (
       <tr data-qa={`submission-row-${submission.id}`} key={submission.id}>
@@ -130,11 +134,14 @@ export default class SubmissionsList extends Component {
         <td>
           {submission.map_revision}
         </td>
+        <td>
+          <LinksList list={links} />
+        </td>
 
         {
           columns.map(key => (
             <td key={key}>
-              <JSONViewer data={flattenPayload[key]} />
+              <JSONViewer data={flattenPayload[key]} links={links} />
             </td>
           ))
         }

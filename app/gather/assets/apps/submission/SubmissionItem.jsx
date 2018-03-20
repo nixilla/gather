@@ -2,7 +2,12 @@ import React, { Component } from 'react'
 import { FormattedMessage } from 'react-intl'
 
 import { filterByPaths } from '../utils/types'
-import { JSONViewer, FullDateTime } from '../components'
+import {
+  JSONViewer,
+  FullDateTime,
+  LinksList,
+  normalizeLinksList
+} from '../components'
 
 export default class SubmissionItem extends Component {
   render () {
@@ -15,6 +20,7 @@ export default class SubmissionItem extends Component {
     // assumption: there is only one item
     const submission = list[0]
     const {columns, separator} = this.props
+    const links = normalizeLinksList(submission.attachments)
 
     return (
       <div data-qa={`submission-item-${submission.id}`} className='x-2'>
@@ -29,6 +35,7 @@ export default class SubmissionItem extends Component {
               <FullDateTime date={submission.date} />
             </div>
           </div>
+
           <div className='property'>
             <h5 className='property-title'>
               <FormattedMessage
@@ -50,8 +57,24 @@ export default class SubmissionItem extends Component {
             </div>
           </div>
 
+          { submission.attachments.length > 0 &&
+            <div className='property'>
+              <h5 className='property-title'>
+                <FormattedMessage
+                  id='submission.view.attachments'
+                  defaultMessage='Attachments' />
+              </h5>
+              <div className='property-value'>
+                <LinksList list={links} />
+              </div>
+            </div>
+          }
+
           <div>
-            <JSONViewer data={filterByPaths(submission.payload, columns, separator)} />
+            <JSONViewer
+              data={filterByPaths(submission.payload, columns, separator)}
+              links={links}
+            />
           </div>
         </div>
       </div>

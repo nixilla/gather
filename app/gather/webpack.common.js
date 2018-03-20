@@ -168,7 +168,9 @@ module.exports = function (custom) {
         }
       }),
       new webpack.EnvironmentPlugin({
+        AETHER_KERNEL_URL: '/kernel',
         AETHER_MODULES: 'kernel',
+        AETHER_ODK_URL: null,
         CSV_HEADER_RULES: '',
         CSV_HEADER_RULES_SEP: ':'
       })

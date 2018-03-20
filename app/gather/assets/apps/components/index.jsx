@@ -8,6 +8,7 @@ import FetchUrlsContainer from './FetchUrlsContainer'
 import JSONViewer from './JSONViewer'
 import FullDateTime from './FullDateTime'
 import HelpMessage from './HelpMessage'
+import { Link, LinksList, normalizeLinksList } from './Link'
 import LoadingSpinner from './LoadingSpinner'
 import MultiSelect from './MultiSelect'
 import PaginationBar from './PaginationBar'
@@ -26,6 +27,7 @@ export {
   JSONViewer,
   FullDateTime,
   HelpMessage,
+  Link, LinksList, normalizeLinksList,
   LoadingSpinner,
   MultiSelect,
   PaginationBar,

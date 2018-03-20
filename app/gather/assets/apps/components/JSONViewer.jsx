@@ -7,6 +7,7 @@ import {
 } from 'react-intl'
 
 import { cleanPropertyName, getType } from '../utils/types'
+import { Link } from './Link'
 
 const renderEmptyValue = () => {
   return (
@@ -72,12 +73,23 @@ export default class JSONViewer extends Component {
   }
 
   renderString (value) {
+    // there is an special case with strings,
+    // they can also be one of the linked attachments.
+    // In those case we should be able to replace
+    // the text value with the link
+    // assumption: there are no duplicated attachment entries
+    if (this.props.links && this.props.links.length > 0) {
+      const link = this.props.links.find(l => l.name === value)
+      if (link) {
+        return <Link className='value' link={link} />
+      }
+    }
     return <span className='value'>{value}</span>
   }
 
   renderInteger (value) {
     return (
-      <span title={value}>
+      <span className='value' title={value}>
         <FormattedNumber value={value} />
       </span>
     )
@@ -85,7 +97,7 @@ export default class JSONViewer extends Component {
 
   renderFloat (value) {
     return (
-      <span title={value}>
+      <span className='value' title={value}>
         <FormattedNumber
           value={value}
           style='decimal'
@@ -97,7 +109,7 @@ export default class JSONViewer extends Component {
 
   renderDateTime (value) {
     return (
-      <span title={value}>
+      <span className='value' title={value}>
         { this.renderDate(value) }
         { ' - '}
         { this.renderTime(value) }
@@ -106,29 +118,41 @@ export default class JSONViewer extends Component {
   }
 
   renderDate (value) {
-    return <FormattedDate
-      value={value}
-      year='numeric'
-      month='long'
-      day='numeric'
-    />
+    return (
+      <span className='value' title={value}>
+        <FormattedDate
+          value={value}
+          year='numeric'
+          month='long'
+          day='numeric'
+        />
+      </span>
+    )
   }
 
   renderTime (value) {
-    return <FormattedTime
-      value={value}
-      hour12={false}
-      hour='2-digit'
-      minute='2-digit'
-      second='2-digit'
-      timeZoneName='short'
-    />
+    return (
+      <span className='value' title={value}>
+        <FormattedTime
+          value={value}
+          hour12={false}
+          hour='2-digit'
+          minute='2-digit'
+          second='2-digit'
+          timeZoneName='short'
+        />
+      </span>
+    )
   }
 
   renderBoolean (value) {
-    return (value
-      ? <FormattedMessage id='json.viewer.boolean.true' defaultMessage='Yes' />
-      : <FormattedMessage id='json.viewer.boolean.false' defaultMessage='No' />
+    return (
+      <span className='value' title={value}>
+        { value
+          ? <FormattedMessage id='json.viewer.boolean.true' defaultMessage='Yes' />
+          : <FormattedMessage id='json.viewer.boolean.false' defaultMessage='No' />
+        }
+      </span>
     )
   }
 
@@ -196,7 +220,6 @@ class JSONArrayViewer extends Component {
           <i className='fa fa-minus' />
         </button>
         <ol className='property-list'>
-
           {
             values.map((value, index) => (
               <li key={index} className='property-item'>
