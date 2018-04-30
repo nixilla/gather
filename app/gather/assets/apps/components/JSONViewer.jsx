@@ -202,7 +202,7 @@ class JSONArrayViewer extends Component {
           <button
             className='btn icon-only btn-expand'
             onClick={this.toggleView.bind(this)}>
-            <i className='fa fa-plus' />
+            <i className='fas fa-plus' />
           </button>
 
           <span className='badge'>
@@ -217,7 +217,7 @@ class JSONArrayViewer extends Component {
         <button
           className='btn icon-only btn-collapse'
           onClick={this.toggleView.bind(this)}>
-          <i className='fa fa-minus' />
+          <i className='fas fa-minus' />
         </button>
         <ol className='property-list'>
           {

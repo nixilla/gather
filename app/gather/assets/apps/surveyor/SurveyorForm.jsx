@@ -73,7 +73,7 @@ export class SurveyorForm extends Component {
             id='surveyor.form.title.edit'
             defaultMessage='Edit surveyor' />
           <span className='username ml-2'>
-            <i className='fa fa-user mr-1' />
+            <i className='fas fa-user mr-1' />
             {this.props.surveyor.username}
           </span>
         </span>
@@ -159,7 +159,7 @@ export class SurveyorForm extends Component {
                   onConfirm={this.onDelete.bind(this)}
                   title={
                     <span className='username'>
-                      <i className='fa fa-user mr-1' />
+                      <i className='fas fa-user mr-1' />
                       {this.props.surveyor.username}
                     </span>
                   }
@@ -247,18 +247,15 @@ export class SurveyorForm extends Component {
     return saveMethod(url, surveyor)
       .then(this.goBack)
       .catch(error => {
-        console.log(error.message)
-        error.response
-          .then(resp => {
-            this.setState({ errors: resp })
+        if (error.content) {
+          this.setState({ errors: error.content })
+        } else {
+          this.setState({
+            errors: {
+              generic: [formatMessage(MESSAGES.submitError, {...surveyor})]
+            }
           })
-          .catch(() => {
-            this.setState({
-              errors: {
-                generic: [formatMessage(MESSAGES.submitError, {...surveyor})]
-              }
-            })
-          })
+        }
       })
   }
 
@@ -270,12 +267,15 @@ export class SurveyorForm extends Component {
     return deleteData(url)
       .then(this.goBack)
       .catch(error => {
-        console.log(error.message)
-        this.setState({
-          errors: {
-            generic: [formatMessage(MESSAGES.deleteError, {...surveyor})]
-          }
-        })
+        if (error.content) {
+          this.setState({ errors: error.content })
+        } else {
+          this.setState({
+            errors: {
+              generic: [formatMessage(MESSAGES.deleteError, {...surveyor})]
+            }
+          })
+        }
       })
   }
 

@@ -71,7 +71,7 @@ export class LinksList extends Component {
           <button
             className='btn icon-only btn-collapse'
             onClick={() => this.setState({ collapsed: !this.state.collapsed })}>
-            <i className={`fa fa-${this.state.collapsed ? 'plus' : 'minus'}`} />
+            <i className={`fas fa-${this.state.collapsed ? 'plus' : 'minus'}`} />
           </button>
         }
 

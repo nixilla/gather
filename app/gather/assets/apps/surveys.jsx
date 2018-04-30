@@ -1,13 +1,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { hot } from 'react-hot-loader'
 
 import { AppIntl } from './components'
 import SurveyDispatcher from './survey'
-
-// Include this to enable HMR for this module
-if (module.hot) {
-  module.hot.accept()
-}
 
 /*
 This is the surveys/surveys app.
@@ -19,9 +15,13 @@ const appElement = document.getElementById('surveys-app')
 const surveyId = appElement.getAttribute('data-survey-id')
 const action = appElement.getAttribute('data-action')
 
-ReactDOM.render(
+const dispatcher = (
   <AppIntl>
     <SurveyDispatcher action={action} surveyId={surveyId} />
-  </AppIntl>,
-  appElement
+  </AppIntl>
 )
+
+ReactDOM.render(dispatcher, appElement)
+
+// Include this to enable HMR for this module
+hot(module)(dispatcher)

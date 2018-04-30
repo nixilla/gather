@@ -117,7 +117,7 @@ export class SurveyMasks extends Component {
             onClick={() => { this.setState({ showColumns: !this.state.showColumns }) }}
           >
             { currentMask.name }
-            <i className='fa fa-angle-down ml-2' />
+            <i className='fas fa-angle-down ml-2' />
           </button>
         </div>
 
@@ -141,7 +141,7 @@ export class SurveyMasks extends Component {
           className='close-filters'
           onClick={() => { this.setState({ showColumns: false }) }}
         >
-          <i className='fa fa-angle-up' />
+          <i className='fas fa-angle-up' />
         </button>
       </div>
     )
@@ -174,7 +174,7 @@ export class SurveyMasks extends Component {
                   <ConfirmButton
                     className='btn btn-sm icon-only preset-delete'
                     title={mask.name}
-                    buttonLabel={<i className='fa fa-close' />}
+                    buttonLabel={<i className='fas fa-times' />}
                     cancelable
                     message={
                       <FormattedMessage
@@ -279,39 +279,33 @@ export class SurveyMasks extends Component {
     return postData(getMasksAPIPath({}), mask)
       .then(this.props.reload)
       .catch(error => {
-        console.log(error.message)
-        error.response
-          .then(errors => {
-            console.log(errors)
-            this.setState({
-              message: {
-                title: errorTitle,
-                body: (errors.non_field_errors
-                  ? <FormattedMessage
-                    id='survey.mask.preset.save.error.duplicated'
-                    defaultMessage='This mask name is already in use' />
-                  : defaultErrorBody
-                )
-              }
-            })
+        if (error.content) {
+          this.setState({
+            message: {
+              title: errorTitle,
+              body: (error.content.non_field_errors
+                ? <FormattedMessage
+                  id='survey.mask.preset.save.error.duplicated'
+                  defaultMessage='This mask name is already in use' />
+                : defaultErrorBody
+              )
+            }
           })
-          .catch((err) => {
-            console.log(err)
-            this.setState({
-              message: {
-                title: errorTitle,
-                body: defaultErrorBody
-              }
-            })
+        } else {
+          this.setState({
+            message: {
+              title: errorTitle,
+              body: defaultErrorBody
+            }
           })
+        }
       })
   }
 
   onDelete (mask) {
     return deleteData(getMasksAPIPath({id: mask.id}))
       .then(this.props.reload)
-      .catch(error => {
-        console.log(error.message)
+      .catch(() => {
         this.setState({
           message: {
             title: mask.name,

@@ -72,7 +72,7 @@ setup_prod() {
 }
 
 test_lint() {
-    npm run lint
+    npm run test-lint
     flake8 /code/. --config=/code/conf/extras/flake8.cfg
 }
 
@@ -88,7 +88,7 @@ test_coverage() {
 }
 
 test_js() {
-    npm run test-js
+    npm run test-js "${@:1}"
 }
 
 
@@ -163,7 +163,7 @@ case "$1" in
     ;;
 
     test_js)
-        test_js
+        test_js "${@:2}"
     ;;
 
     start )

@@ -24,13 +24,13 @@ export default class SurveyorsList extends Component {
             list.map((surveyor) => (
               <div key={surveyor.id} className='surveyor-list-item'>
                 <div className='surveyor-header'>
-                  <i className='fa fa-user mr-2' />
+                  <i className='fas fa-user mr-2' />
                   {surveyor.username}
                   <a
                     href={getSurveyorsPath({action: 'edit', id: surveyor.id})}
                     role='button'
-                    className='btn btn-sm btn-secondary icon-only pull-right'>
-                    <i className='fa fa-pencil' />
+                    className='btn btn-sm btn-secondary icon-only float-right'>
+                    <i className='fas fa-pencil-alt' />
                   </a>
                 </div>
               </div>

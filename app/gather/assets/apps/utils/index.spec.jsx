@@ -1,7 +1,7 @@
 /* global describe, it */
 
 import assert from 'assert'
-import { clone, deepEqual } from './index'
+import { clone, deepEqual, range } from './index'
 
 describe('utils', () => {
   describe('clone', () => {
@@ -29,6 +29,10 @@ describe('utils', () => {
       assert(deepEqual(a, b), 'Objects are equal')
       b.baz.y = 5
       assert(!deepEqual(a, b), 'Objects are not equal')
+      b.baz.y = 4
+      b.baz.x = 1
+      a.baz.z = 1
+      assert(!deepEqual(a, b), 'Objects are not equal')
     })
 
     it('should compare arrays', () => {
@@ -44,6 +48,14 @@ describe('utils', () => {
       let b = {x: 1}
       assert(deepEqual(a, b, true), 'Should be equal without null values')
       assert(!deepEqual(a, b), 'Should not be equal with null values')
+    })
+  })
+
+  describe('range', () => {
+    it('should create an array of ints', () => {
+      assert.deepEqual(range(0, 0), [])
+      assert.deepEqual(range(0, 1), [0])
+      assert.deepEqual(range(1, 3), [1, 2])
     })
   })
 })

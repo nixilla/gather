@@ -232,7 +232,7 @@ class XForm extends Component {
 
     const title = (
       <span title={xform.description} className='form-title'>
-        <i className='fa fa-file mr-2' />
+        <i className='fas fa-file mr-2' />
         {xform.title}
         <span className='badge badge-default mx-2'>
           <FormattedMessage
@@ -283,7 +283,7 @@ class XForm extends Component {
           onConfirm={this.props.onRemove}
           title={title}
           message={formatMessage(MESSAGES.deleteConfirm, {...xform})}
-          buttonLabel={<i className='fa fa-close' />}
+          buttonLabel={<i className='fas fa-times' />}
         />
 
         { /* only existing xforms can edit */
@@ -291,7 +291,7 @@ class XForm extends Component {
           <button
             className='btn btn-sm btn-secondary btn-edit icon-only'
             onClick={this.toggleEditView.bind(this)}>
-            <i className={`fa fa-${this.state.editView ? 'minus' : 'pencil'}`} />
+            <i className={`fas fa-${this.state.editView ? 'minus' : 'pencil-alt'}`} />
           </button>
         }
 
@@ -327,7 +327,7 @@ class XForm extends Component {
                   <span>{ xform.file.name }</span>
                   <button
                     className='btn btn-sm icon-only btn-danger ml-2'
-                    onClick={this.removeFile.bind(this)}><i className='fa fa-close' /></button>
+                    onClick={this.removeFile.bind(this)}><i className='fas fa-times' /></button>
                 </span>
               }
 
@@ -455,7 +455,7 @@ class MediaFile extends Component {
           })}
           title={this.props.title}
           message={formatMessage(MESSAGES.deleteMediaConfirm, {...mediaFile})}
-          buttonLabel={<i className='fa fa-close' />}
+          buttonLabel={<i className='fas fa-times' />}
         />
       </span>
     )

@@ -96,7 +96,7 @@ input.hidden-file {
   box-shadow: 1px 1px 5px $shadow-color;
 
   &::before {
-    content: '\f007';
+    content: '\f007'; /* fa-user */
     font-family: $icon-font;
     font-size: 1.3rem;
     padding: .8rem;
@@ -113,7 +113,7 @@ input.hidden-file {
     background: none;
 
     &::before {
-      content: '\f007';
+      content: '\f007'; /* fa-user */
       font-family: $icon-font;
       margin-right: .4em;
     }

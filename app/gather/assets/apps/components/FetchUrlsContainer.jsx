@@ -67,11 +67,10 @@ export default class FetchUrlsContainer extends Component {
         })
       })
       .catch((error) => {
-        console.log(error)
         this.setState({
           isLoading: false,
           isRefreshing: false,
-          error: true
+          error
         })
       })
   }

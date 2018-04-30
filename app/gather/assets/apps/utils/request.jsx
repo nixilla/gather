@@ -1,8 +1,5 @@
-import 'whatwg-fetch'
-import jQuery from 'jquery'
-
 const request = (
-  method = 'GET', //          GET, POST, PUT, PATCH, DELETE
+  method, //                  GET, POST, PUT, PATCH, DELETE
   url, //                     server url
   // rest of options
   {
@@ -12,7 +9,7 @@ const request = (
     fileName = 'download' //  in case of "download" the file name
   }
 ) => {
-  const inspectResponse = (response) => {
+  const inspectResponse = (resolve, reject, response) => {
     // According to fetch docs: https://github.github.io/fetch/
     // Note that the promise won't be rejected in case of HTTP 4xx or 5xx server responses.
     // The promise will be resolved just as it would be for HTTP 2xx.
@@ -22,7 +19,7 @@ const request = (
     if (response.ok) {
       // `DELETE` method returns a 204 status code without response content
       if (response.status === 204) {
-        return {} // NO-CONTENT response
+        return resolve() // NO-CONTENT response
       } else {
         // file to download
         if (download) {
@@ -39,22 +36,28 @@ const request = (
               a.click()
               window.URL.revokeObjectURL(url)
             })
+            .then(() => resolve()) // NO-CONTENT response
         }
 
-        return response.json()
+        return response
+          .json()
+          .then(content => resolve(content))
       }
     } else {
-      const error = new Error(response.statusText)
-      try {
-        error.response = response.json()
-      } catch (e) {
-        error.response = response
-      }
-      throw error
+      return response
+        .text()
+        .then(content => {
+          try {
+            reject({message: response.statusText, content: JSON.parse(content)})
+          } catch (e) {
+            reject({message: response.statusText, content})
+          }
+        })
     }
   }
 
-  // See: https://docs.djangoproject.com/en/1.11/ref/csrf/
+  /* global jQuery */
+  // See: https://docs.djangoproject.com/en/2.0/ref/csrf/
   const csrfToken = jQuery('[name=csrfmiddlewaretoken]').val()
   const options = {
     method,
@@ -103,7 +106,9 @@ const request = (
     }
   }
 
-  return window.fetch(url, options).then(inspectResponse)
+  return new Promise((resolve, reject) => {
+    window.fetch(url, options).then(inspectResponse.bind(null, resolve, reject))
+  })
 }
 
 /**

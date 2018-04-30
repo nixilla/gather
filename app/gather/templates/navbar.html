@@ -41,16 +41,16 @@
 
         </ul>
 
-        <ul class="nav navbar-nav pull-right">
+        <ul class="nav navbar-nav float-right">
           <li class="nav-item user-name">
-            <i class="fa fa-user-circle mr-1"></i>
+            <i class="fas fa-user-circle mr-1"></i>
             <span
               id="logged-in-user-info"
               data-user-id="{{ request.user.id }}">
               {{ request.user|get_fullname }}
             </span>
             <a class="logout" href="{% url 'rest_framework:logout' %}">
-              <i class="fa fa-sign-out" title="{% trans 'Sign Out' %}" aria-hidden="true"></i>
+              <i class="fas fa-sign-out-alt" title="{% trans 'Sign Out' %}" aria-hidden="true"></i>
             </a>
           </li>
         </ul>

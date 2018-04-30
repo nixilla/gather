@@ -3,6 +3,9 @@
 import assert from 'assert'
 import {
   buildQueryString,
+  getMasksAPIPath,
+  getMediaFileAPIPath,
+  getProjectAPIPath,
   getSubmissionsAPIPath,
   getSurveyorsAPIPath,
   getSurveyorsPath,
@@ -12,6 +15,26 @@ import {
 } from './paths'
 
 describe('paths utils', () => {
+  describe('getProjectAPIPath', () => {
+    it('should return the Project API path', () => {
+      assert.equal(getProjectAPIPath(), '/gather/project/')
+    })
+  })
+
+  describe('getMasksAPIPath', () => {
+    it('should return the Mask API path', () => {
+      assert.equal(getMasksAPIPath({}), '/gather/masks.json?')
+      assert.equal(getMasksAPIPath({id: 1}), '/gather/masks/1.json?')
+    })
+  })
+
+  describe('getMediaFileAPIPath', () => {
+    it('should return the Media Files API path', () => {
+      assert.equal(getMediaFileAPIPath({}), '/odk/media-files.json?')
+      assert.equal(getMediaFileAPIPath({id: 1}), '/odk/media-files/1.json?')
+    })
+  })
+
   describe('getSurveysAPIPath', () => {
     describe('without app or `kernel` app', () => {
       const prefix = '/kernel/'

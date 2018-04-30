@@ -1,7 +1,7 @@
 /* global describe, it */
 
 import assert from 'assert'
-import { getType, flatten, inflate } from './types'
+import { getType, flatten, unflatten, inflate, filterByPaths } from './types'
 
 describe('types', () => {
   describe('getType', () => {
@@ -16,10 +16,13 @@ describe('types', () => {
     })
 
     it('should indicate if the value is an object', () => {
+      assert.equal(getType({}), null)
       assert.equal(getType({a: 1}), 'object')
     })
 
     it('should indicate if the value is an array', () => {
+      assert.equal(getType([ null ]), 'array')
+      assert.equal(getType([ undefined ]), 'array')
       assert.equal(getType([1, 2, 3]), 'array')
     })
 
@@ -69,10 +72,15 @@ describe('types', () => {
               d: 1
             }
           }
+        },
+        x: {
+          y: {
+            z: null
+          }
         }
       }
 
-      assert.deepEqual(flatten(entry), { 'a.b.c.d': 1 })
+      assert.deepEqual(flatten(entry), { 'a.b.c.d': 1, 'x.y.z': null })
     })
 
     it('should not flatten array properties', () => {
@@ -87,7 +95,45 @@ describe('types', () => {
         }
       }
 
-      assert.deepEqual(flatten(entry), { 'a.b.c.d': 1, 'a.b.a': [1, 2, {}, {d: 1}] })
+      assert.deepEqual(flatten(entry, ':'), { 'a:b:c:d': 1, 'a:b:a': [1, 2, {}, {d: 1}] })
+    })
+  })
+
+  describe('unflatten', () => {
+    it('should unflatten to JSON objects', () => {
+      const entry = { 'a.b.c.d': 1, 'x.y.z': null }
+      const expected = {
+        a: {
+          b: {
+            c: {
+              d: 1
+            }
+          }
+        },
+        x: {
+          y: {
+            z: null
+          }
+        }
+      }
+
+      assert.deepEqual(unflatten(entry), expected)
+    })
+
+    it('should not unflatten array properties', () => {
+      const entry = { 'a:b:c:d': 1, 'a:b:a': [1, 2, {}, {d: 1}] }
+      const expected = {
+        a: {
+          b: {
+            c: {
+              d: 1
+            },
+            a: [1, 2, {}, {d: 1}]
+          }
+        }
+      }
+
+      assert.deepEqual(unflatten(entry, ':'), expected)
     })
   })
 
@@ -123,6 +169,33 @@ describe('types', () => {
       ]
 
       assert.deepEqual(inflate(keys, '|'), expectedValue)
+    })
+  })
+
+  describe('filterByPaths', () => {
+    it('should include only the indicated paths', () => {
+      const entry = {
+        a: {
+          b: {
+            c: {
+              d: 1
+            }
+          }
+        },
+        x: {
+          y: {
+            z: 2
+          }
+        }
+      }
+
+      assert.deepEqual(flatten(filterByPaths(entry, [])), {})
+      assert.deepEqual(flatten(filterByPaths(entry, ['b'])), {})
+
+      assert.deepEqual(flatten(filterByPaths(entry, ['a'])), { 'a.b.c.d': 1 })
+      assert.deepEqual(flatten(filterByPaths(entry, ['a.b'])), { 'a.b.c.d': 1 })
+      assert.deepEqual(flatten(filterByPaths(entry, ['a.b.c'])), { 'a.b.c.d': 1 })
+      assert.deepEqual(flatten(filterByPaths(entry, ['a.b.c.d'])), { 'a.b.c.d': 1 })
     })
   })
 })

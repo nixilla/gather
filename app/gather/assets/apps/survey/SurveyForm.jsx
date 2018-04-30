@@ -225,7 +225,7 @@ export class SurveyForm extends Component {
             </div>
 
             <div className='modal-body'>
-              <i className='fa fa-spin fa-cog mr-2' />
+              <i className='fas fa-spin fa-cog mr-2' />
               <FormattedMessage
                 id='survey.form.action.updating'
                 defaultMessage='Saving data in progress…' />
@@ -475,7 +475,6 @@ export class SurveyForm extends Component {
      */
     const {formatMessage} = this.props.intl
 
-    console.log(error.message)
     this.setState({ isUpdating: false, actionsInProgress: [] })
 
     if (!error.message) {
@@ -488,28 +487,24 @@ export class SurveyForm extends Component {
       return
     }
 
-    return error.response
-      .then(errors => {
-        if (nestedProperty) {
-          this.setState({ errors: { [nestedProperty]: errors } })
-        } else {
-          this.setState({ errors })
-        }
-      })
-      .catch((err) => {
-        console.log(err.message)
+    if (error.content) {
+      if (nestedProperty) {
+        this.setState({ errors: { [nestedProperty]: error.content } })
+      } else {
+        this.setState({ errors: error.content })
+      }
+    } else {
+      const actionMessage = (action === 'delete')
+        ? MESSAGES.deleteError
+        : MESSAGES.submitError
+      const generic = [formatMessage(actionMessage, {...this.state})]
 
-        const actionMessage = (action === 'delete')
-          ? MESSAGES.deleteError
-          : MESSAGES.submitError
-        const generic = [formatMessage(actionMessage, {...this.state})]
-
-        if (nestedProperty) {
-          this.setState({ errors: { [nestedProperty]: { generic } } })
-        } else {
-          this.setState({ errors: { generic } })
-        }
-      })
+      if (nestedProperty) {
+        this.setState({ errors: { [nestedProperty]: { generic } } })
+      } else {
+        this.setState({ errors: { generic } })
+      }
+    }
   }
 
   backToView (survey) {

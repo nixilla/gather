@@ -46,15 +46,8 @@ export const getType = (value) => {
     return NO_TYPE
   }
 
-  if (value.toString().trim() === '') {
-    return NO_TYPE
-  }
-
   // check the object type
   switch (Object.prototype.toString.call(value)) {
-    case '[object Function]':
-      return NO_TYPE // we do not expect this kind of responses
-
     case '[object Object]':
       return Object.keys(value).length === 0 ? NO_TYPE : 'object'
 
@@ -74,6 +67,10 @@ export const getType = (value) => {
       return 'datetime'
 
     case '[object String]':
+      if (value.toString().trim() === '') {
+        return NO_TYPE
+      }
+
       // should also check if the value represents a Date/time
 
       // like: 2017-09-09T14:16:05.869000+01:00
@@ -121,22 +118,10 @@ export const flatten = (object, separator = '.') => {
   // assumption: no property names contain `separator`
   // https://gist.github.com/penguinboy/762197#gistcomment-2168525
 
-  const isValidObject = (value) => {
-    if (!value) {
-      return false
-    }
-
-    const isArray = Array.isArray(value)
-    const isObject = Object.prototype.toString.call(value) === '[object Object]'
-    const hasKeys = !!Object.keys(value).length
-
-    return !isArray && isObject && hasKeys
-  }
-
   const walker = (child, path = []) => Object.assign(
     {},
     ...Object.keys(child).map(key => (
-      isValidObject(child[key])
+      (getType(child[key]) === 'object')
         ? walker(child[key], path.concat([key]))
         : { [path.concat([key]).join(separator)]: child[key] }
     ))

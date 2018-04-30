@@ -1,184 +1,93 @@
-var path = require('path')
+const path = require('path')
+const BundleTracker = require('webpack-bundle-tracker')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const webpack = require('webpack')
 
-var BundleTracker = require('webpack-bundle-tracker')
-var ExtractTextPlugin = require('extract-text-webpack-plugin')
-var webpack = require('webpack')
+const buildEntries = require('./webpack.apps')
 
-function getApps (hmr) {
-  var list = {
-    // the apps that DO NOT need Hot Module Replacement in development mode
-    'common': [ 'jquery', 'popper.js', 'bootstrap' ],
-    'html5shiv': 'html5shiv'
-  }
+module.exports = (custom) => ({
+  mode: (custom.production ? 'production' : 'development'),
+  context: __dirname,
 
-  // The list of current apps that DO need Hot Module Replacement in development mode
-  var apps = [
-    {
-      name: 'styles',
-      path: './assets/css/index.scss'
-    },
-    {
-      name: 'home',
-      path: './assets/apps/home'
-    },
-    {
-      name: 'surveys',
-      path: './assets/apps/surveys'
-    },
-    {
-      name: 'surveyors',
-      path: './assets/apps/surveyors'
-    }
-  ]
+  entry: buildEntries(custom.entryOptions),
 
-  apps.forEach(app => {
-    list[app.name] = (hmr ? hmr.concat([app.path]) : app.path)
-  })
+  output: Object.assign({
+    filename: '[name]-[hash].js',
+    library: ['gather', '[name]'],
+    libraryTarget: 'var',
+    path: path.resolve(__dirname, './assets/bundles/')
+  }, custom.output),
 
-  return list
-}
+  optimization: {
+    minimize: custom.production
+  },
 
-var stylesAsJsRules = [
-  {
-    test: /\.css$/,
-    use: [
-      { loader: 'style-loader' },
-      { loader: 'css-loader' }
+  module: {
+    rules: [
+      {
+        test: /\.(css|sass|scss)$/,
+        use: [
+          // to transform styles into CSS or JS file
+          { loader: (custom.stylesAsCss ? MiniCssExtractPlugin.loader : 'style-loader') },
+          { loader: 'css-loader' },
+          { loader: 'sass-loader' }
+        ]
+      },
+
+      // to transform JSX into JS
+      {
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+        options: {
+          // This is a feature of `babel-loader` for Webpack (not Babel itself).
+          // It enables caching results in ./node_modules/.cache/babel-loader/
+          // directory for faster rebuilds.
+          cacheDirectory: true
+        }
+      }
     ]
   },
-  {
-    test: /\.scss$/,
-    use: [
-      { loader: 'style-loader' },
-      { loader: 'css-loader' },
-      { loader: 'sass-loader' }
-    ]
+
+  plugins: [
+    // use to provide the global constants
+    new webpack.ProvidePlugin({
+      $: 'jquery',
+      jQuery: 'jquery',
+      Popper: 'popper.js'
+    }),
+
+    // needed by `django-webpack-loader`
+    new BundleTracker({
+      path: __dirname,
+      filename: './assets/bundles/webpack-stats.json'
+    }),
+
+    // Environment variables
+    new webpack.DefinePlugin({
+      'process.env': {
+        'NODE_ENV': JSON.stringify(custom.production ? 'production' : 'development')
+      }
+    }),
+    new webpack.EnvironmentPlugin({
+      AETHER_KERNEL_URL: '/kernel',
+      AETHER_MODULES: 'kernel',
+      AETHER_ODK_URL: null,
+      CSV_HEADER_RULES: '',
+      CSV_HEADER_RULES_SEP: ':'
+    }),
+
+    // extract styles as a CSS file not JS file
+    ...(custom.stylesAsCss
+      ? [new MiniCssExtractPlugin({ filename: '[name]-[chunkhash].css' })]
+      : []
+    ),
+
+    ...(custom.plugins || [])
+  ],
+
+  resolve: {
+    modules: ['node_modules'],
+    extensions: ['.js', '.jsx']
   }
-]
-
-var stylesAsCssRules = [
-  {
-    test: /\.css$/,
-    loader: ExtractTextPlugin.extract({
-      fallback: 'style-loader',
-      use: 'css-loader'
-    })
-  },
-  {
-    test: /\.scss$/,
-    loader: ExtractTextPlugin.extract({
-      fallback: 'style-loader',
-      use: [
-        { loader: 'css-loader' },
-        { loader: 'sass-loader' }
-      ]
-    })
-  }
-]
-
-module.exports = function (custom) {
-  return {
-    context: __dirname,
-
-    entry: getApps(custom.entry),
-
-    module: {
-      rules: [
-        // to transform JSX into JS
-        {
-          test: /\.jsx?$/,
-          exclude: /node_modules/,
-          use: [
-            { loader: 'react-hot-loader/webpack' },
-            { loader: 'babel-loader' }
-          ]
-        },
-        // font files
-        {
-          test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
-          loader: 'url-loader',
-          options: {
-            limit: 10000,
-            mimetype: 'application/font-woff'
-          }
-        },
-        {
-          test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
-          loader: 'url-loader',
-          options: {
-            limit: 10000,
-            mimetype: 'application/font-woff'
-          }
-        },
-        {
-          test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
-          loader: 'url-loader',
-          options: {
-            limit: 10000,
-            mimetype: 'application/octet-stream'
-          }
-        },
-        {
-          test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
-          loader: 'url-loader',
-          options: {
-            limit: 10000,
-            mimetype: 'image/svg+xml'
-          }
-        },
-        {
-          test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
-          loader: 'file-loader'
-        },
-
-        // images
-        {
-          test: /\.png(\?v=\d+\.\d+\.\d+)?$/,
-          loader: 'url-loader',
-          options: {
-            limit: 10000,
-            mimetype: 'image/png'
-          }
-        }
-      ].concat((custom.stylesAsCss ? stylesAsCssRules : stylesAsJsRules))
-    },
-
-    output: Object.assign({
-      filename: '[name]-[hash].js',
-      library: ['gather', '[name]'],
-      libraryTarget: 'var',
-      path: path.resolve(__dirname, './assets/bundles')
-    }, custom.output),
-
-    plugins: [
-      new webpack.ProvidePlugin({
-        $: 'jquery',
-        jQuery: 'jquery',
-        Popper: 'popper.js'
-      }),
-
-      new BundleTracker({
-        path: __dirname,
-        filename: './assets/bundles/webpack-stats.json'
-      }),
-
-      new webpack.DefinePlugin({
-        'process.env': {
-          NODE_ENV: JSON.stringify(custom.production ? 'production' : 'development')
-        }
-      }),
-      new webpack.EnvironmentPlugin({
-        AETHER_KERNEL_URL: '/kernel',
-        AETHER_MODULES: 'kernel',
-        AETHER_ODK_URL: null,
-        CSV_HEADER_RULES: '',
-        CSV_HEADER_RULES_SEP: ':'
-      })
-    ].concat(custom.plugins),
-
-    resolve: {
-      modules: ['node_modules'],
-      extensions: ['.js', '.jsx']
-    }
-  }
-}
+})

@@ -54,7 +54,7 @@ export default class Survey extends Component {
             href={getSurveysPath({action: 'edit', id: survey.id})}
             role='button'
             className='btn btn-primary btn-icon'>
-            <i className='fa fa-pencil invert mr-3' />
+            <i className='fas fa-pencil-alt invert mr-3' />
             <FormattedMessage
               id='survey.view.action.edit'
               defaultMessage='Edit survey' />
@@ -91,7 +91,7 @@ export default class Survey extends Component {
                 className={`tab ${pageSize !== 1 ? 'active' : ''}`}
                 onClick={() => { this.setState({ pageSize: TABLE_SIZE }) }}
               >
-                <i className='fa fa-th-list mr-2' />
+                <i className='fas fa-th-list mr-2' />
                 <FormattedMessage
                   id='survey.view.action.table'
                   defaultMessage='Table' />
@@ -102,7 +102,7 @@ export default class Survey extends Component {
                 className={`tab ${pageSize === 1 ? 'active' : ''}`}
                 onClick={() => { this.setState({ pageSize: 1 }) }}
               >
-                <i className='fa fa-file mr-2' />
+                <i className='fas fa-file mr-2' />
                 <FormattedMessage
                   id='survey.view.action.single'
                   defaultMessage='Single' />
@@ -159,7 +159,6 @@ export default class Survey extends Component {
 
     const download = (options, fileName) => {
       postData(getSubmissionsAPIPath(options), payload, {download: true, fileName})
-        .catch(err => { console.log(err) })
     }
 
     if (total < pageSize) {
@@ -168,7 +167,7 @@ export default class Survey extends Component {
           className='tab'
           onClick={() => { download(params, `${survey.name}.csv`) }}
         >
-          <i className='fa fa-download mr-2' />
+          <i className='fas fa-download mr-2' />
           <FormattedMessage
             id='survey.view.action.download'
             defaultMessage='Download' />
@@ -191,7 +190,7 @@ export default class Survey extends Component {
           id={dropdown}
           data-toggle='dropdown'
         >
-          <i className='fa fa-download mr-2' />
+          <i className='fas fa-download mr-2' />
           <FormattedMessage
             id='survey.view.action.download'
             defaultMessage='Download' />

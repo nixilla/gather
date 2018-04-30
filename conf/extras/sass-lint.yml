@@ -3,7 +3,7 @@ options:
 
 files:
   include:
-    - './gather/assets/css/*.scss'
+    - './gather/assets/css/**/*.scss'
 
 rules:
   # ========================

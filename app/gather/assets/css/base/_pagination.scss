@@ -85,7 +85,7 @@
     position: relative;
 
     &::before {
-      content: '\f002';
+      content: '\f002'; /* fa-search */
       display: inline-block;
       font-family: $icon-font;
       font-size: 1.3em;
@@ -106,7 +106,6 @@
       margin: .2rem 0;
       background: none;
       z-index: 2;
-      width: 0;
       transition: width .5s;
 
       &:focus,
