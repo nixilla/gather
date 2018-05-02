@@ -101,10 +101,11 @@ export const getType = (value) => {
  *
  * @param {string} key
  */
-export const cleanPropertyName = (key) => key
+export const cleanPropertyName = (key) => (key
   .replace(/_/g, ' ') //             convert `my_name_is` into `my name is`
   .replace(/([A-Z]+)/g, ' $1') //    convert `myNameIs` into `my Name Is`
   .replace(/([A-Z][a-z])/g, ' $1')
+)
 
 /**
  * Flatten a deep object into a one level object with it’s path as key
@@ -161,7 +162,6 @@ export const unflatten = (object, separator = '.') => {
  *
  * @return {object}           - The resulting unflat object
  */
-
 export const filterByPaths = (object, paths, separator = '.') => {
   const flattenObject = flatten(object, separator)
   const filteredFlattenObject = {}
@@ -274,7 +274,7 @@ export const inflate = (flatKeys, separator = '.') => {
           // count the properties that start with this one (siblings at this tree level)
           // adding suffix `separator` skips the edge case
           // { a: 1, ab: { c: 1 } } -> { 'a': 1, 'ab.c': 1 }
-          siblings: flatKeys.filter(c => c === key || c.indexOf(key + separator) === 0).length
+          siblings: flatKeys.filter(c => c.indexOf(key + separator) === 0).length || 1
         }
       })
       .forEach(column => {

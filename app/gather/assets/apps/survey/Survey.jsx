@@ -15,7 +15,7 @@ import SubmissionsList from '../submission/SubmissionsList'
 import SubmissionItem from '../submission/SubmissionItem'
 
 const TABLE_SIZE = 10
-const SEPARATOR = '¬¬¬' // very uncommon string
+const SEPARATOR = String.fromCharCode(0) // very uncommon string
 
 export default class Survey extends Component {
   constructor (props) {
@@ -38,7 +38,7 @@ export default class Survey extends Component {
           .forEach(key => { allFlattenKeys.push(key) })
       })
 
-      this.state.allColumns = [ ...new Set(allFlattenKeys) ]
+      this.state.allColumns = [ ...new Set(allFlattenKeys) ].sort()
       this.state.selectedColumns = [ ...this.state.allColumns ]
     }
   }
@@ -118,7 +118,7 @@ export default class Survey extends Component {
         </div>
         <PaginationContainer
           pageSize={pageSize}
-          url={getSubmissionsAPIPath({mapping: survey.id})}
+          url={getSubmissionsAPIPath({mapping: survey.id, ordering: '-created'})}
           position='top'
           listComponent={SubmissionComponent}
           search

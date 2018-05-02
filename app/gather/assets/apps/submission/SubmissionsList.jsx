@@ -33,33 +33,43 @@ export default class SubmissionsList extends Component {
 
   renderHeader () {
     /****************************************************************
-        Data
-        ====
-        {
-          a: {
-            b: {
-              c: 1,
-              d: 2
-            },
-            e: {
-              f: true
-            },
-            g: []
-          },
-          h: 0
-        }
+    Data
+    ====
+    {
+      a: {
+        b: {
+          c: 1,
+          d: 2
+        },
+        e: {
+          f: true
+        },
+        g: []
+      },
+      h: 0
+    }
 
-        Table header
-        ============
-        +---+------------++----------------+---+
-        | # | Submitted  | A              | H |
-        |   |            +-------+---+----+   |
-        |   |            | B     | E | G  |   |
-        |   |            +---+---+---+    |   |
-        |   |            | C | D | F |    |   |
-        +---+------------+---+---+---+----+---+
-        | 1 | 1999-01-01 | 1 | 2 | T | [] | 0 |
-        +---+------------+---+---+---+----+---+
+    Columns
+    =======
+    [
+      'a.b.c',
+      'a.b.d',
+      'a.e.f',
+      'a.g',
+      'h'
+    ]
+
+    Table header
+    ============
+    +---+------------++----------------+---+
+    | # | Submitted  | A              | H |
+    |   |            +-------+---+----+   |
+    |   |            | B     | E | G  |   |
+    |   |            +---+---+---+    |   |
+    |   |            | C | D | F |    |   |
+    +---+------------+---+---+---+----+---+
+    | 1 | 1999-01-01 | 1 | 2 | T | [] | 0 |
+    +---+------------+---+---+---+----+---+
 
     ****************************************************************/
 
@@ -69,49 +79,64 @@ export default class SubmissionsList extends Component {
 
     return (
       <thead>
-        {
-          headers.map((row, index) => (
-            <tr key={index}>
-              {
-                (index === 0) &&
-                <React.Fragment>
-                  <th rowSpan={rows || 1} />
-                  <th rowSpan={rows || 1}>
-                    <FormattedMessage
-                      id='submission.list.table.date'
-                      defaultMessage='Submitted' />
-                  </th>
-                  <th rowSpan={rows || 1}>
-                    <FormattedMessage
-                      id='submission.list.table.revision'
-                      defaultMessage='Revision' />
-                  </th>
-                  <th rowSpan={rows || 1}>
-                    <FormattedMessage
-                      id='submission.list.table.survey.revision'
-                      defaultMessage='Survey revision' />
-                  </th>
-                  <th rowSpan={rows || 1}>
-                    <FormattedMessage
-                      id='submission.list.table.attachments'
-                      defaultMessage='Attachments' />
-                  </th>
-                </React.Fragment>
-              }
+        <tr key={0}>
+          <th rowSpan={rows || 1} />
+          <th rowSpan={rows || 1}>
+            <FormattedMessage
+              id='submission.list.table.date'
+              defaultMessage='Submitted' />
+          </th>
+          <th rowSpan={rows || 1}>
+            <FormattedMessage
+              id='submission.list.table.revision'
+              defaultMessage='Revision' />
+          </th>
+          <th rowSpan={rows || 1}>
+            <FormattedMessage
+              id='submission.list.table.survey.revision'
+              defaultMessage='Survey revision' />
+          </th>
+          <th rowSpan={rows || 1}>
+            <FormattedMessage
+              id='submission.list.table.attachments'
+              defaultMessage='Attachments' />
+          </th>
 
-              {
+          {
+            headers
+              .filter((row, index) => index === 0)
+              .map((row, index) => (
                 Object.keys(row).map(column => (
                   <th
                     key={row[column].key}
                     title={row[column].path}
-                    rowSpan={row[column].isLeaf ? (rows - index) : 1}
+                    rowSpan={row[column].isLeaf ? rows : 1}
                     colSpan={row[column].siblings}>
                     { row[column].label }
                   </th>
                 ))
-              }
-            </tr>
-          ))
+              ))
+          }
+        </tr>
+
+        {
+          headers
+            .filter((row, index) => index > 0)
+            .map((row, index) => (
+              <tr key={index}>
+                {
+                  Object.keys(row).map(column => (
+                    <th
+                      key={row[column].key}
+                      title={row[column].path}
+                      rowSpan={row[column].isLeaf ? (rows - index - 1) : 1}
+                      colSpan={row[column].siblings}>
+                      { row[column].label }
+                    </th>
+                  ))
+                }
+              </tr>
+            ))
         }
       </thead>
     )
