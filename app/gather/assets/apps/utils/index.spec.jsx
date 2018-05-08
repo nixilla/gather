@@ -1,7 +1,13 @@
 /* global describe, it */
 
 import assert from 'assert'
-import { clone, deepEqual, range } from './index'
+import {
+  clone,
+  deepEqual,
+  generateRandomId,
+  range,
+  sortBy
+} from './index'
 
 describe('utils', () => {
   describe('clone', () => {
@@ -51,11 +57,69 @@ describe('utils', () => {
     })
   })
 
+  describe('generateRandomId', () => {
+    it('should return a random value every time is called', () => {
+      const a = generateRandomId()
+      const b = generateRandomId()
+      assert(a)
+      assert(b)
+      assert(a !== b)
+    })
+  })
+
   describe('range', () => {
     it('should create an array of ints', () => {
       assert.deepEqual(range(0, 0), [])
       assert.deepEqual(range(0, 1), [0])
       assert.deepEqual(range(1, 3), [1, 2])
+    })
+  })
+
+  describe('sortBy', () => {
+    it('should order an array of objects by the given property value', () => {
+      assert.deepEqual(sortBy([]), [])
+      assert.deepEqual(
+        sortBy([ 1, 10, 11, 100, 12, 1 ]),
+        [ 1, 1, 10, 100, 11, 12 ]
+      )
+
+      assert.deepEqual(
+        sortBy([
+          { a: '1' },
+          { a: '10' },
+          { a: '11' },
+          { a: '100' },
+          { a: '12' },
+          { a: '1' }
+        ], 'a'),
+        [
+          { a: '1' },
+          { a: '1' },
+          { a: '10' },
+          { a: '100' },
+          { a: '11' },
+          { a: '12' }
+        ]
+      )
+
+      assert.deepEqual(
+        sortBy([
+          { c: 2 },
+          { a: 10 },
+          { a: 11 },
+          { a: 100 },
+          { a: 12 },
+          { b: 1000 }
+        ], 'a'),
+        [
+          { c: 2 },
+          { b: 1000 },
+          { a: 10 },
+          { a: 100 },
+          { a: 11 },
+          { a: 12 }
+        ]
+      )
     })
   })
 })

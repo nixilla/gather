@@ -13,6 +13,7 @@ import LoadingSpinner from './LoadingSpinner'
 import MultiSelect from './MultiSelect'
 import PaginationBar from './PaginationBar'
 import PaginationContainer from './PaginationContainer'
+import Portal from './Portal'
 import RefreshSpinner from './RefreshSpinner'
 import WarningAlert from './WarningAlert'
 
@@ -32,6 +33,7 @@ export {
   MultiSelect,
   PaginationBar,
   PaginationContainer,
+  Portal,
   RefreshSpinner,
   WarningAlert
 }

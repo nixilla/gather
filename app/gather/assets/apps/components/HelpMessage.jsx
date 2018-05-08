@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 
+import { generateRandomId } from '../utils'
+
 /**
  * HelpMessage component.
  *
@@ -8,7 +10,7 @@ import React, { Component } from 'react'
 
 export default class HelpMessage extends Component {
   render () {
-    const randomId = `help-content-${Math.random().toString(36).slice(2)}`
+    const randomId = `help-content-${generateRandomId()}`
 
     return (
       <div data-qa='data-help-message' className='d-inline'>

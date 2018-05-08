@@ -147,7 +147,7 @@ export default class JSONViewer extends Component {
 
   renderBoolean (value) {
     return (
-      <span className='value' title={value}>
+      <span className='value' title={value.toString()}>
         { value
           ? <FormattedMessage id='json.viewer.boolean.true' defaultMessage='Yes' />
           : <FormattedMessage id='json.viewer.boolean.false' defaultMessage='No' />
@@ -192,14 +192,11 @@ class JSONArrayViewer extends Component {
     const {collapsed} = this.state
     const {values} = this.props
 
-    if (!getType(values)) {
-      return renderEmptyValue()
-    }
-
     if (collapsed) {
       return (
         <div>
           <button
+            type='button'
             className='btn icon-only btn-expand'
             onClick={this.toggleView.bind(this)}>
             <i className='fas fa-plus' />
@@ -215,6 +212,7 @@ class JSONArrayViewer extends Component {
     return (
       <div>
         <button
+          type='button'
           className='btn icon-only btn-collapse'
           onClick={this.toggleView.bind(this)}>
           <i className='fas fa-minus' />

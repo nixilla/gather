@@ -22,7 +22,7 @@ import RefreshSpinner from './RefreshSpinner'
  *                            ...
  *                          ]
  *
- *   `hideHints`:          Indicates if the auxiliary hint components
+ *   `silent`:             Indicates if the auxiliary hint components
  *                         (loading, error) are hidden.
  *                         The whole fetch process is in silent mode.
  *
@@ -40,9 +40,7 @@ export default class FetchUrlsContainer extends Component {
 
     this.state = {
       // default status variables
-      isLoading: true,
-      isRefreshing: false,
-      error: false
+      isLoading: true
     }
   }
 
@@ -56,14 +54,14 @@ export default class FetchUrlsContainer extends Component {
   }
 
   loadData () {
-    fetchUrls(this.props.urls)
+    return fetchUrls(this.props.urls)
       .then((response) => {
         const {handleResponse} = this.props
         this.setState({
           response: handleResponse ? handleResponse(response) : response,
           isLoading: false,
           isRefreshing: false,
-          error: false
+          error: null
         })
       })
       .catch((error) => {
@@ -77,20 +75,20 @@ export default class FetchUrlsContainer extends Component {
 
   render () {
     if (this.state.isLoading) {
-      return this.props.hideHints ? <div /> : <LoadingSpinner />
+      return this.props.silent ? <div /> : <LoadingSpinner />
     }
     if (this.state.error) {
-      return this.props.hideHints ? <div /> : <FetchErrorAlert />
+      return this.props.silent ? <div /> : <FetchErrorAlert error={this.state.error} />
     }
     if (!this.state.response) {
-      return this.props.hideHints ? <div /> : <EmptyAlert />
+      return this.props.silent ? <div /> : <EmptyAlert />
     }
 
     const TargetComponent = this.props.targetComponent
 
     return (
       <div data-qa='data-loaded'>
-        { this.state.isRefreshing && <RefreshSpinner /> }
+        { !this.props.silent && this.state.isRefreshing && <RefreshSpinner /> }
         <TargetComponent
           {...this.state.response}
           reload={this.refreshData.bind(this)}

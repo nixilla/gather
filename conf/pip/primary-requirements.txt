@@ -11,19 +11,21 @@
 
 # Main libraries
 django
-django-cas-ng
 django-cors-headers
 django-solo
-django-ums-client
+django-webpack-loader
 djangorestframework
 psycopg2-binary
 requests
 uwsgi
 
+# UMS
+django-cas-ng
+django-ums-client
+
 
 # Development
 django-debug-toolbar
-django-webpack-loader
 
 
 # Server side

@@ -3,15 +3,12 @@ import React, { Component } from 'react'
 import { AETHER_KERNEL_URL, AETHER_ODK_URL } from '../utils/env'
 
 const getAppUrl = (app) => {
-  switch (app) {
-    case 'kernel':
-      return AETHER_KERNEL_URL
+  if (app === 'kernel') {
+    return AETHER_KERNEL_URL
+  }
 
-    case 'odk':
-      if (AETHER_ODK_URL) {
-        return AETHER_ODK_URL
-      }
-      break
+  if (app === 'odk' && AETHER_ODK_URL) {
+    return AETHER_ODK_URL
   }
 
   return ''
@@ -69,6 +66,8 @@ export class LinksList extends Component {
       <div>
         { list.length > 1 &&
           <button
+            type='button'
+            data-qa='link-list-collapse-button'
             className='btn icon-only btn-collapse'
             onClick={() => this.setState({ collapsed: !this.state.collapsed })}>
             <i className={`fas fa-${this.state.collapsed ? 'plus' : 'minus'}`} />

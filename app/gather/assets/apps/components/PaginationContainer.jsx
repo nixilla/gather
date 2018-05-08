@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import { FormattedMessage } from 'react-intl'
+
 import { getData } from '../utils/request'
 import { buildQueryString } from '../utils/paths'
 
@@ -35,11 +37,9 @@ export default class PaginationContainer extends Component {
 
     this.state = {
       // default status variables
-      pageSize: this.props.pageSize || 25,
-      page: 1,
       isLoading: true,
-      isRefreshing: false,
-      error: false
+      pageSize: props.pageSize || 25,
+      page: 1
     }
   }
 
@@ -50,28 +50,29 @@ export default class PaginationContainer extends Component {
   }
 
   componentDidMount () {
-    this.fetchData()
+    this.loadData()
   }
 
   componentDidUpdate (prevProps, prevState) {
     if (prevState.page !== this.state.page ||
         prevState.pageSize !== this.state.pageSize ||
         prevState.search !== this.state.search) {
-      this.fetchData()
+      this.loadData()
     }
   }
 
-  fetchData () {
+  loadData () {
     const {page, pageSize, search} = this.state
-    const url = `${this.props.url}&${buildQueryString({page, pageSize, search})}`
+    const sep = this.props.url.indexOf('?') > -1 ? '&' : '?'
+    const url = `${this.props.url}${sep}${buildQueryString({page, pageSize, search})}`
 
-    getData(url)
+    return getData(url)
       .then((response) => {
         this.setState({
           list: response,
           isLoading: false,
           isRefreshing: false,
-          error: false
+          error: null
         })
       })
       .catch((error) => {
@@ -88,7 +89,7 @@ export default class PaginationContainer extends Component {
       return <LoadingSpinner />
     }
     if (this.state.error) {
-      return <FetchErrorAlert />
+      return <FetchErrorAlert error={this.state.error} />
     }
 
     const position = this.props.position || 'bottom'
@@ -98,31 +99,51 @@ export default class PaginationContainer extends Component {
     return (
       <div data-qa='data-loaded'>
         { this.state.isRefreshing && <RefreshSpinner /> }
+
         { (position === 'top') && this.renderPaginationBar() }
 
-        { count === 0 && <EmptyAlert /> }
+        { count === 0 && this.renderEmptyWarning() }
 
-        <ListComponent
-          {...this.props.extras}
-          list={results}
-          total={count}
-          start={this.state.pageSize * (this.state.page - 1) + 1}
-        />
+        { count > 0 &&
+          <ListComponent
+            {...this.props.extras}
+            list={results}
+            total={count}
+            start={this.state.pageSize * (this.state.page - 1) + 1}
+          />
+        }
 
         { (position === 'bottom') && this.renderPaginationBar() }
       </div>
     )
   }
 
-  renderPaginationBar (list) {
-    const {count} = this.state.list
-    const {page, pageSize} = this.state
+  renderEmptyWarning () {
+    if (!this.state.isRefreshing && this.state.search) {
+      return (
+        <div data-qa='data-empty' className='container-fluid'>
+          <p className='alert alert-danger'>
+            <i className='fas fa-exclamation-triangle mr-2' />
+            <FormattedMessage
+              id='pagination.search.empty'
+              defaultMessage='No results found for {search}.'
+              values={{ search: this.state.search }}
+            />
+          </p>
+        </div>
+      )
+    }
 
+    return <EmptyAlert />
+  }
+
+  renderPaginationBar () {
     return (
       <PaginationBar
-        currentPage={page}
-        pageSize={pageSize}
-        records={count}
+        currentPage={this.state.page}
+        pageSize={this.state.pageSize}
+        records={(this.state.list && this.state.list.count) || 0}
+
         goToPage={(page) => { this.setState({ page, isRefreshing: true }) }}
         onSearch={(search) => { this.setState({ search, page: 1, isRefreshing: true }) }}
 

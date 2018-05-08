@@ -15,7 +15,7 @@ import SubmissionsList from '../submission/SubmissionsList'
 import SubmissionItem from '../submission/SubmissionItem'
 
 const TABLE_SIZE = 10
-const SEPARATOR = String.fromCharCode(0) // very uncommon string
+const SEPARATOR = '¬¬¬' // very uncommon string
 
 export default class Survey extends Component {
   constructor (props) {
@@ -88,6 +88,7 @@ export default class Survey extends Component {
           <ul className='survey-data-tabs'>
             <li>
               <button
+                type='button'
                 className={`tab ${pageSize !== 1 ? 'active' : ''}`}
                 onClick={() => { this.setState({ pageSize: TABLE_SIZE }) }}
               >
@@ -99,6 +100,7 @@ export default class Survey extends Component {
             </li>
             <li>
               <button
+                type='button'
                 className={`tab ${pageSize === 1 ? 'active' : ''}`}
                 onClick={() => { this.setState({ pageSize: 1 }) }}
               >
@@ -164,6 +166,7 @@ export default class Survey extends Component {
     if (total < pageSize) {
       return (
         <button
+          type='button'
           className='tab'
           onClick={() => { download(params, `${survey.name}.csv`) }}
         >
@@ -186,6 +189,7 @@ export default class Survey extends Component {
     return (
       <div className='dropdown'>
         <button
+          type='button'
           className='tab'
           id={dropdown}
           data-toggle='dropdown'
@@ -205,6 +209,7 @@ export default class Survey extends Component {
               pages.map(page => (
                 <button
                   key={page.key}
+                  type='button'
                   className='dropdown-item'
                   onClick={() => { download(page.options, page.fileName) }}
                 >

@@ -1,6 +1,8 @@
 import React, {Component} from 'react'
 import { FormattedMessage } from 'react-intl'
 
+import Portal from './Portal'
+
 /**
  * ConfirmButton component.
  *
@@ -15,73 +17,82 @@ export default class ConfirmButton extends Component {
   }
 
   render () {
+    const button = (
+      <button
+        data-qa='confirm-button'
+        type='button'
+        disabled={this.state.open}
+        className={this.props.className || 'btn btn-primary'}
+        onClick={this.onClick.bind(this)}>
+        { this.props.buttonLabel || this.props.title }
+      </button>
+    )
+
     if (!this.state.open) {
-      return (
-        <button
-          type='button'
-          className={this.props.className || 'btn btn-primary'}
-          onClick={this.onClick.bind(this)}>
-          { this.props.buttonLabel || this.props.title }
-        </button>
-      )
+      return button
     }
 
     return (
-      <div className='confirmation-container'>
+      <React.Fragment>
         { /* show disabled button */ }
-        <button
-          type='button'
-          disabled
-          className={this.props.className || 'btn btn-primary'}>
-          { this.props.buttonLabel || this.props.title }
-        </button>
+        { button }
 
-        <div className='modal show'>
-          <div className='modal-dialog modal-md'>
-            <div className='modal-content'>
-              <div className='modal-header'>
-                <h5 className='modal-title'>{this.props.title}</h5>
-                <button
-                  type='button'
-                  className='close'
-                  onClick={this.onCancel.bind(this)}>
-                  &times;
-                </button>
-              </div>
+        <Portal>
+          <div data-qa='confirm-button-window' className='confirmation-container'>
+            <div className='modal show'>
+              <div className='modal-dialog modal-md'>
+                <div className='modal-content'>
+                  <div className='modal-header'>
+                    <h5 className='modal-title'>{this.props.title}</h5>
+                    { this.props.cancelable &&
+                      <button
+                        data-qa='confirm-button-close'
+                        type='button'
+                        className='close'
+                        onClick={this.onCancel.bind(this)}>
+                        &times;
+                      </button>
+                    }
+                  </div>
 
-              <div className='modal-body'>
-                {this.props.message}
-              </div>
+                  <div data-qa='confirm-button-message' className='modal-body'>
+                    {this.props.message}
+                  </div>
 
-              <div className='modal-footer'>
-                { this.props.cancelable &&
-                  <button
-                    type='button'
-                    className='btn btn-default'
-                    onClick={this.onCancel.bind(this)}>
-                    <FormattedMessage
-                      id='confirm.button.action.cancel'
-                      defaultMessage='No' />
-                  </button>
-                }
-                <button
-                  type='button'
-                  className='btn btn-secondary'
-                  onClick={this.execute.bind(this)}>
-                  <FormattedMessage
-                    id='confirm.button.action.confirm'
-                    defaultMessage='Yes' />
-                </button>
+                  <div className='modal-footer'>
+                    { this.props.cancelable &&
+                      <button
+                        data-qa='confirm-button-cancel'
+                        type='button'
+                        className='btn btn-default'
+                        onClick={this.onCancel.bind(this)}>
+                        <FormattedMessage
+                          id='confirm.button.action.cancel'
+                          defaultMessage='No' />
+                      </button>
+                    }
+
+                    <button
+                      data-qa='confirm-button-confirm'
+                      type='button'
+                      className='btn btn-secondary'
+                      onClick={this.execute.bind(this)}>
+                      <FormattedMessage
+                        id='confirm.button.action.confirm'
+                        defaultMessage='Yes' />
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </Portal>
+      </React.Fragment>
     )
   }
 
   onCancel () {
-    this.setState({ open: false })
+    this.props.cancelable && this.setState({ open: false })
   }
 
   onClick () {

@@ -1,4 +1,4 @@
-/* global describe, it, afterEach */
+/* global describe, it, beforeEach, afterEach */
 
 import assert from 'assert'
 import nock from 'nock'
@@ -15,6 +15,10 @@ import {
 
 describe('request utils', () => {
   describe('request', () => {
+    beforeEach(() => {
+      nock.cleanAll()
+    })
+
     afterEach(() => {
       nock.isDone()
       nock.cleanAll()
@@ -186,6 +190,10 @@ describe('request utils', () => {
   })
 
   describe('forceGetData', () => {
+    beforeEach(() => {
+      nock.cleanAll()
+    })
+
     afterEach(() => {
       nock.isDone()
       nock.cleanAll()
@@ -237,6 +245,10 @@ describe('request utils', () => {
   })
 
   describe('fetchUrls', () => {
+    beforeEach(() => {
+      nock.cleanAll()
+    })
+
     afterEach(() => {
       nock.isDone()
       nock.cleanAll()

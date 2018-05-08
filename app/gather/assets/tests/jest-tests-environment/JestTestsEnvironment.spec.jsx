@@ -1,4 +1,4 @@
-/* global describe, it, expect, afterEach */
+/* global describe, it, expect, beforeEach, afterEach */
 
 import nock from 'nock'
 
@@ -30,6 +30,10 @@ describe('Tests Environment', () => {
   })
 
   describe('global.window.fetch', () => {
+    beforeEach(() => {
+      nock.cleanAll()
+    })
+
     afterEach(() => {
       nock.isDone()
       nock.cleanAll()

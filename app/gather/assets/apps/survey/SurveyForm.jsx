@@ -12,7 +12,7 @@ import {
 import { ODK_ACTIVE } from '../utils/env'
 import { ODK_APP } from '../utils/constants'
 
-import { ConfirmButton, ErrorAlert } from '../components'
+import { ConfirmButton, ErrorAlert, Portal } from '../components'
 import SurveyODKForm from './SurveyODKForm'
 
 const MESSAGES = defineMessages({
@@ -82,16 +82,17 @@ const MESSAGES = defineMessages({
   }
 })
 
-export class SurveyForm extends Component {
+class SurveyForm extends Component {
   constructor (props) {
     super(props)
-    const survey = clone(this.props.survey || {})
+
+    const survey = clone(props.survey || {})
     this.state = {
       ...survey,
       errors: {},
       isUpdating: false,
       actionsInProgress: [],
-      project: this.props.project
+      project: props.project
     }
 
     if (ODK_ACTIVE) {
@@ -217,30 +218,32 @@ export class SurveyForm extends Component {
   renderUpdating () {
     const {actionsInProgress} = this.state
     return (
-      <div className='modal show'>
-        <div className='modal-dialog modal-md'>
-          <div className='modal-content'>
-            <div className='modal-header'>
-              <h5 className='modal-title'>{this.renderTitle()}</h5>
-            </div>
+      <Portal>
+        <div className='modal show'>
+          <div className='modal-dialog modal-md'>
+            <div className='modal-content'>
+              <div className='modal-header'>
+                <h5 className='modal-title'>{this.renderTitle()}</h5>
+              </div>
 
-            <div className='modal-body'>
-              <i className='fas fa-spin fa-cog mr-2' />
-              <FormattedMessage
-                id='survey.form.action.updating'
-                defaultMessage='Saving data in progress…' />
-              <div className='mt-2'>
-                <ul>
-                  {
-                    actionsInProgress.length > 0 &&
-                    actionsInProgress.map((msg, index) => <li key={index}>{msg}</li>)
-                  }
-                </ul>
+              <div className='modal-body'>
+                <i className='fas fa-spin fa-cog mr-2' />
+                <FormattedMessage
+                  id='survey.form.action.updating'
+                  defaultMessage='Saving data in progress…' />
+                <div className='mt-2'>
+                  <ul>
+                    {
+                      actionsInProgress.length > 0 &&
+                      actionsInProgress.map((msg, index) => <li key={index}>{msg}</li>)
+                    }
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </Portal>
     )
   }
 

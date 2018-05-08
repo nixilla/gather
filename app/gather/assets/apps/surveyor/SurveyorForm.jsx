@@ -52,10 +52,10 @@ const MESSAGES = defineMessages({
   }
 })
 
-export class SurveyorForm extends Component {
+class SurveyorForm extends Component {
   constructor (props) {
     super(props)
-    this.state = { ...clone(this.props.surveyor), errors: {} }
+    this.state = { ...clone(props.surveyor), errors: {} }
   }
 
   render () {

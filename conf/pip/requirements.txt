@@ -9,13 +9,13 @@
 #                                                                              #
 ################################################################################
 
-awscli==1.15.10
-botocore==1.10.10
+awscli==1.15.15
+botocore==1.10.15
 certifi==2018.4.16
 chardet==3.0.4
 colorama==0.3.7
 coverage==4.5.1
-Django==2.0.4
+Django==2.0.5
 django-cas-ng==3.5.9
 django-cors-headers==2.2.0
 django-debug-toolbar==1.9.1

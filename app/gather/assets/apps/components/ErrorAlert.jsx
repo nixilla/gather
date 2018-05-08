@@ -18,7 +18,7 @@ export default class ErrorAlert extends Component {
       <div data-qa='data-erred' className='form-error'>
         {
           errors.map((error, index) => (
-            <p className='error' key={index}>
+            <p key={index} data-qa={`data-erred-${index}`} className='error'>
               { error }
             </p>
           ))

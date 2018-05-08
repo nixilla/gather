@@ -1,5 +1,18 @@
+
+/**
+ * Clones object.
+ *
+ * @param {*} x -- the object
+ */
 export const clone = (x) => JSON.parse(JSON.stringify(x))
 
+/**
+ * Checks if the two objects are equal, comparing even nested properties.
+ *
+ * @param {*}      a          -- object 1
+ * @param {*}      b          -- object 2
+ * @param {bool}   ignoreNull -- ignore null values
+ */
 export const deepEqual = (a, b, ignoreNull = false) => {
   if (typeof a !== 'object') {
     return a === b
@@ -41,5 +54,30 @@ export const deepEqual = (a, b, ignoreNull = false) => {
   return true
 }
 
-// https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/from
+/**
+ * Creates an array of numbers with the indicated start and end points.
+ *
+ * https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/from
+ *
+ * @param {Number} start - the start point
+ * @param {Number} end   - the end point
+ */
 export const range = (start, end) => Array.from({length: end - start}, (v, i) => i + start)
+
+/**
+ * Sorts an array of objects by a given key value
+ *
+ * @param {Array of Number} array - the array of numeric values
+ * @param {String}          key   - the property to sort by
+ */
+export const sortBy = (array, key) => array.sort((a, b) => {
+  const aa = ((!key ? a : a[key]) || '').toString()
+  const bb = ((!key ? b : b[key]) || '').toString()
+
+  return aa.localeCompare(bb)
+})
+
+/**
+ * Creates a random id
+ */
+export const generateRandomId = () => Math.random().toString(36).slice(2)

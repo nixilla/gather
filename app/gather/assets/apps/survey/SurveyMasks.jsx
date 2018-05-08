@@ -4,7 +4,7 @@ import { defineMessages, injectIntl, FormattedMessage } from 'react-intl'
 import { cleanPropertyName } from '../utils/types'
 import { deleteData, postData } from '../utils/request'
 import { getMasksAPIPath } from '../utils/paths'
-import { ConfirmButton } from '../components'
+import { ConfirmButton, Portal } from '../components'
 
 const MESSAGES = defineMessages({
   namePlaceholder: {
@@ -19,7 +19,7 @@ const MESSAGES = defineMessages({
  * Renders the columns selection mask.
  */
 
-export class SurveyMasks extends Component {
+class SurveyMasks extends Component {
   constructor (props) {
     super(props)
 
@@ -113,6 +113,7 @@ export class SurveyMasks extends Component {
             id='survey.mask.fields'
             defaultMessage='Mask fields:' />
           <button
+            type='button'
             className={`btn badge ${currentMask.id !== -1 ? 'active' : ''} ${this.state.showColumns ? 'open' : ''} ${currentMask.id > 0 ? 'custom' : ''}`}
             onClick={() => { this.setState({ showColumns: !this.state.showColumns }) }}
           >
@@ -138,6 +139,7 @@ export class SurveyMasks extends Component {
         { this.renderColumnsList() }
 
         <button
+          type='button'
           className='close-filters'
           onClick={() => { this.setState({ showColumns: false }) }}
         >
@@ -165,6 +167,7 @@ export class SurveyMasks extends Component {
             this.state.masks.map(mask => (
               <li key={mask.id} className={`badge column-preset ${getClassName(mask)} ${mask.id > 0 ? 'custom' : ''}`}>
                 <button
+                  type='button'
                   className='preset-action'
                   onClick={() => selectMaskColumns(mask)}>
                   {mask.name}
@@ -323,28 +326,30 @@ export class SurveyMasks extends Component {
     }
 
     return (
-      <div className='modal show'>
-        <div className='modal-dialog modal-md'>
-          <div className='modal-content'>
-            <div className='modal-header'>
-              <h5 className='modal-title'>{ this.state.message.title }</h5>
-            </div>
-            <div className='modal-body'>
-              { this.state.message.body }
-            </div>
-            <div className='modal-footer'>
-              <button
-                type='button'
-                className='btn btn-secondary'
-                onClick={() => this.setState({ message: null })}>
-                <FormattedMessage
-                  id='survey.mask.preset.button.close'
-                  defaultMessage='Close' />
-              </button>
+      <Portal>
+        <div className='modal show'>
+          <div className='modal-dialog modal-md'>
+            <div className='modal-content'>
+              <div className='modal-header'>
+                <h5 className='modal-title'>{ this.state.message.title }</h5>
+              </div>
+              <div className='modal-body'>
+                { this.state.message.body }
+              </div>
+              <div className='modal-footer'>
+                <button
+                  type='button'
+                  className='btn btn-secondary'
+                  onClick={() => this.setState({ message: null })}>
+                  <FormattedMessage
+                    id='survey.mask.preset.button.close'
+                    defaultMessage='Close' />
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </Portal>
     )
   }
 }

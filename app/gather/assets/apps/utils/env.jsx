@@ -1,5 +1,5 @@
 // takes enabled modules from the environment variable
-export const ODK_ACTIVE = (process.env.AETHER_MODULES.split(',').indexOf('odk') > -1)
+export const ODK_ACTIVE = ((process.env.AETHER_MODULES || '').split(',').indexOf('odk') > -1)
 
 // these are used to export the responses as a CSV file using the CustomCSVRenderer
 export const CSV_HEADER_RULES = process.env.CSV_HEADER_RULES

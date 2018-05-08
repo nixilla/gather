@@ -6,7 +6,7 @@ import {
   FormattedRelative
 } from 'react-intl'
 
-import { clone } from '../utils'
+import { clone, generateRandomId } from '../utils'
 import {
   ConfirmButton,
   ErrorAlert,
@@ -33,7 +33,7 @@ const MESSAGES = defineMessages({
   }
 })
 
-export class SurveyODKForm extends Component {
+class SurveyODKForm extends Component {
   constructor (props) {
     super(props)
 
@@ -114,7 +114,7 @@ export class SurveyODKForm extends Component {
             defaultMessage='Granted Surveyors' />
         </label>
         <MultiSelect
-          values={selectedSurveyors}
+          selected={selectedSurveyors}
           options={availableSurveyors}
           valueProp='id'
           textProp='username'
@@ -199,7 +199,7 @@ export class SurveyODKForm extends Component {
     for (let i = 0; i < event.target.files.length; i++) {
       const file = event.target.files.item(i)
       xforms.push({
-        key: Math.random().toString(36).slice(2),
+        key: generateRandomId(),
         title: file.name,
         version: formatMessage(MESSAGES.newForm),
         file
@@ -215,7 +215,7 @@ class XForm extends Component {
     super(props)
 
     this.state = {
-      ...clone(this.props.xform),
+      ...clone(props.xform),
       editView: false
     }
   }
@@ -289,6 +289,7 @@ class XForm extends Component {
         { /* only existing xforms can edit */
           xform.id &&
           <button
+            type='button'
             className='btn btn-sm btn-secondary btn-edit icon-only'
             onClick={this.toggleEditView.bind(this)}>
             <i className={`fas fa-${this.state.editView ? 'minus' : 'pencil-alt'}`} />
@@ -326,6 +327,7 @@ class XForm extends Component {
                 <span className='ml-4'>
                   <span>{ xform.file.name }</span>
                   <button
+                    type='button'
                     className='btn btn-sm icon-only btn-danger ml-2'
                     onClick={this.removeFile.bind(this)}><i className='fas fa-times' /></button>
                 </span>
@@ -469,7 +471,7 @@ class MediaFile extends Component {
     for (let i = 0; i < event.target.files.length; i++) {
       const file = event.target.files.item(i)
       mediaFiles.push({
-        key: Math.random().toString(36).slice(2),
+        key: generateRandomId(),
         name: file.name,
         file
       })

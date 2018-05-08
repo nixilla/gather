@@ -53,7 +53,7 @@ const MESSAGES = defineMessages({
  *     - LAST.
  */
 
-export class PaginationBar extends Component {
+class PaginationBar extends Component {
   constructor (props) {
     super(props)
 
@@ -69,60 +69,29 @@ export class PaginationBar extends Component {
   }
 
   render (list) {
-    if (this.getNumberOfPages() < 2 && (!this.props.search || !this.state.currentSearch)) {
+    if (this.getNumberOfPages() < 2 && !this.props.search) {
       return <div />
-    }
-
-    if (this.getNumberOfPages() === 0) {
-      return (
-        <nav data-qa='data-pagination' className='pagination-bar'>
-          { /* render SEARCH */ }
-          { this.renderSearchBar() }
-        </nav>
-      )
     }
 
     return (
       <nav data-qa='data-pagination' className='pagination-bar'>
         { /* render SEARCH */ }
         { this.renderSearchBar() }
-
-        <ul className='pagination'>
-          { /* go to FIRST page */}
-          { this.renderLinkToPage('first') }
-
-          { /* go to PREVIOUS page */}
-          { this.renderLinkToPage('previous') }
-
-          { /* CURRENT page */}
-          <li className='page-item disabled'>
-            <FormattedMessage
-              {...MESSAGES[(this.props.pageSize === 1 ? 'record' : 'page')]}
-              values={{
-                current: this.renderCurrentPage(),
-                total: this.renderNumberOfPages()
-              }}
-            />
-          </li>
-
-          { /* go to NEXT page */}
-          { this.renderLinkToPage('next') }
-
-          { /* go to LAST page */}
-          { this.renderLinkToPage('last') }
-        </ul>
+        { /* render NAVIGATION BUTTONS and CURRENT PAGE input */ }
+        { this.renderNavigationButtons() }
       </nav>
     )
   }
 
   getNumberOfPages () {
-    return Math.ceil(this.props.records / this.props.pageSize)
+    return Math.ceil(this.props.records / this.props.pageSize) || 0
   }
 
   renderSearchBar () {
     if (!this.props.search) {
       return ''
     }
+
     const onChange = (event) => {
       this.setState({ [event.target.name]: event.target.value })
     }
@@ -146,6 +115,38 @@ export class PaginationBar extends Component {
           onKeyPress={onKeyPress}
         />
       </div>
+    )
+  }
+  renderNavigationButtons () {
+    if (this.getNumberOfPages() < 2) {
+      return ''
+    }
+
+    return (
+      <ul data-qa='data-pagination-buttons' className='pagination'>
+        { /* go to FIRST page */}
+        { this.renderLinkToPage('first') }
+
+        { /* go to PREVIOUS page */}
+        { this.renderLinkToPage('previous') }
+
+        { /* CURRENT page */}
+        <li className='page-item disabled'>
+          <FormattedMessage
+            {...MESSAGES[(this.props.pageSize === 1 ? 'record' : 'page')]}
+            values={{
+              current: this.renderCurrentPage(),
+              total: this.renderNumberOfPages()
+            }}
+          />
+        </li>
+
+        { /* go to NEXT page */}
+        { this.renderLinkToPage('next') }
+
+        { /* go to LAST page */}
+        { this.renderLinkToPage('last') }
+      </ul>
     )
   }
 
@@ -198,7 +199,7 @@ export class PaginationBar extends Component {
 
   onBlurPage () {
     if (this.state.currentPage !== this.props.currentPage) {
-      this.props.gotToPage(this.state.currentPage)
+      this.props.goToPage(this.state.currentPage)
     }
   }
 
@@ -248,12 +249,13 @@ export class PaginationBar extends Component {
 
     return (
       <li data-qa={`data-pagination-${pageName}`} className='page-item'>
-        <a
+        <button
+          type='button'
           className='page-link'
           onClick={() => this.props.goToPage(newPage)}
           aria-label={formatMessage(MESSAGES[pageName])}>
           <FormattedMessage {...MESSAGES[pageName]} />
-        </a>
+        </button>
       </li>
     )
   }
