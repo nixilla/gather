@@ -74,7 +74,8 @@ module.exports = (custom) => ({
       AETHER_MODULES: 'kernel',
       AETHER_ODK_URL: null,
       CSV_HEADER_RULES: '',
-      CSV_HEADER_RULES_SEP: ':'
+      CSV_HEADER_RULES_SEP: ':',
+      CSV_MAX_ROWS_SIZE: '10000'
     }),
 
     // extract styles as a CSS file not JS file

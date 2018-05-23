@@ -20,7 +20,8 @@ describe('environment constants', () => {
           AETHER_ODK_URL: 'http://odk-test:9002',
 
           CSV_HEADER_RULES: 'replace;.;:;',
-          CSV_HEADER_RULES_SEP: ';'
+          CSV_HEADER_RULES_SEP: ';',
+          CSV_MAX_ROWS_SIZE: null
         }
       )
     })
@@ -39,6 +40,7 @@ describe('environment constants', () => {
 
       assert.deepEqual(envWithODK.CSV_HEADER_RULES, 'replace;.;:;')
       assert.deepEqual(envWithODK.CSV_HEADER_RULES_SEP, ';')
+      assert.deepEqual(envWithODK.CSV_MAX_ROWS_SIZE, 0)
     })
   })
 
@@ -57,7 +59,8 @@ describe('environment constants', () => {
           AETHER_ODK_URL: 'http://odk-test:9002',
 
           CSV_HEADER_RULES: 'replace¬.¬:¬',
-          CSV_HEADER_RULES_SEP: '¬'
+          CSV_HEADER_RULES_SEP: '¬',
+          CSV_MAX_ROWS_SIZE: '123456'
         }
       )
     })
@@ -76,6 +79,7 @@ describe('environment constants', () => {
 
       assert.deepEqual(envWithoutODK.CSV_HEADER_RULES, 'replace¬.¬:¬')
       assert.deepEqual(envWithoutODK.CSV_HEADER_RULES_SEP, '¬')
+      assert.deepEqual(envWithoutODK.CSV_MAX_ROWS_SIZE, 123456)
     })
   })
 })

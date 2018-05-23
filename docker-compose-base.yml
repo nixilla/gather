@@ -124,6 +124,7 @@ services:
 
       CSV_HEADER_RULES: replace;.;:;
       CSV_HEADER_RULES_SEP: ;
+      CSV_MAX_ROWS_SIZE: 1000
 
       # Do not buffer python stdout so we see log output immediatly
       PYTHONUNBUFFERED: ""

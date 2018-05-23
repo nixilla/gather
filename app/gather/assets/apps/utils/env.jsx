@@ -4,6 +4,7 @@ export const ODK_ACTIVE = ((process.env.AETHER_MODULES || '').split(',').indexOf
 // these are used to export the responses as a CSV file using the CustomCSVRenderer
 export const CSV_HEADER_RULES = process.env.CSV_HEADER_RULES
 export const CSV_HEADER_RULES_SEP = process.env.CSV_HEADER_RULES_SEP
+export const CSV_MAX_ROWS_SIZE = parseInt(process.env.CSV_MAX_ROWS_SIZE, 10) || 0
 
 // needed to create the links to external modules
 export const AETHER_KERNEL_URL = process.env.AETHER_KERNEL_URL

@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl'
 import { FetchUrlsContainer, PaginationContainer } from '../components'
 import { range } from '../utils'
 import { MAX_PAGE_SIZE, GATHER_APP } from '../utils/constants'
-import { CSV_HEADER_RULES, CSV_HEADER_RULES_SEP } from '../utils/env'
+import { CSV_HEADER_RULES, CSV_HEADER_RULES_SEP, CSV_MAX_ROWS_SIZE } from '../utils/env'
 import { getSurveysPath, getSurveysAPIPath, getSubmissionsAPIPath } from '../utils/paths'
 import { postData } from '../utils/request'
 import { flatten } from '../utils/types'
@@ -136,7 +136,7 @@ export default class Survey extends Component {
     const {survey} = this.props
     const {total, allColumns, selectedColumns} = this.state
 
-    const pageSize = MAX_PAGE_SIZE
+    const pageSize = CSV_MAX_ROWS_SIZE || MAX_PAGE_SIZE
     const sep = CSV_HEADER_RULES_SEP
     const params = {
       mapping: survey.id,
