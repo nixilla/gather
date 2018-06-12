@@ -140,10 +140,9 @@ export default class Survey extends Component {
         </div>
         <PaginationContainer
           pageSize={pageSize}
-          url={getSubmissionsAPIPath({mapping: survey.id, ordering: '-created'})}
+          url={getSubmissionsAPIPath({project: survey.id, ordering: '-created'})}
           position='top'
           listComponent={SubmissionComponent}
-          search
           showPrevious
           showNext
           extras={extras}
@@ -157,19 +156,17 @@ export default class Survey extends Component {
     const {total, allColumns, selectedColumns} = this.state
 
     const pageSize = CSV_MAX_ROWS_SIZE || MAX_PAGE_SIZE
-    const sep = CSV_HEADER_RULES_SEP
     const params = {
-      mapping: survey.id,
+      ordering: '-created',
+      project: survey.id,
       fields: 'created,payload',
-      // using different format than `json` will build the "post as get" API path
+      action: 'fetch', // this will build the "post as get" API path
       format: 'csv',
       pageSize
     }
     const payload = {
-      // remove "payload.None." prefix from headers labels
-      // from "payload.None.a.b.c" to "a.b.c"
-      parse_columns: `remove-prefix${sep}payload.,remove-prefix${sep}None.,${CSV_HEADER_RULES}`,
-      rule_sep: sep
+      parse_columns: CSV_HEADER_RULES,
+      rule_sep: CSV_HEADER_RULES_SEP
     }
 
     // restrict the columns to export with the selected columns
@@ -261,7 +258,7 @@ export default class Survey extends Component {
         url: getSurveysAPIPath({ app: GATHER_APP, id: this.props.survey.id }),
         force: {
           url: getSurveysAPIPath({ app: GATHER_APP }),
-          data: { mapping_id: this.props.survey.id, name: this.props.survey.name }
+          data: { project_id: this.props.survey.id, name: this.props.survey.name }
         }
       }
     ]

@@ -33,8 +33,271 @@ import {
   putData
 } from './request'
 
+const handleUnexpectedBody = (body) => { assert(!body, `Unexpected response ${body}`) }
+const handleUnexpectedError = (error) => { assert(!error, `Unexpected error ${error}`) }
+
 describe('request utils', () => {
   describe('request', () => {
+    describe('implemented HTTP methods', () => {
+      beforeEach(() => {
+        nock.cleanAll()
+      })
+
+      afterEach(() => {
+        nock.isDone()
+        nock.cleanAll()
+      })
+
+      it('should do a GET request', () => {
+        nock('http://localhost')
+          .get('/get')
+          .reply(200, {get: true})
+
+        return getData('http://localhost/get')
+          .then(
+            (body) => { assert(body.get, 'GET request should work') },
+            handleUnexpectedError
+          )
+          .catch(handleUnexpectedError)
+      })
+
+      it('should do a POST request', () => {
+        nock('http://localhost')
+          .post('/post', {foo: 'bar'})
+          .reply(200, {post: true})
+
+        return postData('http://localhost/post', {foo: 'bar'})
+          .then(
+            (body) => { assert(body.post, 'POST request should work') },
+            handleUnexpectedError
+          )
+          .catch(handleUnexpectedError)
+      })
+
+      it('should do a PUT request', () => {
+        nock('http://localhost')
+          .put('/put', {foo: 'bar'})
+          .reply(200, {put: true})
+
+        return putData('http://localhost/put', {foo: 'bar'})
+          .then(
+            (body) => { assert(body.put, 'PUT request should work') },
+            handleUnexpectedError
+          )
+          .catch(handleUnexpectedError)
+      })
+
+      it('should do a PUT request using FormData', () => {
+        nock('http://localhost')
+          .put('/put-form')
+          .reply(200, {putForm: true})
+
+        return putData(
+          'http://localhost/put-form',
+          {foo: 'bar', list: [1, 2, 3], useless: null, nothing: undefined},
+          {multipart: true}
+        )
+          .then(
+            (body) => { assert(body.putForm, 'PUT request using FormData should work') },
+            handleUnexpectedError
+          )
+          .catch(handleUnexpectedError)
+      })
+
+      it('should do a fake PUT request', () => {
+        nock('http://localhost')
+          .put('/fake-put')
+          .reply(200, {put: true})
+
+        return postData('http://localhost/fake-put', {foo: 'bar'}, {multipart: true})
+          .then(
+            (body) => { assert(body.put, 'Fake PUT request should work') },
+            handleUnexpectedError
+          )
+          .catch(handleUnexpectedError)
+      })
+
+      it('should do a PATCH request', () => {
+        nock('http://localhost')
+          .patch('/patch', {foo: 'bar'})
+          .reply(200, {patch: true})
+
+        return patchData('http://localhost/patch', {foo: 'bar'})
+          .then(
+            (body) => { assert(body.patch, 'PATCH request should work') },
+            handleUnexpectedError
+          )
+          .catch(handleUnexpectedError)
+      })
+
+      it('should do a DELETE request', () => {
+        nock('http://localhost')
+          .delete('/del')
+          .reply(204)
+
+        return deleteData('http://localhost/del')
+          .then(
+            (body) => { assert(!body, 'DELETE request should work') },
+            handleUnexpectedError
+          )
+          .catch(handleUnexpectedError)
+      })
+    })
+
+    describe('download response as file', () => {
+      beforeEach(() => {
+        nock.cleanAll()
+      })
+
+      afterEach(() => {
+        nock.isDone()
+        nock.cleanAll()
+      })
+
+      it('should do a GET request and download response', () => {
+        nock('http://localhost')
+          .get('/down')
+          .reply(200, 'content text')
+
+        let createObjectURLCalled = false
+        let revokeObjectURLCalled = false
+        let appendChildCalled = false
+        let removeChildCalled = false
+        let addedElement = null
+
+        window.URL = {
+          createObjectURL: (content) => {
+            assert(content)
+            createObjectURLCalled = true
+          },
+          revokeObjectURL: (url) => {
+            assert(url)
+            revokeObjectURLCalled = true
+          }
+        }
+
+        document.body.appendChild = (element) => {
+          addedElement = element
+          assert.equal(element.download, 'download')
+          appendChildCalled = true
+        }
+
+        document.body.removeChild = (element) => {
+          assert.equal(element, addedElement)
+          assert.equal(element.download, 'download')
+          removeChildCalled = true
+        }
+
+        return getData('http://localhost/down', {download: true})
+          .then(
+            (body) => {
+              assert(!body, `No expected response ${body}`)
+              assert(createObjectURLCalled, 'createObjectURL was called')
+              assert(revokeObjectURLCalled, 'revokeObjectURL was called')
+              assert(appendChildCalled, 'appendChild was called')
+              assert(removeChildCalled, 'removeChild was called')
+            },
+            handleUnexpectedError
+          )
+          .catch(handleUnexpectedError)
+      })
+
+      it('should do a GET request and download response with the given file name', () => {
+        nock('http://localhost')
+          .get('/down')
+          .reply(200, 'content text')
+
+        let createObjectURLCalled = false
+        let revokeObjectURLCalled = false
+        let appendChildCalled = false
+        let removeChildCalled = false
+        let addedElement = null
+
+        window.URL = {
+          createObjectURL: (content) => {
+            assert(content)
+            createObjectURLCalled = true
+          },
+          revokeObjectURL: (url) => {
+            assert(url)
+            revokeObjectURLCalled = true
+          }
+        }
+
+        document.body.appendChild = (element) => {
+          addedElement = element
+          assert.equal(element.download, 'my-file.txt')
+          appendChildCalled = true
+        }
+
+        document.body.removeChild = (element) => {
+          assert.equal(element, addedElement)
+          assert.equal(element.download, 'my-file.txt')
+          removeChildCalled = true
+        }
+
+        return getData('http://localhost/down', {download: true, fileName: 'my-file.txt'})
+          .then(
+            (body) => {
+              assert(!body, `No expected response ${body}`)
+              assert(createObjectURLCalled, 'createObjectURL was called')
+              assert(revokeObjectURLCalled, 'revokeObjectURL was called')
+              assert(appendChildCalled, 'appendChild was called')
+              assert(removeChildCalled, 'removeChild was called')
+            },
+            handleUnexpectedError
+          )
+          .catch(handleUnexpectedError)
+      })
+    })
+
+    describe('error handling', () => {
+      beforeEach(() => {
+        nock.cleanAll()
+      })
+
+      afterEach(() => {
+        nock.isDone()
+        nock.cleanAll()
+      })
+
+      it('should throw an error with JSON content', () => {
+        nock('http://localhost')
+          .get('/error-404')
+          .reply(404, {message: 'something went wrong'})
+
+        return getData('http://localhost/error-404')
+          .then(
+            handleUnexpectedBody,
+            (error) => {
+              assert(error, 'Expected error')
+              assert.equal(error.message, 'Not Found', '404 error message')
+              assert.equal(error.content.message, 'something went wrong')
+            }
+          )
+          .catch(handleUnexpectedError)
+      })
+
+      it('should throw an error and ignore TEXT content', () => {
+        nock('http://localhost')
+          .get('/error-400')
+          .reply(400, 'something went wrong')
+
+        return getData('http://localhost/error-400')
+          .then(
+            handleUnexpectedBody,
+            (error) => {
+              assert(error, 'Expected error')
+              assert.equal(error.message, 'Bad Request', '400 error message')
+              assert.equal(error.content, null)
+            }
+          )
+          .catch(handleUnexpectedError)
+      })
+    })
+  })
+
+  describe('CSRF Token', () => {
     beforeEach(() => {
       nock.cleanAll()
     })
@@ -44,168 +307,32 @@ describe('request utils', () => {
       nock.cleanAll()
     })
 
-    it('should do a GET request', () => {
-      nock('http://localhost')
+    it('should do a GET request with the indicated CSRF token', () => {
+      const tokenValue = 'CSRF-Token-Value'
+
+      const element = document.createElement('div')
+      element.value = tokenValue
+
+      nock('http://localhost', {
+        reqheaders: {
+          'X-CSRFToken': tokenValue,
+          'X-METHOD': 'GET'
+        }
+      })
         .get('/get')
         .reply(200, {get: true})
 
-      return getData('http://localhost/get')
-        .then(body => {
-          assert(body.get, 'GET request should work')
-        })
-        .catch(error => {
-          assert(!error, `Unexpected error ${error}`)
-        })
-    })
-
-    it('should do a GET request and download response', () => {
-      nock('http://localhost')
-        .get('/down')
-        .reply(200, 'content text')
-
-      let createObjectURLCalled = false
-      let revokeObjectURLCalled = false
-
-      window.URL = {
-        createObjectURL: (content) => {
-          assert(content)
-          createObjectURLCalled = true
-        },
-        revokeObjectURL: (url) => {
-          assert.equal(url, 'http://localhost/down')
-          revokeObjectURLCalled = true
-        }
+      document.querySelector = (selector) => {
+        assert.equal(selector, '[name=csrfmiddlewaretoken]')
+        return element
       }
 
-      return getData('http://localhost/down', {download: true})
-        .then(body => {
-          assert(!body, `No expected response ${body}`)
-          assert(createObjectURLCalled, 'createObjectURL was called')
-          assert(revokeObjectURLCalled, 'revokeObjectURL was called')
-        })
-        .catch(error => {
-          assert(!error, `Unexpected error ${error}`)
-        })
-    })
-
-    it('should do a POST request', () => {
-      nock('http://localhost')
-        .post('/post', {foo: 'bar'})
-        .reply(200, {post: true})
-
-      return postData('http://localhost/post', {foo: 'bar'})
-        .then(body => {
-          assert(body.post, 'POST request should work')
-        })
-        .catch(error => {
-          assert(!error, `Unexpected error ${error}`)
-        })
-    })
-
-    it('should do a PUT request', () => {
-      nock('http://localhost')
-        .put('/put', {foo: 'bar'})
-        .reply(200, {put: true})
-
-      return putData('http://localhost/put', {foo: 'bar'})
-        .then(body => {
-          assert(body.put, 'PUT request should work')
-        })
-        .catch(error => {
-          assert(!error, `Unexpected error ${error}`)
-        })
-    })
-
-    it('should do a PUT request using FormData', () => {
-      nock('http://localhost')
-        .put('/put-form')
-        .reply(200, {putForm: true})
-
-      return putData(
-        'http://localhost/put-form',
-        {foo: 'bar', list: [1, 2, 3], useless: null, nothing: undefined},
-        {multipart: true}
-      )
-        .then(body => {
-          assert(body.putForm, 'PUT request using FormData should work')
-        })
-        .catch(error => {
-          assert(!error, `Unexpected error ${error}`)
-        })
-    })
-
-    it('should do a fake PUT request', () => {
-      nock('http://localhost')
-        .put('/fake-put')
-        .reply(200, {put: true})
-
-      return postData('http://localhost/fake-put', {foo: 'bar'}, {multipart: true})
-        .then(body => {
-          assert(body.put, 'Fake PUT request should work')
-        })
-        .catch(error => {
-          assert(!error, `Unexpected error ${error}`)
-        })
-    })
-
-    it('should do a PATCH request', () => {
-      nock('http://localhost')
-        .patch('/patch', {foo: 'bar'})
-        .reply(200, {patch: true})
-
-      return patchData('http://localhost/patch', {foo: 'bar'})
-        .then(body => {
-          assert(body.patch, 'PATCH request should work')
-        })
-        .catch(error => {
-          assert(!error, `Unexpected error ${error}`)
-        })
-    })
-
-    it('should do a DELETE request', () => {
-      nock('http://localhost')
-        .delete('/del')
-        .reply(204)
-
-      return deleteData('http://localhost/del')
-        .then(body => {
-          assert(!body, 'DELETE request should work')
-        })
-        .catch(error => {
-          assert(!error, `Unexpected error ${error}`)
-        })
-    })
-
-    it('should throw an error with JSON content', () => {
-      nock('http://localhost')
-        .get('/error-404')
-        .reply(404, {message: 'something went wrong'})
-
-      return getData('http://localhost/error-404')
-        .then(body => {
-          assert(!body, 'Unexpected response', body)
-        })
-        .catch(error => {
-          assert(error, 'Expected error')
-          assert.equal(error.message, 'Not Found', '404 error message')
-          assert.equal(error.content.message, 'something went wrong')
-        })
-    })
-
-    it('should throw an error with TEXT content', () => {
-      nock('http://localhost')
-        .get('/error-400')
-        .reply(400, 'something went wrong')
-
-      return getData('http://localhost/error-400')
-        .then(body => {
-          assert(!body, 'Unexpected response', body)
-        })
-        .catch(error => {
-          assert(error, 'Expected error')
-          assert.equal(error.message, 'Bad Request', '400 error message')
-          assert.equal(error.content, 'something went wrong')
-        })
+      return getData('http://localhost/get')
+        .then(
+          (body) => { assert(body.get, 'GET request should work') },
+          handleUnexpectedError
+        )
+        .catch(handleUnexpectedError)
     })
   })
 
@@ -229,12 +356,11 @@ describe('request utils', () => {
         'http://localhost/force-get-post',
         {foo: 'bar'}
       )
-        .then(body => {
-          assert(body.forceGet, 'Force GET request should work')
-        })
-        .catch(error => {
-          assert(!error, `Unexpected error ${error}`)
-        })
+        .then(
+          (body) => { assert(body.forceGet, 'Force GET request should work') },
+          handleUnexpectedError
+        )
+        .catch(handleUnexpectedError)
     })
 
     it('should force a GET request', () => {
@@ -255,12 +381,11 @@ describe('request utils', () => {
         'http://localhost/force-post',
         {foo: 'bar'}
       )
-        .then(body => {
-          assert(body.forceGet, 'Force GET request should work')
-        })
-        .catch(error => {
-          assert(!error, `Unexpected error ${error}`)
-        })
+        .then(
+          (body) => { assert(body.forceGet, 'Force GET request should work') },
+          handleUnexpectedError
+        )
+        .catch(handleUnexpectedError)
     })
   })
 
@@ -283,12 +408,11 @@ describe('request utils', () => {
         name: 'first',
         url: 'http://localhost/first-url'
       }])
-        .then(body => {
-          assert.deepEqual(body.first, {content: 'something'})
-        })
-        .catch(error => {
-          assert(!error, `Unexpected error ${error}`)
-        })
+        .then(
+          (body) => { assert.deepEqual(body.first, {content: 'something'}) },
+          handleUnexpectedError
+        )
+        .catch(handleUnexpectedError)
     })
 
     it('should force a GET request', () => {
@@ -312,12 +436,11 @@ describe('request utils', () => {
           data: {foo: 'bar'}
         }
       }])
-        .then(body => {
-          assert(body.first.forceGet, 'Force GET request should work')
-        })
-        .catch(error => {
-          assert(!error, `Unexpected error ${error}`)
-        })
+        .then(
+          (body) => { assert(body.first.forceGet, 'Force GET request should work') },
+          handleUnexpectedError
+        )
+        .catch(handleUnexpectedError)
     })
 
     it('should do more than one GET request', () => {
@@ -342,17 +465,16 @@ describe('request utils', () => {
           url: 'http://localhost/second-get'
         }
       ])
-        .then(body => {
-          assert.deepEqual(body,
-            {
+        .then(
+          (body) => {
+            assert.deepEqual(body, {
               first: {content: 'something'},
               second: {content: 'else'}
-            }
-          )
-        })
-        .catch(error => {
-          assert(!error, `Unexpected error ${error}`)
-        })
+            })
+          },
+          handleUnexpectedError
+        )
+        .catch(handleUnexpectedError)
     })
 
     it('should throw an error', () => {
@@ -373,15 +495,16 @@ describe('request utils', () => {
           url: 'http://localhost/second-error'
         }
       ])
-        .then(body => {
-          assert(!body, 'Unexpected response')
-        })
-        .catch(error => {
-          assert(error, 'Expected error')
-          // it throws the first error and does not continue with the rest of Promises
-          assert.equal(error.message, 'Bad Request', '400 error message')
-          assert.equal(error.content.message, 'something went wrong')
-        })
+        .then(
+          handleUnexpectedBody,
+          (error) => {
+            assert(error, 'Expected error')
+            // it throws the first error and does not continue with the rest of Promises
+            assert.equal(error.message, 'Bad Request', '400 error message')
+            assert.equal(error.content.message, 'something went wrong')
+          }
+        )
+        .catch(handleUnexpectedError)
     })
   })
 })

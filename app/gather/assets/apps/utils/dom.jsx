@@ -18,10 +18,13 @@
  * under the License.
  */
 
-import { getSurveysPath } from './utils/paths'
+import ReactDOM from 'react-dom'
 
-/*
-This is the home app -> skip welcome screen and go straight to list of surveys
-*/
-
-window.location.assign(getSurveysPath({}))
+export const isMounted = (Component) => {
+  try {
+    ReactDOM.findDOMNode(Component)
+    return true
+  } catch (e) {
+    return false
+  }
+}

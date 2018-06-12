@@ -81,9 +81,9 @@ class SurveyODKForm extends Component {
   }
 
   render () {
-    const dataQA = (!this.props.survey.mapping_id
+    const dataQA = (!this.props.survey.project_id
       ? 'survey-odk-add'
-      : `survey-odk-edit-${this.props.survey.mapping_id}`
+      : `survey-odk-edit-${this.props.survey.project_id}`
     )
 
     return (
@@ -96,6 +96,7 @@ class SurveyODKForm extends Component {
   }
 
   renderODK () {
+    const errors = this.props.errors || {}
     return (
       <div className='survey-section'>
         <label>
@@ -106,7 +107,11 @@ class SurveyODKForm extends Component {
         <HelpMessage>
           <FormattedMessage
             id='survey.odk.form.odk.help.odk'
-            defaultMessage='Open Data Kit (ODK) is a free and open-source set of tools which help organizations author, field, and manage mobile data collection solutions.' />
+            defaultMessage={`
+              Open Data Kit (or ODK for short) is an open-source suite of tools
+              that helps organizations author, collect, and manage mobile data
+              collection solutions.
+            `} />
           <br />
           <a href='https://opendatakit.org/' target='_blank'>
             <FormattedMessage
@@ -114,6 +119,7 @@ class SurveyODKForm extends Component {
               defaultMessage='Click here to see more about Open Data Kit' />
           </a>
         </HelpMessage>
+        <ErrorAlert errors={errors.generic} />
       </div>
     )
   }
@@ -147,6 +153,7 @@ class SurveyODKForm extends Component {
 
   renderXForms () {
     const {xforms, surveyors} = this.state
+    const errors = this.props.errors || {}
 
     return (
       <div>
@@ -157,15 +164,37 @@ class SurveyODKForm extends Component {
               defaultMessage='xForms' />
           </label>
           <HelpMessage>
-            <FormattedMessage
-              id='survey.odk.form.xform.file.help'
-              defaultMessage='XLSForm is a kind of survey definition used by ODK Collect.' />
-            <br />
-            <a href='http://xlsform.org/' target='_blank'>
+            <div className='mb-2'>
               <FormattedMessage
-                id='survey.odk.form.odk.help.xlsform.link'
-                defaultMessage='Click here to see more about XLSForm' />
-            </a>
+                id='survey.odk.form.xform.file.help'
+                defaultMessage={`
+                  XLSForm is a form standard created to help simplify the authoring of forms in Excel.
+                  Authoring is done in a human readable format using a familiar tool that almost
+                  everyone knows - Excel. XLSForms provide a practical standard for sharing and
+                  collaborating on authoring forms.
+                `} />
+              <br />
+              <a href='http://xlsform.org/' target='_blank'>
+                <FormattedMessage
+                  id='survey.odk.form.odk.help.xlsform.link'
+                  defaultMessage='Click here to see more about XLSForm' />
+              </a>
+            </div>
+            <div>
+              <FormattedMessage
+                id='survey.odk.form.xform.odk.help'
+                defaultMessage={`
+                  The ODK XForms specification is used by tools in the Open Data Kit ecosystem.
+                  It is a subset of the far larger W3C XForms 1.0 specification and
+                  also contains a few additional features not found in the W3C XForms specification.
+                `} />
+              <br />
+              <a href='http://opendatakit.github.io/xforms-spec/' target='_blank'>
+                <FormattedMessage
+                  id='survey.odk.form.odk.help.xform.link'
+                  defaultMessage='Click here to see more about XForm specification' />
+              </a>
+            </div>
           </HelpMessage>
         </div>
 
@@ -175,6 +204,7 @@ class SurveyODKForm extends Component {
               <XFormIntl
                 key={xform.key}
                 xform={xform}
+                errors={errors[xform.key]}
                 surveyors={surveyors}
                 onRemove={() => this.setState({
                   xforms: xforms.filter((_, jndex) => jndex !== index)
@@ -249,6 +279,10 @@ class XForm extends Component {
   render () {
     const {formatMessage} = this.props.intl
     const xform = this.state
+    const errors = this.props.errors || {}
+
+    const allErrors = []
+    Object.keys(errors).forEach(key => { allErrors.push(errors[key]) })
 
     const title = (
       <span title={xform.description} className='form-title'>
@@ -293,85 +327,89 @@ class XForm extends Component {
     )
 
     return (
-      <div className={`form-item mb-2 ${this.state.editView ? 'expanded' : ''}`}>
-        { title }
-        { date }
-        { mediaFiles }
-        <ConfirmButton
-          className='btn btn-sm icon-only btn-danger ml-2 mr-2'
-          cancelable
-          onConfirm={this.props.onRemove}
-          title={title}
-          message={formatMessage(MESSAGES.deleteConfirm, {...xform})}
-          buttonLabel={<i className='fas fa-times' />}
-        />
+      <React.Fragment>
+        <ErrorAlert errors={allErrors} />
+        <div className={`form-item mb-2 ${this.state.editView ? 'expanded' : ''}`}>
+          { title }
+          { date }
+          { mediaFiles }
+          <ConfirmButton
+            className='btn btn-sm icon-only btn-danger ml-2 mr-2'
+            cancelable
+            onConfirm={this.props.onRemove}
+            title={title}
+            message={formatMessage(MESSAGES.deleteConfirm, {...xform})}
+            buttonLabel={<i className='fas fa-times' />}
+          />
 
-        { /* only existing xforms can edit */
-          xform.id &&
-          <button
-            type='button'
-            className='btn btn-sm btn-secondary btn-edit icon-only'
-            onClick={this.toggleEditView.bind(this)}>
-            <i className={`fas fa-${this.state.editView ? 'minus' : 'pencil-alt'}`} />
-          </button>
-        }
+          { /* only existing xforms can edit */
+            xform.id &&
+            <button
+              type='button'
+              className='btn btn-sm btn-secondary btn-edit icon-only'
+              onClick={this.toggleEditView.bind(this)}>
+              <i className={`fas fa-${this.state.editView ? 'minus' : 'pencil-alt'}`} />
+            </button>
+          }
 
-        {
-          this.state.editView &&
-          <div className='edit-form-item mt-3'>
-            <div className='form-group'>
-              <textarea
-                name='description'
-                className='form-control code mb-2'
-                rows={3}
-                value={xform.description}
-                placeholder={formatMessage(MESSAGES.description)}
-                onChange={this.onInputChange.bind(this)}
-              />
+          {
+            this.state.editView &&
+            <div className='edit-form-item mt-3'>
+              <div className='form-group'>
+                <textarea
+                  name='description'
+                  className='form-control code mb-2'
+                  rows={3}
+                  value={xform.description}
+                  placeholder={formatMessage(MESSAGES.description)}
+                  onChange={this.onInputChange.bind(this)}
+                />
 
-              <label className='btn btn-secondary' htmlFor='xFormFile'>
-                <FormattedMessage
-                  id='survey.odk.form.xform.file'
-                  defaultMessage='Upload new xForm/XLSForm file' />
-              </label>
-              <input
-                name='file'
-                id='xFormFile'
-                type='file'
-                className='hidden-file'
-                accept='.xls,.xlsx,.xml'
-                onChange={this.onFileChange.bind(this)}
-              />
-              {
-                xform.file &&
-                <span className='ml-4'>
-                  <span>{ xform.file.name }</span>
-                  <button
-                    type='button'
-                    className='btn btn-sm icon-only btn-danger ml-2'
-                    onClick={this.removeFile.bind(this)}><i className='fas fa-times' /></button>
-                </span>
-              }
+                <label className='btn btn-secondary' htmlFor='xFormFile'>
+                  <FormattedMessage
+                    id='survey.odk.form.xform.file'
+                    defaultMessage='Upload new xForm/XLSForm file' />
+                </label>
+                <input
+                  name='file'
+                  id='xFormFile'
+                  type='file'
+                  className='hidden-file'
+                  accept='.xls,.xlsx,.xml'
+                  onChange={this.onFileChange.bind(this)}
+                />
+                {
+                  xform.file &&
+                  <span className='ml-4'>
+                    <span>{ xform.file.name }</span>
+                    <button
+                      type='button'
+                      className='btn btn-sm icon-only btn-danger ml-2'
+                      onClick={this.removeFile.bind(this)}><i className='fas fa-times' /></button>
+                  </span>
+                }
 
-              <textarea
-                name='xml_data'
-                className='form-control code'
-                disabled={xform.file !== undefined}
-                rows={10}
-                value={xform.xml_data}
-                onChange={this.onInputChange.bind(this)}
+                <textarea
+                  name='xml_data'
+                  className={`${errors.xml_data ? 'error' : ''} form-control code`}
+                  disabled={xform.file !== undefined}
+                  rows={10}
+                  value={xform.xml_data}
+                  onChange={this.onInputChange.bind(this)}
+                />
+                <ErrorAlert errors={errors.xml_data} />
+              </div>
+
+              <MediaFileIntl
+                id={xform.id}
+                title={title}
+                mediaFiles={xform.media_files}
+                onChange={(mediaFiles) => this.setState({media_files: mediaFiles})}
               />
             </div>
-
-            <MediaFileIntl
-              id={xform.id}
-              title={title}
-              mediaFiles={xform.media_files}
-              onChange={(mediaFiles) => this.setState({media_files: mediaFiles})}
-            />
-          </div>
-        }
-      </div>
+          }
+        </div>
+      </React.Fragment>
     )
   }
 

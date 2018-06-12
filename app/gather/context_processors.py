@@ -27,11 +27,12 @@ def gather_context(request):
     context = {
         'dev_mode': settings.DEBUG,
         'app_name': settings.APP_NAME,
+        'instance_name': settings.INSTANCE_NAME,
         'navigation_list': navigation_list,
         'kernel_url': settings.AETHER_APPS['kernel']['url'],
     }
 
-    if settings.AETHER_ODK:  # pragma: no cover
+    if settings.AETHER_ODK:
         context['odk_url'] = settings.AETHER_APPS['odk']['url']
 
     return context
