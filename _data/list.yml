@@ -1,0 +1,15 @@
+toc:
+  - title: Introduction to Gather
+    url: /documentation/introduction/index.html
+    subfolderitems:
+      - page: What is Gather?
+        url: /documentation/introduction/index.html
+      - page: A Deeper Dive
+        url: /documentation/introduction/deeper.html
+  - title: Try It For Yourself
+    url: /documentation/try/index.html
+    subfolderitems:
+      - page: Spin Up a Local Instance
+        url: /documentation/try/index.html
+      - page: Adding Aether Connect
+        url: /documentation/try/connect.html
