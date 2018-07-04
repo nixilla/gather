@@ -1,6 +1,6 @@
-# aether-website
+# Gather website
 
-This is the product website for aether.
+This is the product website for Gather.
 It uses Jekyll for site generation. 
 This allows us to use Markdown to easily add and update documentation and blog posts.
 
