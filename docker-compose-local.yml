@@ -10,8 +10,8 @@
 version: "2"
 
 networks:
-    internal:
-        driver: bridge
+  internal:
+    driver: bridge
 
 services:
 
@@ -108,7 +108,7 @@ services:
 
 
   # ---------------------------------
-  # ODK Adapter container
+  # ODK container
   # ---------------------------------
 
   odk:
@@ -179,7 +179,7 @@ services:
       STATIC_ROOT: /code/aether/ui/assets/bundles
       WEB_SERVER_PORT: 8004
     volumes:
-      - ../aether/aether-ui/code:/code
+      - ../aether/aether-ui:/code
     ports:
       - "8004:8004"
     command: start_dev

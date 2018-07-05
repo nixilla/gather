@@ -22,7 +22,7 @@ import React, { Component } from 'react'
 
 import { FetchUrlsContainer, PaginationContainer } from '../components'
 import {
-  getSubmissionsAPIPath,
+  getSchemasAPIPath,
   getSurveyorsAPIPath,
   getSurveysAPIPath
 } from '../utils/paths'
@@ -91,9 +91,10 @@ export default class SurveyDispatcher extends Component {
             url: getSurveysAPIPath({id: surveyId, withStats: true})
           },
           {
-            // take the first 10 submissions to extract the table columns
-            name: 'submissions',
-            url: getSubmissionsAPIPath({project: surveyId, pageSize: 10})
+            // take the last schemas to extract the paths and labels
+            // TODO: let the user choose the schema and fetch only entities of that one
+            name: 'schemas',
+            url: getSchemasAPIPath({project: surveyId, ordering: '-modified', pageSize: 10})
           }
         ]
 

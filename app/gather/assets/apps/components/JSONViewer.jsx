@@ -26,21 +26,21 @@ import {
   FormattedTime
 } from 'react-intl'
 
-import { cleanPropertyName, getType } from '../utils/types'
+import { getLabel, getType } from '../utils/types'
 import { Link } from './Link'
-
-const renderEmptyValue = () => {
-  return (
-    <span className='empty'>
-      –
-    </span>
-  )
-}
 
 /**
  * JSONViewer component.
  *
  * Renders a JSON object in "pretty" format.
+ *
+ * Properties:
+ *   - `data`:        The object.
+ *   - `links`:       The list of links ({url, name}) associated with this object.
+ *                    Take a look at the `renderString` method.
+ *   - `labels`:      A map with the possible object labels.
+ *                    The keys are the jsonpaths and the values the labels.
+ *   - `labelRoot`:   The prefix needed to look for the associated label.
  */
 
 export default class JSONViewer extends Component {
@@ -56,7 +56,7 @@ export default class JSONViewer extends Component {
 
   renderValue (value) {
     if (!getType(value)) {
-      return renderEmptyValue()
+      return this.renderEmptyValue()
     }
 
     // check the object type
@@ -92,12 +92,20 @@ export default class JSONViewer extends Component {
     }
   }
 
+  renderEmptyValue () {
+    return (
+      <span className='empty'>
+        –
+      </span>
+    )
+  }
+
   renderString (value) {
-    // there is an special case with strings,
+    // There is an special case with strings,
     // they can also be one of the linked attachments.
     // In those case we should be able to replace
-    // the text value with the link
-    // assumption: there are no duplicated attachment entries
+    // the text value with the link.
+    // Assumption: there are no duplicated attachment entries
     if (this.props.links && this.props.links.length > 0) {
       const link = this.props.links.find(l => l.name === value)
       if (link) {
@@ -177,26 +185,89 @@ export default class JSONViewer extends Component {
   }
 
   renderArray (values) {
-    return <JSONArrayViewer values={values} />
+    return (
+      <JSONArrayViewer
+        values={values}
+        links={this.props.links}
+        labels={this.props.labels}
+        labelRoot={(this.props.labelRoot || '') + '#.'}
+      />
+    )
   }
 
   renderObject (value) {
     return (
+      <JSONObjectViewer
+        value={value}
+        links={this.props.links}
+        labels={this.props.labels}
+        labelRoot={(this.props.labelRoot || '')}
+        collapsible={this.props.collapsible}
+      />
+    )
+  }
+}
+
+class JSONObjectViewer extends Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      collapsed: props.collapsible
+    }
+  }
+
+  render () {
+    const {collapsed} = this.state
+    const {value, collapsible} = this.props
+
+    if (collapsible && collapsed) {
+      return (
+        <div>
+          <button
+            type='button'
+            className='btn icon-only btn-expand'
+            onClick={this.toggleView.bind(this)}>
+            <i className='fas fa-plus' />
+          </button>
+          <span className='badge'>…</span>
+        </div>
+      )
+    }
+
+    return (
       <div>
+        { collapsible &&
+          <button
+            type='button'
+            className='btn icon-only btn-collapse'
+            onClick={this.toggleView.bind(this)}>
+            <i className='fas fa-minus' />
+          </button>
+        }
         {
           Object.keys(value).map(key => (
             <div key={key} className={`property ${getType(value[key]) || ''}`}>
               <div className={`property-title ${getType(value[key]) ? '' : 'empty'}`}>
-                { cleanPropertyName(key) }
+                { getLabel(this.props.labelRoot + key, this.props.labels) }
               </div>
               <div className='property-value'>
-                { this.renderValue(value[key]) }
+                <JSONViewer
+                  data={value[key]}
+                  links={this.props.links}
+                  labels={this.props.labels}
+                  labelRoot={this.props.labelRoot + key + '.'}
+                  collapsible
+                />
               </div>
             </div>
           ))
         }
       </div>
     )
+  }
+
+  toggleView () {
+    this.setState({ collapsed: !this.state.collapsed })
   }
 }
 
@@ -241,7 +312,12 @@ class JSONArrayViewer extends Component {
           {
             values.map((value, index) => (
               <li key={index} className='property-item'>
-                <JSONViewer data={value} />
+                <JSONViewer
+                  data={value}
+                  links={this.props.links}
+                  labels={this.props.labels}
+                  labelRoot={this.props.labelRoot}
+                />
               </li>
             ))
           }

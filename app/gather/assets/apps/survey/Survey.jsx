@@ -25,19 +25,18 @@ import { FetchUrlsContainer, PaginationContainer } from '../components'
 import { range } from '../utils'
 import { MAX_PAGE_SIZE, GATHER_APP } from '../utils/constants'
 import { CSV_HEADER_RULES, CSV_HEADER_RULES_SEP, CSV_MAX_ROWS_SIZE } from '../utils/env'
-import { getSurveysPath, getSurveysAPIPath, getSubmissionsAPIPath } from '../utils/paths'
+import { getSurveysPath, getSurveysAPIPath, getEntitiesAPIPath } from '../utils/paths'
 import { postData } from '../utils/request'
-import { flatten } from '../utils/types'
+import { extractPathDocs } from '../utils/avro-utils'
 
 import SurveyDetail from './SurveyDetail'
-import SurveyMasks from './SurveyMasks'
-import SubmissionsList from '../submission/SubmissionsList'
-import SubmissionItem from '../submission/SubmissionItem'
+import SurveyMasks from './mask/SurveyMasks'
+import EntitiesList from './entity/EntitiesList'
+import EntityItem from './entity/EntityItem'
 
 const TABLE_VIEW = 'table'
 const SINGLE_VIEW = 'single'
 const TABLE_SIZES = [ 10, 25, 50, 100 ]
-const SEPARATOR = '¬¬¬' // very uncommon string
 
 export default class Survey extends Component {
   constructor (props) {
@@ -45,23 +44,51 @@ export default class Survey extends Component {
 
     this.state = {
       viewMode: TABLE_VIEW,
-      total: props.submissions.count,
-      allColumns: [],
-      selectedColumns: []
+      total: props.survey.entities_count,
+      labels: {},
+      allPaths: [],
+      selectedPaths: []
     }
 
-    const {results} = props.submissions
+    const {results} = props.schemas
     if (results.length) {
-      const allFlattenKeys = []
+      const pathsAndLabels = {
+        labels: {},
+        paths: []
+      }
 
-      // use the initial submissions to extract the possible columns
+      // use the schemas to extract the possible paths
       results.forEach(result => {
-        Object.keys(flatten(result.payload, SEPARATOR))
-          .forEach(key => { allFlattenKeys.push(key) })
+        extractPathDocs(result.definition, pathsAndLabels)
       })
 
-      this.state.allColumns = [ ...new Set(allFlattenKeys) ].sort()
-      this.state.selectedColumns = [ ...this.state.allColumns ]
+      // not desired paths
+      const forbiddenPath = (jsonPath) => (
+        // attributes "@attr"
+        (jsonPath.charAt(0) === '@') ||
+        // internal xForm properties
+        ([
+          '_id', '_version',
+          'starttime', 'endtime', 'deviceid',
+          'meta'
+        ].indexOf(jsonPath) > -1) ||
+        // "meta" children
+        (jsonPath.indexOf('meta.') === 0) ||
+        // array/ map properties
+        (jsonPath.indexOf('#') > -1 || jsonPath.indexOf('*') > -1)
+      )
+      // ["a", "a.b", "a.c"] => ["a.b", "a.c"]
+      const isLeaf = (jsonPath, _, array) => array.filter(
+        anotherPath => anotherPath.indexOf(jsonPath + '.') === 0
+      ).length === 0
+
+      this.state.labels = pathsAndLabels.labels
+      this.state.allPaths = pathsAndLabels.paths
+        // remove undesired paths
+        .filter(jsonPath => !forbiddenPath(jsonPath))
+        // keep only the leafs
+        .filter(isLeaf)
+      this.state.selectedPaths = this.state.allPaths
     }
   }
 
@@ -85,23 +112,22 @@ export default class Survey extends Component {
 
         <SurveyDetail survey={survey} />
 
-        { this.renderSubmissions() }
+        { this.renderEntities() }
       </div>
     )
   }
 
-  renderSubmissions () {
-    const {survey} = this.props
-
-    if (survey.submissions === 0) {
+  renderEntities () {
+    if (this.state.total === 0) {
       return ''
     }
 
+    const {survey} = this.props
     const {viewMode} = this.state
-    const SubmissionComponent = (viewMode === SINGLE_VIEW ? SubmissionItem : SubmissionsList)
+    const listComponent = (viewMode === SINGLE_VIEW ? EntityItem : EntitiesList)
     const extras = {
-      separator: SEPARATOR,
-      columns: this.state.selectedColumns
+      labels: this.state.labels,
+      paths: this.state.selectedPaths
     }
 
     return (
@@ -145,9 +171,9 @@ export default class Survey extends Component {
         <PaginationContainer
           pageSize={viewMode === SINGLE_VIEW ? 1 : TABLE_SIZES[0]}
           sizes={viewMode === SINGLE_VIEW ? [] : TABLE_SIZES}
-          url={getSubmissionsAPIPath({project: survey.id, ordering: '-created'})}
+          url={getEntitiesAPIPath({project: survey.id, ordering: '-modified'})}
           position='top'
-          listComponent={SubmissionComponent}
+          listComponent={listComponent}
           showPrevious
           showNext
           extras={extras}
@@ -158,13 +184,13 @@ export default class Survey extends Component {
 
   renderDownloadButton () {
     const {survey} = this.props
-    const {total, allColumns, selectedColumns} = this.state
+    const {total, allPaths, selectedPaths} = this.state
 
     const pageSize = CSV_MAX_ROWS_SIZE || MAX_PAGE_SIZE
     const params = {
-      ordering: '-created',
+      ordering: '-modified',
       project: survey.id,
-      fields: 'created,payload',
+      fields: 'modified,payload',
       action: 'fetch', // this will build the "post as get" API path
       format: 'csv',
       pageSize
@@ -175,14 +201,14 @@ export default class Survey extends Component {
     }
 
     // restrict the columns to export with the selected columns
-    if (selectedColumns.length !== allColumns.length) {
-      payload.columns = 'created,' + selectedColumns
-        .map(key => 'payload.' + key.replace(new RegExp(SEPARATOR, 'g'), '.'))
+    if (selectedPaths.length !== allPaths.length) {
+      payload.columns = 'modified,' + selectedPaths
+        .map(key => 'payload.' + key)
         .join(',')
     }
 
     const download = (options, fileName) => {
-      postData(getSubmissionsAPIPath(options), payload, {download: true, fileName})
+      postData(getEntitiesAPIPath(options), payload, {download: true, fileName})
     }
 
     if (total < pageSize) {
@@ -246,15 +272,16 @@ export default class Survey extends Component {
   }
 
   renderMaskButton () {
-    if (this.state.allColumns.length === 0) {
+    if (this.state.allPaths.length === 0) {
       return ''
     }
 
     const handleResponse = (response) => ({
       ...response,
-      columns: this.state.allColumns,
-      separator: SEPARATOR,
-      onChange: (selectedColumns) => { this.setState({ selectedColumns }) }
+      columns: this.state.allPaths,
+      initialSelected: this.state.selectedPaths,
+      labels: this.state.labels,
+      onChange: (selectedPaths) => { this.setState({ selectedPaths }) }
     })
 
     const urls = [
