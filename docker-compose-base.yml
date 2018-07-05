@@ -25,18 +25,16 @@ services:
     ports:
       - "80:80"
 
+
   # ---------------------------------
   # Aether kernel container
   # ---------------------------------
 
   kernel-base:
-    image: ehealthafrica/aether-kernel:0.7.0
-    stdin_open: true
-    tty: true
+    image: ehealthafrica/aether-kernel:0.8.0-rc
     environment:
       CAS_SERVER_URL: https://ums-dev.ehealthafrica.org
       CSRF_COOKIE_DOMAIN: .aether.local
-      DEBUG: "true"
       DJANGO_SECRET_KEY: "secret"
       HOSTNAME: kernel.aether.local
 
@@ -46,32 +44,30 @@ services:
       RDS_PORT: 5432
       RDS_USERNAME: postgres
 
-      WEB_SERVER_PORT: 8001
+      WEB_SERVER_PORT: 8000
     volumes:
       # media folder
       - ./tmp/kernel:/media
     ports:
-      - "8001:8001"
+      - "8000:8000"
     command: start_dev
+
 
   # ---------------------------------
   # ODK Adapter container
   # ---------------------------------
 
   odk-base:
-    image: ehealthafrica/aether-odk:0.7.0
-    stdin_open: true
-    tty: true
+    image: ehealthafrica/aether-odk:0.8.0-rc
     environment:
       CAS_SERVER_URL: https://ums-dev.ehealthafrica.org
       CSRF_COOKIE_DOMAIN: .aether.local
-      DEBUG: "true"
       DJANGO_SECRET_KEY: "secret"
       HOSTNAME: odk.aether.local
 
       AETHER_KERNEL_TOKEN: a2d6bc20ad16ec8e715f2f42f54eb00cbbea2d24
-      AETHER_KERNEL_URL: http://kernel:8001
-      AETHER_KERNEL_URL_TEST: http://kernel-test:9001
+      AETHER_KERNEL_URL: http://kernel:8000
+      AETHER_KERNEL_URL_TEST: http://kernel-test:9000
 
       RDS_DB_NAME: aether-odk
       RDS_HOSTNAME: db
@@ -87,17 +83,49 @@ services:
       - "8443:8443"
     command: start_dev
 
+
+  # ---------------------------------
+  # Aether UI module
+  # ---------------------------------
+
+  ui-base:
+    image: ehealthafrica/aether-ui:0.8.0-rc
+    environment:
+      CAS_SERVER_URL: https://ums-dev.ehealthafrica.org
+      CSRF_COOKIE_DOMAIN: .aether.local
+      DJANGO_SECRET_KEY: "secret"
+      HOSTNAME: ui.aether.local
+
+      AETHER_KERNEL_TOKEN: a2d6bc20ad16ec8e715f2f42f54eb00cbbea2d24
+      AETHER_KERNEL_URL: http://kernel:8000
+      AETHER_KERNEL_URL_TEST: http://kernel-test:9000
+
+      RDS_DB_NAME: aether-ui
+      RDS_HOSTNAME: db
+      RDS_PASSWORD: ""
+      RDS_PORT: 5432
+      RDS_USERNAME: postgres
+
+      # this is the right value with "start_dev" command
+      # comment it out when using "start" command
+      STATIC_ROOT: /code/aether/ui/static
+      WEB_SERVER_PORT: 8004
+    ports:
+      - "8004:8004"
+    command: start_dev
+
+
   # ---------------------------------
   # Gather container
   # ---------------------------------
 
   gather-base:
     image: gather
-    stdin_open: true
-    tty: true
     build:
       context: .
       dockerfile: app/Dockerfile
+    stdin_open: true
+    tty: true
     environment: &gather-environment
       CAS_SERVER_URL: https://ums-dev.ehealthafrica.org
       CSRF_COOKIE_DOMAIN: gather.local
@@ -106,14 +134,14 @@ services:
       STATIC_ROOT: /code/gather/assets/bundles
 
       AETHER_KERNEL_TOKEN: a2d6bc20ad16ec8e715f2f42f54eb00cbbea2d24
-      AETHER_KERNEL_URL: http://kernel:8001
-      AETHER_KERNEL_URL_TEST: http://kernel-test:9001
+      AETHER_KERNEL_URL: http://kernel:8000
+      AETHER_KERNEL_URL_TEST: http://kernel-test:9000
 
       AETHER_MODULES: "kernel,odk,"
 
       AETHER_ODK_TOKEN: d5184a044bb5acff89a76ec4e67d0fcddd5cd3a1
       AETHER_ODK_URL: http://odk:8443
-      AETHER_ODK_URL_TEST: http://odk-test:9002
+      AETHER_ODK_URL_TEST: http://odk-test:9443
 
       RDS_DB_NAME: gather
       RDS_HOSTNAME: db
@@ -125,7 +153,7 @@ services:
       CSV_HEADER_RULES_SEP: ;
       CSV_MAX_ROWS_SIZE: 1000
 
-      WEB_SERVER_PORT: 8000
+      WEB_SERVER_PORT: 8005
     volumes: &gather-volumes
       #################################################
       #                    WARNING                    #
@@ -142,17 +170,17 @@ services:
       - ./app/manage.py:/code/manage.py
       - ./app/package.json:/code/package.json
     ports:
-      - "8000:8000"
+      - "8005:8005"
     command: start_dev
 
   # ---------------------------------
-  # Webpack container
+  # Gather Webpack container
   # ---------------------------------
 
-  webpack-base:
+  gather-webpack-base:
     image: gather
     environment: *gather-environment
     volumes: *gather-volumes
     ports:
-      - "3000:3000"
+      - "3005:3005"
     command: start_webpack

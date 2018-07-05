@@ -49,6 +49,22 @@ services:
           - odk.aether.local
 
   # ---------------------------------
+  # Aether UI container
+  # ---------------------------------
+
+  ui:
+    extends:
+      file: docker-compose-base.yml
+      service: ui-base
+    depends_on:
+      - db
+      - kernel
+    networks:
+      internal:
+        aliases:
+          - ui.aether.local
+
+  # ---------------------------------
   # Gather container
   # ---------------------------------
 
@@ -58,22 +74,22 @@ services:
       service: gather-base
     depends_on:
       - db
+      - gather-webpack
       - kernel
       - odk
-      - webpack
     networks:
       internal:
         aliases:
           - gather.local
 
   # ---------------------------------
-  # Webpack container
+  # Gather Webpack container
   # ---------------------------------
 
-  webpack:
+  gather-webpack:
     extends:
       file: docker-compose-base.yml
-      service: webpack-base
+      service: gather-webpack-base
     networks:
       - internal
 
@@ -89,5 +105,6 @@ services:
       - gather
       - kernel
       - odk
+      - ui
     networks:
       - internal
