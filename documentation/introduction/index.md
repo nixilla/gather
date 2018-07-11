@@ -9,4 +9,4 @@ Gather is a versatile, secure and performant platform for data collection. It ca
 
 It contains a set of tools for creating surveys and collecting data. It is analogous to ODK, and includes components that allow it to function with elements of the ODK ecosystem, such as XLSForms and ODK Collect.
 
-
+[Learn more about Gather](https://docs.google.com/document/d/103qTvtmWkM9wq8AZmYWxZgVCSA8BsYZKQSG83btd7UA/preview)
