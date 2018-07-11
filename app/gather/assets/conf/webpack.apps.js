@@ -22,23 +22,23 @@
 const apps = [
   {
     name: 'styles',
-    path: './assets/css/index.scss'
-  },
-  {
-    name: 'home',
-    path: './assets/apps/home'
-  },
-  {
-    name: 'surveys',
-    path: './assets/apps/surveys'
-  },
-  {
-    name: 'surveyors',
-    path: './assets/apps/surveyors'
+    path: '../css/index.scss'
   },
   {
     name: 'styles-login',
-    path: './assets/css/login.scss'
+    path: '../css/login.scss'
+  },
+  {
+    name: 'home',
+    path: '../apps/home'
+  },
+  {
+    name: 'surveys',
+    path: '../apps/surveys'
+  },
+  {
+    name: 'surveyors',
+    path: '../apps/surveyors'
   }
 ]
 

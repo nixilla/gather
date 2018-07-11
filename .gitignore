@@ -130,3 +130,4 @@ terraform.tfstate.backup
 
 # Webpack build files
 **/assets/bundles/
+**/static/*.*

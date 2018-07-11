@@ -15,6 +15,7 @@
     - [UMS settings for local development](#ums-settings-for-local-development)
     - [Token Authentication](#token-authentication)
 - [Development](#development)
+  - [Frontend assets](#frontend-assets)
 - [Deployment](#deployment)
 - [Containers and services](#containers-and-services)
 - [Run commands in the containers](#run-commands-in-the-containers)
@@ -62,6 +63,7 @@ of the most common ones with non default values. For more info take a look at th
 
 - Gather specific:
   - `INSTANCE_NAME`: `Gather 3` identifies the current instance among others.
+
 - CSV export:
   - `CSV_MAX_ROWS_SIZE`: `1048575` indicates the maximum number of rows to include in the CSV file.
   - `CSV_HEADER_RULES`: `remove-prefix;payload.,remove-prefix;None.,replace;.;:;`
@@ -69,21 +71,32 @@ of the most common ones with non default values. For more info take a look at th
     Default rules are `remove-prefix;payload.,remove-prefix;None.,`, removes `payload.None.` prefixes.
   - `CSV_HEADER_RULES_SEP`: `;` rules divider. Default `:`. Include it if any of the rules uses `:`.
     See more in `aether.common.drf.renderers.CustomCSVRenderer`.
+
 - Authentication (UMS):
   - `CAS_SERVER_URL`: `https://ums-dev.ehealthafrica.org`.
   - `HOSTNAME`: `gather.local`.
+
 - Django specific:
+  - `ADMIN_PASSWORD`: `secresecret` the setup script will create the superuser
+    "admin-gather" with this password. There is no default value.
+  - `DJANGO_SECRET_KEY`: `any_long_and_secret_key_you_can_imagine`.
+    See more in [Django settings](https://docs.djangoproject.com/en/2.0/ref/settings/#std:setting-SECRET_KEY)
   - `RDS_DB_NAME`: `gather` Postgres database name.
   - `WEB_SERVER_PORT`: `8005` Web server port.
+
 - Aether specific:
   - `AETHER_MODULES`: `odk,` Comma separated list with the available modules.
     To avoid confusion, the values will match the container name, `odk`.
+
   - Aether Kernel:
-    - `AETHER_KERNEL_TOKEN`: `a2d6bc20ad16ec8e715f2f42f54eb00cbbea2d24` Token to connect to Aether Kernel Server.
+    - `AETHER_KERNEL_TOKEN`: `a2d6bc20ad16ec8e715f2f42f54eb00cbbea2d24`
+      Token to connect to Aether Kernel Server.
     - `AETHER_KERNEL_URL`: `http://kernel:8000` Aether Kernel Server url.
     - `AETHER_KERNEL_URL_TEST`: `http://kernel-test:9000` Aether Kernel Testing Server url.
+
   - Aether ODK:
-    - `AETHER_ODK_TOKEN`: `d5184a044bb5acff89a76ec4e67d0fcddd5cd3a1` Token to connect to Aether ODK Server.
+    - `AETHER_ODK_TOKEN`: `d5184a044bb5acff89a76ec4e67d0fcddd5cd3a1`
+      Token to connect to Aether ODK Server.
     - `AETHER_ODK_URL`: `http://odk:8443` Aether ODK Server url.
     - `AETHER_ODK_URL_TEST`: `http://odk-test:9443` Aether ODK Testing Server url.
 
@@ -94,25 +107,24 @@ of the most common ones with non default values. For more info take a look at th
 docker-compose up --build    # this will update the cointainers if needed
 ```
 
-_If you get errors like:_
-```ERROR: pull access denied for <foo> repository does not exist or may require 'docker login' ```
-_verify you are logged into docker and have permission to the repository._
-
 This will start:
 
 - **gather** on `http://gather.local:8005`
-  and create a superuser `admin-gather`.
+  and create a superuser `${ADMIN_USERNAME}`.
+
+- **gather-assets** on `http://localhost:3005`
+  only needed for HMR during assets development (`/app/gather/assets/).
 
 - **aether-kernel** on `http://kernel.aether.local:8000`
-  and create a superuser `admin-kernel` with the needed TOKEN.
+  and create a superuser `admin` with the needed TOKEN.
 
 - **aether-odk** on `http://odk.aether.local:8443`
-  and create a superuser `admin-odk` with the needed TOKEN.
+  and create a superuser `admin` with the needed TOKEN.
 
 - **aether-ui** on `http://ui.aether.local:8004`
-  and create a superuser `admin-ui` with the needed TOKEN.
+  and create a superuser `admin` with the needed TOKEN.
 
-All the created superusers have password `adminadmin` in each container.
+All the created superusers have password `${ADMIN_PASSWORD}` in each container.
 
 If the `nginx` container is also started the url ports can be removed.
 - `http://gather.local`
@@ -179,6 +191,15 @@ docker-compose -f docker-compose-local.yml up
 *[Return to TOC](#table-of-contents)*
 
 
+### Frontend assets
+
+Frontend assets include JS, CSS, and fonts. They are all handled by webpack.
+
+See more in [Assets README](app/gather/assets/README.md)
+
+*[Return to TOC](#table-of-contents)*
+
+
 ## Deployment
 
 Set the `HOSTNAME` and `CAS_SERVER_URL` environment variables if you want to
@@ -200,10 +221,11 @@ The list of the main containers:
 | Container         | Description                                                       |
 | ----------------- | ----------------------------------------------------------------- |
 | db                | [PostgreSQL](https://www.postgresql.org/) database                |
-| **kernel**        | Aether Kernel app                                                 |
-| **ui**            | Aether Kernel UI (only needed for advanced mapping functionality) |
-| **odk**           | Aether ODK Collect Adapter app (imports data from ODK Collect)    |
 | **gather**        | Gather app                                                        |
+| **gather-assets** | Gather Assets HRM module                                          |
+| **kernel**        | Aether Kernel app                                                 |
+| **odk**           | Aether ODK Collect Adapter app (imports data from ODK Collect)    |
+| **ui**            | Aether Kernel UI (only needed for advanced mapping functionality) |
 | kernel-test       | Aether Kernel TESTING app (used only in e2e testss)               |
 | odk-test          | Aether ODK TESTING app (used only in e2e testss)                  |
 
@@ -238,14 +260,17 @@ or
 
 ```bash
 docker-compose run gather test
+docker-compose run gather-assets test
 ```
 
 or
 
 ```bash
 docker-compose run gather test_lint
-docker-compose run gather test_js
 docker-compose run gather test_coverage
+
+docker-compose run gather-assets test_lint
+docker-compose run gather-assets test_js
 ```
 
 The e2e tests are run against different containers, the config file used
