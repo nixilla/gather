@@ -20,7 +20,7 @@ You will need a computer running Linux, Mac OSX or a cloud based Linux VM (such 
     - [Python 3](https://www.python.org/) installed and accessable via commandline
     - Mac users - As of Python 3.6, you must have set up your trust certificates, usually at install.  Otherwise, you will get this error when running the generate script:  
  `ERROR: urllib.error.URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed`  
- FIX: There is info in the installer readMe file and here: [http://www.cdotson.com/2017/01/sslerror-with-python-3-6-x-on-macos-sierra/](http://www.cdotson.com/2017/01/sslerror-with-python-3-6-x-on-macos-sierra/)
+ FIX: There is info in the installer readMe file and [here](http://www.cdotson.com/2017/01/sslerror-with-python-3-6-x-on-macos-sierra/)
     - [pipenv](http://pipenv.readthedocs.io/en/latest/) (python enviroment and package manager) installed
     - The following ports should be available on your machine:  
 3000, 5601, 5984, 8000, 8080, 8443, 8666, 9000, 9200, 9300, 9443 & 9600
