@@ -27,3 +27,4 @@ Initialize the Aether Bootstrap repository
 
 ...
 
+[Next Steps: Collecting Data](demo_helloworld)
