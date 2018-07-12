@@ -11,7 +11,7 @@ It contains a set of tools for creating surveys and collecting data. It is analo
 
 [Learn more about Gather](https://docs.google.com/document/d/103qTvtmWkM9wq8AZmYWxZgVCSA8BsYZKQSG83btd7UA/preview)
 
-### Gather is for you if:
+## Gather is for you if:
 
 - you need people collecting data in the field by conducting surveys using mobile devices
 - you need your collected data to be streamed in realtime to a third party system such as a data portal or analytic platform
@@ -21,7 +21,7 @@ It contains a set of tools for creating surveys and collecting data. It is analo
 - your solution needs to be deployed to a production environment and begin collecting data hours and minutes, not days
 - your organization needs to deploy to a local server or in the cloud *(Currently supporting AWS - Google and Microsoft coming soon)*
 
-### In very broad brush strokes, the Gather workflow is:
+## In very broad brush strokes, the Gather workflow is:
 
 - An admin create's a survey using ODK XForms or XLSForms and defines where the data goes and who is allowed to access it
 - Registered users with Android devices use the ODK Collect app to remotely collect data and upload to the Gather server
