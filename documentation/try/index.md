@@ -39,6 +39,4 @@ and verify version 2.10 or greater.
 
 ## You are now ready to setup Gather
 
-[Demo 1 - Gather Deploy and Setup](demo_install)
-
-
+[Next Steps: Deploy and Setup Gather](demo_install)
