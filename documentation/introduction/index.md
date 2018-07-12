@@ -23,7 +23,7 @@ It contains a set of tools for creating surveys and collecting data. It is analo
 
 ## In very broad brush strokes, the Gather workflow is:
 
-- An admin create's a survey using ODK XForms or XLSForms and defines where the data goes and who is allowed to access it
+- An admin creates a survey using ODK XForms or XLSForms and defines where the data goes and who is allowed to access it
 - Registered users with Android devices use the ODK Collect app to remotely collect data and upload to the Gather server
 - The Gather server maps and routes that data to it's proper destination
 - Repeat 
