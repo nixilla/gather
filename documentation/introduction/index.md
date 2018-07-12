@@ -11,21 +11,21 @@ It contains a set of tools for creating surveys and collecting data. It is analo
 
 [Learn more about Gather](https://docs.google.com/document/d/103qTvtmWkM9wq8AZmYWxZgVCSA8BsYZKQSG83btd7UA/preview)
 
-## Gather is for you if:
+### Gather is for you if:
 
 - you need people collecting data in the field by conducting surveys using mobile devices
 - you need your collected data to be streamed in realtime to a third party system such as a data portal or analytic platform
-- you need to control what fields get streamed to third party systems in order to ensure private data doesn't get shared to the wrong places
+- you need to control what fields get streamed to third party systems in order to ensure private data doesn't go to the wrong places
 - you have survey data that needs to be normalized or split into several data sets with common join fields *(Coming Soon)*
-- your organization is required to maintain full custody of data collected including all aspects of data collection, curation and distribution.
+- your organization is required to maintain full custody of data collected and it's distribution.
 - your solution needs to be deployed to a production environment and begin collecting data hours and minutes, not days
 - your organization needs to deploy to a local server or in the cloud *(Currently supporting AWS - Google and Microsoft coming soon)*
 
-## In very broad brush strokes, Gather works in three stages:
+### In very broad brush strokes, the Gather workflow is:
 
-- Create a survey using ODK XForms or XLSForms and define who is allowed to access it
-- Registered users use ODK Collect on their Android device to collect data and upload to the Gather server
-- The Gather server maps and routes that data to it's destination
+- An admin create's a survey using ODK XForms or XLSForms and defines where the data goes and who is allowed to access it
+- Registered users with Android devices use the ODK Collect app to remotely collect data and upload to the Gather server
+- The Gather server maps and routes that data to it's proper destination
 - Repeat 
 
 
