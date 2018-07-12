@@ -13,8 +13,8 @@ These setup instructions assume that you are a System's Administrator, Developer
 You will need a computer running Linux, Mac OSX or a cloud based Linux VM (such as AWS) with 8MB of RAM.  These instructions have been tested on Ubuntu 16.04.x (we have seen issues with 14.x VMs) and Mac 10.13.x 
 
 - GitHub
- - git must be installed and available
- - SSH keys set up for command line access - [https://help.github.com/articles/connecting-to-github-with-ssh/](https://help.github.com/articles/connecting-to-github-with-ssh/)
+    - git must be installed and available
+    - SSH keys set up for command line access - [https://help.github.com/articles/connecting-to-github-with-ssh/](https://help.github.com/articles/connecting-to-github-with-ssh/)
 - Docker
     - Docker Compose installed setup with at least 4GB limit
 - Python
