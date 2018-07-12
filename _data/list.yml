@@ -13,3 +13,5 @@ toc:
         url: /documentation/try/index.html
       - page: Adding Aether Connect
         url: /documentation/try/connect.html
+  - title: Community
+    url: /community.html
