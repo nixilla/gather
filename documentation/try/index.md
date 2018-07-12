@@ -7,7 +7,7 @@ permalink: documentation/try/index.html
 
 The best way to evaluate Gather is to take it for a test drive.  This series of self guided demo's will take you through installation, setting up a simple survey and then sending that data to a CKAN data portal.  
 
-### Prerequisites
+## Prerequisites
 These setup instructions assume that you are a System's Administrator, Developer or DevOps type person with some familiarity with github and docker.  If this is not you, maybe you can borrow someone like this to help with the prerequisites and get your machine configured properly.  Once your machine is set up and configured with github, docker, and python, the rest is just following command line instructions.
 
 You will need a computer running Linux, Mac OSX or a cloud based Linux VM (such as AWS) with 8MB of RAM.  These instructions have been tested on Ubuntu 16.04.x (we have seen issues with 14.x VMs) and Mac 10.13.x 
@@ -30,7 +30,7 @@ You will also need to register some domains for local resolution on your compute
 
 `127.0.0.1    localhost odk.aether.local sync.aether.local ui.aether.local kernel.aether.local gather.local`
 
-### You are now ready to try some demos
+## You are now ready to try some demos
 
 << It would be great if we had a simple git project that would test git, docker and python without having to wait until they try a dome to find config issues. >>
 
