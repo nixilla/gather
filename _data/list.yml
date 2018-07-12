@@ -11,7 +11,11 @@ toc:
     subfolderitems:
       - page: Spin Up a Local Instance
         url: /documentation/try/index.html
-      - page: Adding Aether Connect
-        url: /documentation/try/connect.html
+      - page: Setup and Configure 
+        url: /documentation/try/demo_install.html
+      - page: Collecting Data 
+        url: /documentation/try/demo_helloworld.html
+      - page: Connecting to CKAN
+        url: /documentation/try/demo_ckan.html
   - title: Community
     url: /community.html
