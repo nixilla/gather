@@ -39,9 +39,8 @@ layout: default
           {% endfor %}
         </ul>
     {% endfor %}
-    <a href="{{ '/support.html' | relative_url }}">Community</a>
   </div>
-  <div class="doc-content{% if page.welcome == true %} welcome{% endif %}">
+  <div class="doc-content{% if page.community == true %} welcome{% endif %}">
 
     {{ content }}
 
