@@ -2,7 +2,6 @@
 title: Gather - Introduction
 permalink: documentation/introduction/index.html
 ---
-
 # What Is Gather?
 Gather is a versatile, secure and performant platform for data collection. It can be used with existing data collection tools such as [ODK Collect](https://docs.opendatakit.org/collect-intro/), and be extended with a wide range of functionality to ensure data integrity and interoperability.  It provides easy deployment in a secure server or cloud environment and allows administrators to control which data fields can be exported. Gather is built on top of the [Aether platform](https://aether.ehealthafrica.org) and can publish survey data directly into a [CKAN portal](https://ckan.org/), [Elasticsearch stack](https://www.elastic.co/), and any other Aether publishing endpoint.
 
@@ -17,6 +16,7 @@ It contains a set of tools for creating surveys and collecting data. It is analo
 - your organization is required to maintain full custody of data collected and it's distribution.
 - your solution needs to be deployed to a production environment and begin collecting data hours and minutes, not days
 - your organization needs to deploy to a local server or in the cloud *(Currently supporting AWS - Google and Microsoft coming soon)*
+
 ## In very broad brush strokes, the Gather workflow is:
 - An admin creates a survey using ODK XForms or XLSForms and defines where the data goes and who is allowed to access it
 - Registered users with Android devices use the ODK Collect app to remotely collect data and upload to the Gather server
