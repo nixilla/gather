@@ -32,3 +32,9 @@ You will also need to register some domains for local resolution on your compute
 
 ### You are now ready to try some demos
 
+<< It would be great if we had a simple git project that would test git, docker and python without having to wait until they try a dome to find config issues. >>
+
+
+[Demo 1 - Installation](demo_install.md)
+
+
