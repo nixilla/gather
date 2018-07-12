@@ -4,9 +4,9 @@ permalink: documentation/try/demo_install.html
 ---
 
 # The Gather Environment
-Gather actually consists of several different servers and services that run in their own virtual network environment.  More specifically, it utilizes container-based virtualization, which allows multiple isolated systems, called containers, to run on a single host and access a single kernel.  The container we use is Docker and we use Docker Compose to define and script deployment configurations.  In production, Gather is deployed and maintained using a DevOps model that takes advantage of this technology.
+Gather actually consists of several different servers and services that run in their own virtual network environment.  More specifically, it utilizes container-based virtualization, which allows multiple isolated systems, called containers, to run on a single host and access a single kernel.  The container we use is Docker and we use Docker Compose to define and script deployment configurations.  In production, Gather is deployed and maintained using a DevOps model that takes advantage of this technology.   
 
-For this demo, you will not need to know much about containers and docker although a basic understanding is helpful.  More information can be found on the [Docker website](https://www.docker.com/what-docker) if you are curious.
+For this demo, you will not need to know much about containers or Docker although a basic understanding is helpful.  More information can be found on the [Docker website](https://www.docker.com/what-docker) if you are curious.
 
 In order to follow this run-through, you will need to have your met the prerequisites defined in the [previous section](index)
 
