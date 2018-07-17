@@ -1,6 +1,6 @@
 ---
 title: Demo 3 Sending data through to CKAN
-permalink: documentation/try/demo_ckan.html
+permalink: documentation/try/ckan.html
 ---
 
 # Sending Data to a CKAN Data Portal

@@ -5,7 +5,7 @@ permalink: documentation/try/index.html
 
 # Try Gather For Yourself
 
-The best way to evaluate Gather is to take it for a test drive.  This series of self guided demo's will take you through installation, setting up a simple survey and then sending that data to a CKAN data portal.  
+The best way to evaluate Gather is to take it for a test drive.  This series of self guided demos will take you through installation, setting up a simple survey and then sending that data to a CKAN data portal.  
 
 ## Prerequisites
 These setup instructions assume that you are a System's Administrator, Developer or DevOps type person with some familiarity with github and docker.  If this is not you, maybe you can borrow someone like this to help with the prerequisites and get your machine configured properly.  Once your machine is set up and configured with github, docker, and python, the rest is just following command line instructions.
@@ -15,7 +15,7 @@ You will need a computer running Linux, Mac OSX or a cloud based Linux VM (such 
 - GitHub
     - [git](https://git-scm.com/) must be installed and available
 - Docker
-    - [Docker Compose](https://docs.docker.com/compose/) installed setup with at least 4GB limit
+    - [Docker Compose](https://docs.docker.com/compose/) installed setup with at least 3GB limit
 - The following ports should be available on your machine:  
 80, 8000, 8004, 8443
 
@@ -24,6 +24,8 @@ You will also need to register some domains for local resolution on your compute
 ```
 127.0.0.1    localhost odk.aether.local ui.aether.local kernel.aether.local gather.local
 ```
+
+Finally, if you want to do some data collection you will need an Android phone or tablet with [ODK Collect](https://play.google.com/store/apps/details?id=org.odk.collect.android&hl=en_US) installed.
 
 ## Quick test
 
@@ -39,4 +41,4 @@ and verify version 2.10 or greater.
 
 ## You are now ready to setup Gather
 
-[Next Steps: Deploy and Setup Gather](demo_install)
+[Next Steps: Deploy and Setup Gather](setup)
