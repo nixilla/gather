@@ -24,7 +24,7 @@ Now go to [http://localhost:5000/organization](http://localhost:5000/organizatio
 
 Name it `eHADemo` and click **Create Organisation**.
 
-Now we need 
+Now that we have CKAN running, we need to turn to Aether Connect, the data publishing half of the Aether platform.
 
 ## Setting Up Aether Connect
 

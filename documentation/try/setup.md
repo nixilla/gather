@@ -11,7 +11,7 @@ For this demo, you will not need to know much about containers or Docker, althou
 In order to follow this run-through, you will need to have your met the prerequisites defined in the [previous section](index)
 
 ## Setup
-We’ve created a GitHub project to help you get started.  It contains the instructions that Docker needs in order to download and install the components that make up the Gather server.  
+We’ve created a helper repository on GitHub to help you get started.  It contains the instructions that Docker needs in order to download and install the components that make up the Gather server.  
 
 Begin by cloning this repository to your computer:
 

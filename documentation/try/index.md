@@ -39,6 +39,6 @@ and verify version 1.20 or greater. Then try:
 
 and verify version 2.10 or greater.
 
-## You are now ready to setup Gather
+**You are now ready to set up Gather**
 
-[Next Steps: Deploy and Setup Gather](setup)
+<div style="margin-top: 2rem; text-align: center"><a href="setup">Next Steps: Set Up and Deploy Gather</a></div>
