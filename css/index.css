@@ -1165,7 +1165,8 @@ p {
     border-bottom: 1px dotted #CED7D8;
     border-left: 1px dotted #CED7D8; }
   .doc-content img {
-    max-width: 100%; }
+    max-width: 100%;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.3); }
   .doc-content .screenshot {
     display: block;
     padding: 1rem;
@@ -1200,5 +1201,3 @@ p {
 @media screen and (max-width: 640px) {
   .doc-content {
     font-size: .9em; } }
-
-/*# sourceMappingURL=index.css.map */
