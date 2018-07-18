@@ -9,9 +9,9 @@ toc:
   - title: Try It For Yourself
     url: /documentation/try/index.html
     subfolderitems:
-      - page: Spin Up a Local Instance
+      - page: Prerequisites
         url: /documentation/try/index.html
-      - page: Setup and Configure
+      - page: Setup and Configuration
         url: /documentation/try/setup.html
       - page: Collecting Data
         url: /documentation/try/collect-data.html
