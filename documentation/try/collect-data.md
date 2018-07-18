@@ -71,4 +71,8 @@ Click on the survey box and you will see the data you just submitted displayed i
 
 Congratulations - we just collected some data! 
 
-[Next Steps: Send Data To CKAN](ckan)
+## Recap 
+
+In this section we created a survey in Gather and uploaded an XLSForm. We then used ODK Collect to download the form, complete it, and submit the data back to Gather. We then reviewed this data in tabulated form within Gather.
+
+<div style="margin-top: 2rem; text-align: center"><a href="ckan">Next Steps: Publish Data to CKAN</a></div>
