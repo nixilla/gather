@@ -11,11 +11,11 @@ toc:
     subfolderitems:
       - page: Spin Up a Local Instance
         url: /documentation/try/index.html
-      - page: Setup and Configure 
-        url: /documentation/try/demo_install.html
-      - page: Collecting Data 
-        url: /documentation/try/demo_helloworld.html
+      - page: Setup and Configure
+        url: /documentation/try/setup.html
+      - page: Collecting Data
+        url: /documentation/try/collect-data.html
       - page: Connecting to CKAN
-        url: /documentation/try/demo_ckan.html
+        url: /documentation/try/ckan.html
   - title: Community
     url: /community.html
