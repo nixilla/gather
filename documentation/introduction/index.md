@@ -22,3 +22,5 @@ It contains a set of tools for creating surveys and collecting data. It is analo
 - Registered users with Android devices use the ODK Collect app to remotely collect data and upload to the Gather server
 - The Gather server maps and routes that data to it's proper destination
 - Repeat
+
+[Next Steps: Try it out]([Next Steps: Send Data To CKAN](try/index))
