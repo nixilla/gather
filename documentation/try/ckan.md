@@ -95,4 +95,4 @@ If you now fill in the `example-microcensus` form again in ODK Collect and submi
 
 In this section we created configured and span up a local CKAN instance. We then configured and deployed Aether Connect, the data publishing half of the Aether platform. We then viewed in CKAN the data that we collected in the previous section.
 
-<div style="margin-top: 2rem; text-align: center"><a href="ckan">Final Steps: Cleaning Up</a></div>
+<div style="margin-top: 2rem; text-align: center"><a href="clean-up">Final Steps: Cleaning Up</a></div>

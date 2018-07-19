@@ -17,5 +17,7 @@ toc:
         url: /documentation/try/collect-data.html
       - page: Connecting to CKAN
         url: /documentation/try/ckan.html
+      - page: Cleaning Up
+        url: /documentation/try/clean-up.html
   - title: Community
     url: /community.html
