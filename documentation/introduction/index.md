@@ -7,7 +7,6 @@ Gather is a versatile, secure and performant platform for data collection. It ca
 
 It contains a set of tools for creating surveys and collecting data. It is analogous to [ODK](https://opendatakit.org/), and includes components that allow it to function with elements of the ODK ecosystem, such as [XForms](https://docs.opendatakit.org/form-design-intro/), [XLSForms](https://docs.opendatakit.org/xlsform/) and [ODK Collect](https://docs.opendatakit.org/collect-intro/).
 
-[Learn more about Gather](https://docs.google.com/document/d/103qTvtmWkM9wq8AZmYWxZgVCSA8BsYZKQSG83btd7UA/preview)
 ## Gather is for you if:
 - you need people collecting data in the field by conducting surveys using mobile devices
 - you need your collected data to be streamed in realtime to a third party system such as a data portal or analytic platform
