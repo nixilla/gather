@@ -32,7 +32,6 @@ class SettingsTest(TestCase):
         self.assertEqual(settings.SECURE_PROXY_SSL_HEADER, None)
 
         self.assertEqual(settings.ROOT_URLCONF, 'gather.urls')
-        self.assertEqual(settings.WSGI_APPLICATION, 'gather.wsgi.application')
         self.assertEqual(settings.APP_NAME, 'Gather')
         self.assertEqual(settings.INSTANCE_NAME, 'Gather 3')
         self.assertEqual(settings.AETHER_MODULES, ['kernel', 'odk'])
@@ -42,4 +41,4 @@ class SettingsTest(TestCase):
 
         self.assertTrue(settings.AETHER_ODK)
         self.assertIn('odk', settings.AETHER_APPS)
-        self.assertEqual(settings.AETHER_APPS['odk']['url'], 'http://odk-test:9443')
+        self.assertEqual(settings.AETHER_APPS['odk']['url'], 'http://odk-test:9002')

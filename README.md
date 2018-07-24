@@ -13,11 +13,9 @@
     - [Gather](#gather)
 - [Usage](#usage)
   - [Users & Authentication](#users--authentication)
-    - [UMS settings for local development](#ums-settings-for-local-development)
     - [Token Authentication](#token-authentication)
 - [Development](#development)
   - [Frontend assets](#frontend-assets)
-- [Deployment](#deployment)
 - [Containers and services](#containers-and-services)
 - [Run commands in the containers](#run-commands-in-the-containers)
   - [Run tests](#run-tests)
@@ -77,8 +75,8 @@ of the most common ones with non default values. For more info take a look at th
   - `CSV_HEADER_RULES_SEP`: `;` rules divider. Default `:`. Include it if any of the rules uses `:`.
     See more in `aether.common.drf.renderers.CustomCSVRenderer`.
 
-- Authentication (UMS):
-  - `CAS_SERVER_URL`: `https://ums-dev.ehealthafrica.org`.
+- Authentication (Central Authentication Service):
+  - `CAS_SERVER_URL`: `https://your.cas.server`.
   - `HOSTNAME`: `gather.local`.
 
 - Django specific:
@@ -94,7 +92,7 @@ of the most common ones with non default values. For more info take a look at th
     To avoid confusion, the values will match the container name, `odk`.
 
   - Aether Kernel:
-    - `AETHER_KERNEL_TOKEN`: `a2d6bc20ad16ec8e715f2f42f54eb00cbbea2d24`
+    - `AETHER_KERNEL_TOKEN`: `aether_kernel_admin_user_auth_token`
       Token to connect to Aether Kernel Server.
     - `AETHER_KERNEL_URL`: `http://kernel:8000` Aether Kernel Server url.
     - `AETHER_KERNEL_URL_TEST`: `http://kernel-test:9000` Aether Kernel Testing Server url.
@@ -103,13 +101,26 @@ of the most common ones with non default values. For more info take a look at th
       served by NGINX. Defaults to `AETHER_KERNEL_URL` value.
 
   - Aether ODK:
-    - `AETHER_ODK_TOKEN`: `d5184a044bb5acff89a76ec4e67d0fcddd5cd3a1`
+    - `AETHER_ODK_TOKEN`: `aether_odk_admin_user_auth_token`
       Token to connect to Aether ODK Server.
-    - `AETHER_ODK_URL`: `http://odk:8443` Aether ODK Server url.
-    - `AETHER_ODK_URL_TEST`: `http://odk-test:9443` Aether ODK Testing Server url.
+    - `AETHER_ODK_URL`: `http://odk:8002` Aether ODK Server url.
+    - `AETHER_ODK_URL_TEST`: `http://odk-test:9002` Aether ODK Testing Server url.
     - `AETHER_ODK_URL_ASSETS`: `http://odk.aether.local` Aether ODK url used in NGINX.
       This url is being used in the frontend to display the linked media files
       served by NGINX. Defaults to `AETHER_ODK_URL` value.
+
+
+##### AETHER_XXX_URL vs AETHER_XXX_URL_ASSETS
+
+The difference between these two variables is quite obscure.
+If we are using docker-compose and running the containers together,
+the first one is the container name with the port, `http://kernel:8000`, and the
+second one is the one provided by NGINX, using the network name, and serves the
+protected media, `http://kernel.aether.local`.
+For an unexpected reason `gather` container cannot communicate with
+`kernel` container using the network name.
+If we are running the containers separately (with kubernetes, in AWS...)
+both urls are external to the gather container and should be the same.
 
 
 ## Usage
@@ -124,12 +135,12 @@ This will start:
   and create a superuser `${ADMIN_USERNAME}`.
 
 - **gather-assets** on `http://localhost:3005`
-  only needed for HMR during assets development (`/app/gather/assets/).
+  only needed for HMR during assets development (`/app/gather/assets/`).
 
 - **aether-kernel** on `http://kernel.aether.local:8000`
   and create a superuser `admin` with the needed TOKEN.
 
-- **aether-odk** on `http://odk.aether.local:8443`
+- **aether-odk** on `http://odk.aether.local:8002`
   and create a superuser `admin` with the needed TOKEN.
 
 - **aether-ui** on `http://ui.aether.local:8004`
@@ -141,6 +152,7 @@ If the `nginx` container is also started the url ports can be removed.
 - `http://gather.local`
 - `http://kernel.aether.local`
 - `http://odk.aether.local`
+- `http://odk.aether.local:8443` This is required by ODK Collect
 - `http://ui.aether.local`
 
 
@@ -148,31 +160,17 @@ If the `nginx` container is also started the url ports can be removed.
 
 ### Users & Authentication
 
-The app defers part of the users management to
-[eHA UMS tool](https://github.com/eHealthAfrica/ums).
-
 Set the `HOSTNAME` and `CAS_SERVER_URL` environment variables if you want to
-activate the UMS integration in each container.
+activate the CAS integration in the app.
+See more in [Django CAS client](https://github.com/mingchen/django-cas-ng).
 
-
-#### UMS settings for local development
-
-The project is `gather-aether` **Gather&Aether**.
-
-The client services are:
-
-  - **Gather & Aether (local)**  for `gather.local`.
-
-
-Other options are to log in via token, via basic authentication or via the
-standard django authentication process in the admin section.
-The available options depend on each container.
+The other option is the standard django authentication.
 
 *[Return to TOC](#table-of-contents)*
 
 #### Token Authentication
 
-The communication between the servers is done via
+The communication with the Aether servers is done via
 [token authentication](http://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication).
 
 In `gather` there are tokens per user to connect to other servers.
@@ -180,7 +178,7 @@ This means that every time a logged in user tries to visit any page that require
 to fetch data from any of the other apps, `aether-kernel` and/or `aether-odk`,
 the system will verify that the user token for that app is valid or will request
 a new one using the global tokens, `AETHER_KERNEL_TOKEN` and/or `AETHER_ODK_TOKEN`;
-that's going to be used for all requests and will allow the system to better
+that token is going to be used for all requests and will allow the system to better
 track the user actions.
 
 *[Return to TOC](#table-of-contents)*
@@ -207,19 +205,6 @@ docker-compose -f docker-compose-local.yml up
 Frontend assets include JS, CSS, and fonts. They are all handled by webpack.
 
 See more in [Assets README](app/gather/assets/README.md)
-
-*[Return to TOC](#table-of-contents)*
-
-
-## Deployment
-
-Set the `HOSTNAME` and `CAS_SERVER_URL` environment variables if you want to
-activate the UMS integration in each container.
-
-If a valid `AETHER_KERNEL_TOKEN` and `AETHER_KERNEL_URL` combination is not set,
-the server will still start, but all connections to Aether Kernel Server will fail.
-
-This also applies to Aether ODK module.
 
 *[Return to TOC](#table-of-contents)*
 

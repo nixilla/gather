@@ -18,7 +18,7 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-set -e
+set -Eeuo pipefail
 
 
 # Define help message
@@ -70,15 +70,15 @@ setup() {
     export PGPORT=$RDS_PORT
 
     until pg_isready -q; do
-      >&2 echo "Waiting for postgres..."
-      sleep 1
+        >&2 echo "Waiting for postgres..."
+        sleep 1
     done
 
     if psql -c "" $RDS_DB_NAME; then
-      echo "$RDS_DB_NAME database exists!"
+        echo "$RDS_DB_NAME database exists!"
     else
-      createdb -e $RDS_DB_NAME -e ENCODING=UTF8
-      echo "$RDS_DB_NAME database created!"
+        createdb -e $RDS_DB_NAME -e ENCODING=UTF8
+        echo "$RDS_DB_NAME database created!"
     fi
 
     # migrate data model if needed
@@ -138,13 +138,19 @@ case "$1" in
         setup
 
         # create static assets
-        ./manage.py collectstatic --noinput
+        ./manage.py collectstatic --noinput --clear --verbosity 0
         chmod -R 755 /var/www/static
 
-        # media assets
-        chown gather: /media
+        # expose version number (if exists)
+        cp ./VERSION /var/www/static/VERSION 2>/dev/null || :
+        # add git revision (if exists)
+        cp ./REVISION /var/www/static/REVISION 2>/dev/null || :
 
-        /usr/local/bin/uwsgi --ini ./conf/uwsgi.ini
+        [ -z "$DEBUG" ] && LOGGING="--disable-logging" || LOGGING=""
+        /usr/local/bin/uwsgi \
+            --ini /code/conf/uwsgi.ini \
+            --http 0.0.0.0:$WEB_SERVER_PORT \
+            $LOGGING
     ;;
 
     start_dev )

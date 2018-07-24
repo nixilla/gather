@@ -173,7 +173,7 @@ HOSTNAME = os.environ.get('HOSTNAME', '')
 
 if CAS_SERVER_URL:  # pragma: no cover
     INSTALLED_APPS += [
-        # UMS apps
+        # CAS apps
         'django_cas_ng',
         'ums_client',
     ]
@@ -181,7 +181,7 @@ if CAS_SERVER_URL:  # pragma: no cover
         'ums_client.backends.UMSRoleBackend',
     ]
 else:  # pragma: no cover
-    logger.info('No UMS enable!')
+    logger.info('No CAS enabled!')
 
 
 # Sentry Configuration
@@ -202,7 +202,7 @@ if SENTRY_DSN:  # pragma: no cover
         'raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware',
     ] + MIDDLEWARE
 else:  # pragma: no cover
-    logger.info('No SENTRY enable!')
+    logger.info('No SENTRY enabled!')
 
 
 # Security Configuration
@@ -244,7 +244,6 @@ if not TESTING and DEBUG:  # pragma: no cover
 # ------------------------------------------------------------------------------
 
 ROOT_URLCONF = 'gather.urls'
-WSGI_APPLICATION = 'gather.wsgi.application'
 
 APP_NAME = 'Gather'
 INSTANCE_NAME = os.environ.get('INSTANCE_NAME', 'Gather 3')
@@ -254,7 +253,7 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50MB
 # Javascript/CSS Files:
 WEBPACK_LOADER = {
     'DEFAULT': {
-        'BUNDLE_DIR_NAME': '/',  # used in prod
+        'BUNDLE_DIR_NAME': '/',
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json'),
     },
 }
