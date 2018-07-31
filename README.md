@@ -26,7 +26,12 @@
 
 ## Introduction
 
-Gather is an ODK-compatible data collection tool. It is built on top of the [Aether framework](https://aether.ehealthafrica.org). If you want to try it out, the easiest way is to follow the [instructions](https://gather.ehealthafrica.org/documentation/try/) on the [Gather microsite](https://gather.ehealthafrica.org).
+Gather is an ODK-compatible data collection tool.
+It is built on top of the [Aether framework](https://aether.ehealthafrica.org).
+If you want to try it out, the easiest way is to follow the
+[instructions](https://gather.ehealthafrica.org/documentation/try/)
+on the [Gather microsite](https://gather.ehealthafrica.org).
+
 
 ## Setup
 
@@ -50,17 +55,31 @@ docker-compose build
 Include this entry in your `/etc/hosts` file:
 
 ```
-127.0.0.1    kernel.aether.local odk.aether.local ui.aether.local gather.local
+# gather
+127.0.0.1    gather.local
+
+# aether
+127.0.0.1    kernel.aether.local odk.aether.local ui.aether.local
 ```
+
+Generate credentials for local development with docker-compose.
+
+```bash
+./scripts/generate-credentials.sh > .env
+```
+
+**Note:** Make sure you have `openssl` installed in your system.
 
 *[Return to TOC](#table-of-contents)*
 
 ### Environment Variables
 
 Most of the environment variables are set to default values. This is the short list
-of the most common ones with non default values. For more info take a look at the file
-[docker-compose-base.yml](docker-compose-base.yml)
+of the most common ones with non default values. For more info take a look at the files
+[docker-compose-base.yml](docker-compose-base.yml) and
+[/scripts/generate-credentials.sh](/scripts/generate-credentials.sh).
 
+See also [Django settings](https://docs.djangoproject.com/en/2.0/ref/settings/).
 
 #### Gather
 
@@ -80,11 +99,11 @@ of the most common ones with non default values. For more info take a look at th
   - `HOSTNAME`: `gather.local`.
 
 - Django specific:
+  - `ADMIN_USERNAME`: `admin` the setup script will create a superuser
+    with this username. There is no default value.
   - `ADMIN_PASSWORD`: `secresecret` the setup script will create the superuser
-    "admin-gather" with this password. There is no default value.
-  - `DJANGO_SECRET_KEY`: `any_long_and_secret_key_you_can_imagine`.
-    See more in [Django settings](https://docs.djangoproject.com/en/2.0/ref/settings/#std:setting-SECRET_KEY)
-  - `RDS_DB_NAME`: `gather` Postgres database name.
+    with this password. There is no default value.
+  - `DB_NAME`: `gather` Postgres database name.
   - `WEB_SERVER_PORT`: `8005` Web server port.
 
 - Aether specific:
@@ -132,21 +151,22 @@ docker-compose up --build    # this will update the cointainers if needed
 This will start:
 
 - **gather** on `http://gather.local:8005`
-  and create a superuser `${ADMIN_USERNAME}`.
+  and create a superuser.
 
 - **gather-assets** on `http://localhost:3005`
   only needed for HMR during assets development (`/app/gather/assets/`).
 
 - **aether-kernel** on `http://kernel.aether.local:8000`
-  and create a superuser `admin` with the needed TOKEN.
+  and create a superuser with the needed TOKEN.
 
 - **aether-odk** on `http://odk.aether.local:8002`
-  and create a superuser `admin` with the needed TOKEN.
+  and create a superuser with the needed TOKEN.
 
 - **aether-ui** on `http://ui.aether.local:8004`
-  and create a superuser `admin` with the needed TOKEN.
+  and create a superuser.
 
-All the created superusers have password `${ADMIN_PASSWORD}` in each container.
+All the created superusers have username `${ADMIN_USERNAME}` and
+password `${ADMIN_PASSWORD}` in each container.
 
 If the `nginx` container is also started the url ports can be removed.
 - `http://gather.local`

@@ -22,7 +22,7 @@ set -Eeuo pipefail
 
 
 # Define help message
-show_help() {
+show_help () {
     echo """
     Commands
     ----------------------------------------------------------------------------
@@ -48,7 +48,7 @@ show_help() {
     """
 }
 
-pip_freeze() {
+pip_freeze () {
     pip install virtualenv
     rm -rf /tmp/env
 
@@ -59,26 +59,18 @@ pip_freeze() {
     /tmp/env/bin/pip freeze --local | grep -v appdir | tee -a conf/pip/requirements.txt
 }
 
-setup() {
+setup () {
     # check if required environment variables exist
     ./conf/check_vars.sh
 
-    # wait for database
-    export PGPASSWORD=$RDS_PASSWORD
-    export PGHOST=$RDS_HOSTNAME
-    export PGUSER=$RDS_USERNAME
-    export PGPORT=$RDS_PORT
+    # check database
+    pg_isready
 
-    until pg_isready -q; do
-        >&2 echo "Waiting for postgres..."
-        sleep 1
-    done
-
-    if psql -c "" $RDS_DB_NAME; then
-        echo "$RDS_DB_NAME database exists!"
+    if psql -c "" $DB_NAME; then
+        echo "$DB_NAME database exists!"
     else
-        createdb -e $RDS_DB_NAME -e ENCODING=UTF8
-        echo "$RDS_DB_NAME database created!"
+        createdb -e $DB_NAME -e ENCODING=UTF8
+        echo "$DB_NAME database created!"
     fi
 
     # migrate data model if needed
@@ -97,11 +89,11 @@ setup() {
     cp -r ./gather/assets/bundles/* ./gather/static/
 }
 
-test_lint() {
+test_lint () {
     flake8 . --config=./conf/extras/flake8.cfg
 }
 
-test_coverage() {
+test_coverage () {
     export RCFILE=./conf/extras/coverage.rc
     export TESTING=true
 
@@ -112,6 +104,11 @@ test_coverage() {
     cat ./conf/extras/good_job.txt
 }
 
+
+# set DEBUG if missing
+set +u
+DEBUG="$DEBUG"
+set -u
 
 case "$1" in
     bash )
@@ -159,6 +156,8 @@ case "$1" in
     ;;
 
     test )
+        echo "DEBUG=$DEBUG"
+        setup
         test_lint
         test_coverage
     ;;

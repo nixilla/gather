@@ -23,16 +23,18 @@ import os
 # Common settings
 # ------------------------------------------------------------------------------
 
-DEBUG = (os.environ.get('DEBUG', '').lower() == 'true')
-TESTING = (os.environ.get('TESTING', '').lower() == 'true')
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+# Environment variables are false if unset or set to empty string, anything
+# else is considered true.
+DEBUG = bool(os.environ.get('DEBUG'))
+TESTING = bool(os.environ.get('TESTING'))
+SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-if DEBUG:  # pragma: no cover
+if DEBUG:
     logger.setLevel(logging.DEBUG)
-if TESTING:  # pragma: no cover
+if TESTING:
     logger.setLevel(logging.CRITICAL)
 
 
@@ -131,11 +133,11 @@ REST_FRAMEWORK = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ.get('RDS_DB_NAME'),
-        'PASSWORD': os.environ.get('RDS_PASSWORD', ''),
-        'USER': os.environ.get('RDS_USERNAME', 'postgres'),
-        'HOST': os.environ.get('RDS_HOSTNAME', 'db'),
-        'PORT': os.environ.get('RDS_PORT', '5432'),
+        'NAME': os.environ['DB_NAME'],
+        'PASSWORD': os.environ['PGPASSWORD'],
+        'USER': os.environ['PGUSER'],
+        'HOST': os.environ['PGHOST'],
+        'PORT': os.environ['PGPORT'],
         'TESTING': {'CHARSET': 'UTF8'},
     },
 }
@@ -166,12 +168,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-CAS_VERSION = 3
-CAS_LOGOUT_COMPLETELY = True
-CAS_SERVER_URL = os.environ.get('CAS_SERVER_URL', '')
-HOSTNAME = os.environ.get('HOSTNAME', '')
-
-if CAS_SERVER_URL:  # pragma: no cover
+CAS_SERVER_URL = os.environ.get('CAS_SERVER_URL')
+if CAS_SERVER_URL:
     INSTALLED_APPS += [
         # CAS apps
         'django_cas_ng',
@@ -180,7 +178,11 @@ if CAS_SERVER_URL:  # pragma: no cover
     AUTHENTICATION_BACKENDS += [
         'ums_client.backends.UMSRoleBackend',
     ]
-else:  # pragma: no cover
+    CAS_VERSION = 3
+    CAS_LOGOUT_COMPLETELY = True
+    HOSTNAME = os.environ.get('HOSTNAME', '')
+
+else:
     logger.info('No CAS enabled!')
 
 
@@ -188,20 +190,16 @@ else:  # pragma: no cover
 # ------------------------------------------------------------------------------
 
 SENTRY_DSN = os.environ.get('SENTRY_DSN')
-SENTRY_CLIENT = os.environ.get(
-    'DJANGO_SENTRY_CLIENT',
-    'raven.contrib.django.raven_compat.DjangoClient'
-)
-SENTRY_CELERY_LOGLEVEL = logging.INFO
-
-if SENTRY_DSN:  # pragma: no cover
-    INSTALLED_APPS += [
-        'raven.contrib.django.raven_compat',
-    ]
+if SENTRY_DSN:
+    INSTALLED_APPS += ['raven.contrib.django.raven_compat', ]
     MIDDLEWARE = [
         'raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware',
     ] + MIDDLEWARE
-else:  # pragma: no cover
+
+    SENTRY_CLIENT = 'raven.contrib.django.raven_compat.DjangoClient'
+    SENTRY_CELERY_LOGLEVEL = logging.INFO
+
+else:
     logger.info('No SENTRY enabled!')
 
 
@@ -216,20 +214,20 @@ CSRF_COOKIE_DOMAIN = os.environ.get('CSRF_COOKIE_DOMAIN', '.gather.org')
 CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', CSRF_COOKIE_DOMAIN).split(',')
 SESSION_COOKIE_DOMAIN = CSRF_COOKIE_DOMAIN
 
-if os.environ.get('DJANGO_USE_X_FORWARDED_HOST', False):      # pragma: no cover
+if os.environ.get('DJANGO_USE_X_FORWARDED_HOST', False):
     USE_X_FORWARDED_HOST = True
 
-if os.environ.get('DJANGO_USE_X_FORWARDED_PORT', False):      # pragma: no cover
+if os.environ.get('DJANGO_USE_X_FORWARDED_PORT', False):
     USE_X_FORWARDED_PORT = True
 
-if os.environ.get('DJANGO_HTTP_X_FORWARDED_PROTO', False):    # pragma: no cover
+if os.environ.get('DJANGO_HTTP_X_FORWARDED_PROTO', False):
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Debug Configuration
 # ------------------------------------------------------------------------------
 
-if not TESTING and DEBUG:  # pragma: no cover
+if not TESTING and DEBUG:
     INSTALLED_APPS += ['debug_toolbar', ]
     MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware', ]
 
@@ -255,6 +253,9 @@ WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': '/',
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json'),
+        'POLL_INTERVAL': 0.1,  # in miliseconds
+        'TIMEOUT': None,
+        'IGNORE': ['.+\.hot-update.js', '.+\.map'],
     },
 }
 
@@ -293,16 +294,18 @@ kernel = {
     'url': os.environ.get('AETHER_KERNEL_URL'),
     'assets': os.environ.get('AETHER_KERNEL_URL_ASSETS', os.environ.get('AETHER_KERNEL_URL')),
 }
-if TESTING:  # pragma: no cover
+if TESTING:
     kernel['url'] = os.environ.get('AETHER_KERNEL_URL_TEST')
 
-if kernel['url'].strip() and kernel['token'].strip():  # pragma: no cover
+if kernel['url'].strip() and kernel['token'].strip():
     AETHER_APPS['kernel'] = kernel
+else:
+    raise RuntimeError('Aether Kernel configuration was not properly set!')
 
 
 # check if ODK is available in this instance
 AETHER_ODK = False
-if 'odk' in AETHER_MODULES:  # pragma: no cover
+if 'odk' in AETHER_MODULES:
     odk = {
         'token': os.environ.get('AETHER_ODK_TOKEN'),
         'url': os.environ.get('AETHER_ODK_URL'),
@@ -314,6 +317,8 @@ if 'odk' in AETHER_MODULES:  # pragma: no cover
     if odk['url'].strip() and odk['token'].strip():
         AETHER_APPS['odk'] = odk
         AETHER_ODK = True
+    else:
+        raise RuntimeError('Aether ODK configuration was not properly set!')
 
 # Asset settings
 CSV_HEADER_RULES = os.environ.get(
