@@ -1051,6 +1051,8 @@ p {
     text-transform: uppercase;
     margin: .5rem 0;
     padding: .4em 1.2em; }
+    .doc-nav-mobile .doc-nav-title:first-child {
+      border-top: 0; }
   .doc-nav-mobile .active a {
     color: #2B4643; }
 
