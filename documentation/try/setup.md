@@ -1,6 +1,7 @@
 ---
-title: Gather - Demo 1 Setting up Gather
+title: Gather - Setting up Gather
 permalink: documentation/try/setup.html
+description: Gather Documentation – Try it for yourself
 ---
 
 # The Gather Environment

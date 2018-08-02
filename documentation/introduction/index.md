@@ -1,6 +1,7 @@
 ---
 title: Gather - Introduction
 permalink: documentation/introduction/index.html
+description: Gather Documentation – Introduction to Gather
 ---
 # What Is Gather?
 Gather is a versatile, secure and performant platform for data collection. It can be used with existing data collection tools such as [ODK Collect](https://docs.opendatakit.org/collect-intro/), and be extended with a wide range of functionality to ensure data integrity and interoperability.  It provides easy deployment in a secure server or cloud environment and allows administrators to control which data fields can be exported. Gather is built on top of the [Aether platform](https://aether.ehealthafrica.org) and can publish survey data directly into a [CKAN portal](https://ckan.org/), [Elasticsearch stack](https://www.elastic.co/), and any other Aether publishing endpoint.

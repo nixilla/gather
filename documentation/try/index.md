@@ -1,6 +1,7 @@
 ---
 title: Gather - Try It
 permalink: documentation/try/index.html
+description: Gather Documentation – Try it for yourself
 ---
 
 # Try Gather For Yourself

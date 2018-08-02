@@ -1,6 +1,7 @@
 ---
-title: Demo 2 Collecting Data
+title: Gather – Collecting Data
 permalink: documentation/try/collect-data.html
+description: Gather Documentation – Try it for yourself
 ---
 
 # Gathering Data

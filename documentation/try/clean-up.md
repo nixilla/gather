@@ -1,6 +1,7 @@
 ---
-title: Cleaning Up
+title: Gather – Cleaning Up
 permalink: documentation/try/clean-up.html
+description: Gather Documentation – Try it for yourself
 ---
 
 # Cleaning Up

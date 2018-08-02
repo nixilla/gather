@@ -1,6 +1,7 @@
 ---
-title: Demo 3 Sending data through to CKAN
+title: Gather – Sending data through to CKAN
 permalink: documentation/try/ckan.html
+description: Gather Documentation – Try it for yourself
 ---
 
 # Sending Data to a CKAN Data Portal
