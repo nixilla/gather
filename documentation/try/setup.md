@@ -26,7 +26,7 @@ The `--recurse-submodules` option is necessary because Gather Deploy uses anothe
 If you are starting Aether for the first time, you will need to create some docker resources (networks and volumes) and generate credentials for all applications:
 
 ```
-./scripts/generate_env_vars.sh
+./scripts/initialise_docker_environment.sh
 ```
 
 To start all the servers and services, just type
