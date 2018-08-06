@@ -23,6 +23,14 @@ cd gather-deploy
 
 The `--recurse-submodules` option is necessary because Gather Deploy uses another repository called [Aether Bootstrap](https://github.com/eHealthAfrica/aether-bootstrap) to install and configure Aether, the underlying platform on which Gather is built.
 
+If you are starting Aether for the first time, you will need to create some docker resources (networks and volumes) and generate credentials for all applications:
+
+```
+cd aether-bootstrap
+./scripts/initialise_docker_environment.sh
+cd ..
+```
+
 To start all the servers and services, just type
 
 ```
