@@ -17,7 +17,7 @@ We’ve created a helper repository on GitHub to help you get started.  It conta
 Begin by cloning this repository to your computer:
 
 ```
-git clone --recurse-submodules git@github.com:eHealthAfrica/gather-deploy.git
+git clone --recurse-submodules https://github.com/eHealthAfrica/gather-deploy.git
 cd gather-deploy
 ```
 
