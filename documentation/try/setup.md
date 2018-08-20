@@ -9,7 +9,7 @@ Gather actually consists of several different servers and services that run in t
 
 For this demo, you will not need to know much about containers or Docker, although a basic understanding is helpful.  More information can be found on the [Docker website](https://www.docker.com/what-docker) if you’re curious.
 
-Before following this run-through, make sure you have met the prerequisites defined in the [previous section](index)
+Before following this run-through, make sure you have met the prerequisites defined in the [previous section](index).
 
 ## Setup
 We’ve created a helper repository on GitHub to help you get started.  It contains the instructions that Docker needs in order to download and install the components that make up the Gather server.  
