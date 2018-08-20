@@ -26,17 +26,6 @@ services:
     networks:
       - gather_local
 
-  # ---------------------------------
-  # NGINX container
-  # ---------------------------------
-
-  nginx:
-    extends:
-      file: ./docker-compose-base.yml
-      service: nginx-base
-    networks:
-      - gather_local
-
 
   # ---------------------------------
   # Aether kernel container
@@ -100,6 +89,17 @@ services:
         aliases:
           - ui.aether.local
 
+  # ---------------------------------
+  # Gather Assets container
+  # ---------------------------------
+
+  gather-assets:
+    extends:
+      file: ./docker-compose-base.yml
+      service: gather-assets-base
+    networks:
+      - gather_local
+
 
   # ---------------------------------
   # Gather container
@@ -121,13 +121,23 @@ services:
         aliases:
           - gather.local
 
+
   # ---------------------------------
-  # Gather Assets container
+  # NGINX container
   # ---------------------------------
 
-  gather-assets:
+  nginx:
     extends:
       file: ./docker-compose-base.yml
-      service: gather-assets-base
+      service: nginx-base
+    depends_on:
+      kernel:
+        condition: service_healthy
+      odk:
+        condition: service_healthy
+      ui:
+        condition: service_healthy
+      gather:
+        condition: service_healthy
     networks:
       - gather_local
