@@ -28,6 +28,11 @@ You will also need to register some domains for local resolution on your compute
 
 Finally, if you want to do some data collection you will need an Android phone or tablet with [ODK Collect](https://play.google.com/store/apps/details?id=org.odk.collect.android&hl=en_US) installed.
 
+## Amazon Web Services
+Using AWS is a great way to evaluate Gather without having to install anything on your own computer.  From start to finish, it only takes about an hour to spin up an EC2 instance, configure it and try the following exercises.  To get started, try these (AWS setup instructions.)[setup-aws]
+
+It only costs about $5.00 to spin up an EC2 instance and run it for a day.  From 
+
 ## Quick test
 
 At the commandline type:
