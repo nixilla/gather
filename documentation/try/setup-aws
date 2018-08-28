@@ -1,0 +1,7 @@
+---
+title: AWS Setup for Gather
+permalink: documentation/try/setup-aws.html
+description: Gather Documentation – Setting up AWS for Gather evaluation
+---
+
+Starting up an AWS instance and configuring it for use with the Gather eval is actually very easy. 
