@@ -41,7 +41,7 @@ and verify version 1.20 or greater. Then try:
 
 ```git --version```
 
-and verify version 2.10 or greater.
+and verify version 2.7 or greater.
 
 **You are now ready to set up Gather**
 
