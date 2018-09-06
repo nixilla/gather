@@ -1215,7 +1215,7 @@ p {
     width:  180px;
     float:   left;
     padding:  5px;
-    border:     0;
+    box-shadow: unset;
   }
 
 
