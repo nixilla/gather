@@ -20,18 +20,17 @@ If you are already comfortable with configuring and running Amazon EC2 instances
 
 Click **Launch Image** to create a new EC2 image.
 
-![AWS EC2 AMI](/images/aws-ec2-step1.png){: .scalable}**Step 1: Choose an AMI**, Select **Ubuntu Server 16.04 LTS (HVM), SSD Volume Type** from the list of AMIs
-
-![AWS EC2 Instance Type](/images/aws-ec2-step2.png){: .scalable}**Step 2: Choose an Instance Type** Select **Ubuntu Server 16.04 LTS (HVM), SSD Volume Type** from the list of AMIs
-
-![AWS EC2 Instance Details](/images/aws-ec2-step3.png){: .scalable}**Step 3: Configure Instance Details** Accept all the defaults except for **Auto-assign Public IP** which should be set to **Enable**
-
-![AWS EC2 Add Storage](/images/aws-ec2-step4.png){: .scalable}**Step 4: Add Storage** The defaults should be fine for just the demo.  If you plan to test with lots of other data, then increase **Size (GiB)** from 8 GiB to something more appropriate for your use case 
-
-![AWS EC2 Add Tags](/images/aws-ec2-step5.png){: .scalable}On **Step 5: Add Tags** No tags are required
-
-![AWS EC2 Ports](/images/aws-ec2-step6.png){: .scalable}On **Step 6: Configure Security Group** Open up the the following ports so that you can access them from your local computer. Ports 22, 80, 8000, 8443 and 5000.  The screenshot on the left has more detail about each port.
-
+![AWS EC2 AMI](/images/aws-ec2-step1.png){: .scalable}**Step 1: Choose an AMI -** Select **Ubuntu Server 16.04 LTS (HVM), SSD Volume Type** from the list of AMIs
+### -
+![AWS EC2 Instance Type](/images/aws-ec2-step2.png){: .scalable}**Step 2: Choose an Instance Type -** Select **Ubuntu Server 16.04 LTS (HVM), SSD Volume Type** from the list of AMIs
+### -
+![AWS EC2 Instance Details](/images/aws-ec2-step3.png){: .scalable}**Step 3: Configure Instance Details -** Accept all the defaults except for **Auto-assign Public IP** which should be set to **Enable**
+### -
+![AWS EC2 Add Storage](/images/aws-ec2-step4.png){: .scalable}**Step 4: Add Storage -** The defaults should be fine for just the demo.  If you plan to test with lots of other data, then increase **Size (GiB) -** from 8 GiB to something more appropriate for your use case 
+### -
+![AWS EC2 Add Tags](/images/aws-ec2-step5.png){: .scalable}On **Step 5: Add Tags -** No tags are required
+### -
+![AWS EC2 Ports](/images/aws-ec2-step6.png){: .scalable}On **Step 6: Configure Security Group -** Open up the the following ports so that you can access them from your local computer. Ports 22, 80, 8000, 8443 and 5000.  The screenshot on the left has more detail about each port.
 
 
 
