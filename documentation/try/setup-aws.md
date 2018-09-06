@@ -10,11 +10,12 @@ This guide will take you through the steps required to create and configure an E
 
 ## Overview of the setup process
 If you are already comfortable with configuring and running Amazon EC2 instances, just follow this list of steps and return to [Setting up Gather](/documentation/try/index#quick-test) or [Setting up Aether](https://aether.ehealthafrica.org/documentation/try/index.html#quick-test)
+* Create an EC2 Ubuntu instance with at least 2 processors, 8GB RAM and 8GB Storage **t3.large**
+* Configure your VPC to be accessable from the internet with these ports open: 22, 80, 8000, 8443, 5000
+* Verify/Install git, Docker and Docker Compose. It helps if Docker can be [run as a non-root user](https://docs.docker.com/install/linux/linux-postinstall/)
+* Use *Stop* instead of *Terminate* if you want to preserve data between sessions.
 
-
-
-Use *Stop* instead of *Terminate* if you want to preserve data between sessions.
-
+## Very detailed steps for people new to AWS
 ![AWS EC2 Launch](/images/aws-ec2-launch.png){: .scalable}Log into your Amazon Web Services account and navigate to the EC2 Management Console.  Select an availability zone appropriate to your location. The screenshot shows that my zone is set to Frankfurt. Click **Launch Image** to create a new EC2 image.
 
 Select **Ubuntu Server 16.04 LTS (HVM), SSD Volume Type** from the list of AMIs
