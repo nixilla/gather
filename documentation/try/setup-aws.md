@@ -16,12 +16,13 @@ If you are already comfortable with configuring and running Amazon EC2 instances
 * Use *Stop* instead of *Terminate* if you want to preserve data between sessions.
 
 ## Very detailed steps for people new to AWS
-![AWS EC2 Launch](/images/aws-ec2-launch.png){: .scalable}Log into your Amazon Web Services account and navigate to the EC2 Management Console.  Select an availability zone appropriate to your location. The screenshot shows that my zone is set to Frankfurt. Click **Launch Image** to create a new EC2 image.
+![AWS EC2 Launch](/images/aws-ec2-launch.png){: .scalable}
+Log into your Amazon Web Services account and navigate to the EC2 Management Console.  Select an availability zone appropriate to your location. The screenshot shows that my zone is set to Frankfurt. Click **Launch Image** to create a new EC2 image.
 
 Select **Ubuntu Server 16.04 LTS (HVM), SSD Volume Type** from the list of AMIs
 
-
-![AWS EC2 Launch](/images/aws-ec2-step3.png){: .scalable}On **Step 3: Configure Instance Details**, Accept all the defaults except for **Auto-assign Public IP** which should be set to **Enable**
+![AWS EC2 Launch](/images/aws-ec2-step3.png){: .scalable}
+On **Step 3: Configure Instance Details**, Accept all the defaults except for **Auto-assign Public IP** which should be set to **Enable**
 
 
 
