@@ -1212,7 +1212,7 @@ p {
   .scalable {
     height: 124px;
     width:  180px;
-    align:   left;
+    float:   left;
   }
 
 
