@@ -20,6 +20,8 @@ If you are already comfortable with configuring and running Amazon EC2 instances
 
 Click **Launch Image** to create a new EC2 image.
 
+
+
 ![AWS EC2 AMI](/images/aws-ec2-step1.png){: .scalable}**Step 1: Choose an AMI -** Select **Ubuntu Server 16.04 LTS (HVM), SSD Volume Type** from the list of AMIs
 
 
