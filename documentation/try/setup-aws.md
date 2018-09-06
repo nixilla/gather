@@ -8,4 +8,4 @@ Starting up an AWS instance and configuring it for use with the Gather eval is a
 
 This guide will take you through the steps required to create and configure an EC2 instance that can be used to evaluate and use Gather and Aether in a **Non Production** environment.  Theis guide doesn't setup strong security and does not provide any data backup or protection.  **When the EC2 terminates, all of your data will be lost.**   Use *Stop* instead of *Terminate* if you want to preserve data between sessions.
 
-![Gather main screen](/images/gather-first-screen.png) On your EC2 console click **Launch Image** 
+<img src="/images/aws-ec2-launch.png" height="124" width="180"></img> On your EC2 console click **Launch Image** 
