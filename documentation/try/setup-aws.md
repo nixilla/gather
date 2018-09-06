@@ -20,6 +20,7 @@ If you are already comfortable with configuring and running Amazon EC2 instances
 
 Select **Ubuntu Server 16.04 LTS (HVM), SSD Volume Type** from the list of AMIs
 
+
 ![AWS EC2 Launch](/images/aws-ec2-step3.png){: .scalable}On **Step 3: Configure Instance Details**, Accept all the defaults except for **Auto-assign Public IP** which should be set to **Enable**
 
 
