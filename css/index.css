@@ -1210,6 +1210,7 @@ p {
     font-size: .9em; } }
 
   .scalable {
+    clear: both;
     height: 124px;
     width:  180px;
     float:   left;
