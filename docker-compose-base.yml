@@ -29,8 +29,6 @@ services:
 
       # static folders per container
       - ./.persistent_data/static:/static
-      # aether favicon
-      - ./local-setup/aether.ico:/static/aether.ico
 
       # media folders per container
       - ./.persistent_data/media:/media
@@ -53,6 +51,7 @@ services:
     environment:
       CSRF_COOKIE_DOMAIN: .aether.local
       DJANGO_SECRET_KEY: ${KERNEL_DJANGO_SECRET_KEY}
+      DJANGO_STORAGE_BACKEND: filesystem
 
       # Uncomment these lines to enable single sign on if you use CAS
       # CAS_SERVER_URL: https://your.cas.server
@@ -94,6 +93,7 @@ services:
     environment:
       CSRF_COOKIE_DOMAIN: .aether.local
       DJANGO_SECRET_KEY: ${ODK_DJANGO_SECRET_KEY}
+      DJANGO_STORAGE_BACKEND: filesystem
 
       # Uncomment these lines to enable single sign on if you use CAS
       # CAS_SERVER_URL: https://your.cas.server
@@ -142,6 +142,7 @@ services:
     environment:
       CSRF_COOKIE_DOMAIN: .aether.local
       DJANGO_SECRET_KEY: ${UI_DJANGO_SECRET_KEY}
+      DJANGO_STORAGE_BACKEND: filesystem
 
       # Uncomment these lines to enable single sign on if you use CAS
       # CAS_SERVER_URL: https://your.cas.server
