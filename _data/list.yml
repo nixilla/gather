@@ -11,8 +11,8 @@ toc:
     subfolderitems:
       - page: Prerequisites
         url: /documentation/try/index.html
-      - page: Setup and Configuration
-        url: /documentation/try/setup.html
+      - page: Install and Configuration
+        url: /documentation/try/install.html
       - page: Collecting Data
         url: /documentation/try/collect-data.html
       - page: Connecting to CKAN

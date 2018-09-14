@@ -28,21 +28,25 @@ Click on **SAVE SURVEY**, and we’re done. Now let’s collect some data.
 
 ## Collecting Data
 
-We’re going need to tell ODK Collect how to connect to our local Gather instance so that it can download our microcensus form, and then submit the data once we’ve completed said form. The information it needs is (a) the IP address of your computer, and (b) the username and password of the surveyor we created a few minutes ago. To find out the IP address of your computer, type the following command:
+We’re going need to tell ODK Collect how to connect to our local Gather instance so that it can download our microcensus form, and then submit the data once we’ve completed said form. The information it needs is (a) the IP address of your computer, and (b) the username and password of the surveyor we created a few minutes ago. 
 
-```
-if config | grep 192
-```
+If you are using a remote server connected directly to the internet, for example AWS, then use the IP address of that server.  If you are running everything on your own local area network or WiFi network, you will need your locally assigned IP address.  This number usually looks like **192.168.x.y**  
 
+At the linux or Mac command line, try:
+```
+ifconfig | grep 192
+```
+On Windows try: 
+```
+ipconfig
+```
 You should get some output that looks like this:
-
 ```
 inet 192.168.178.163 netmask 0xffffff00 broadcast 192.168.178.255
 ```
-
 In this particular example, `192.168.178.163` is my computer’s IP address.
 
-*Note that this command assumes that you are on a standard local network. If you don’t get output that looks like the above, seek professional assistance.*
+*If you had trouble finding your local IP address, try this article [How do I find my local IP address?](https://www.whatismyip.com/questions/how-do-i-find-my-local-ip-address/)*
 
 Fire up _ODK Collect_ on your Android device. Tap the three dots in the top right hand corner:
 
