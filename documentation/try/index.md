@@ -27,7 +27,7 @@ If you are unsure what all of the above means, we have some detailed steps that 
 
 **[Windows Setup Help](http://aether.ehealthafrica.org/documentation/try/setup-windows)** for Windows 10 and newer releases.
 
-**[Linux Setup Help](http://aether.ehealthafrica.org/documentation/try/setup-windows)** for Ubuntu 16.04.x and newer releases.
+**[Linux Setup Help](http://aether.ehealthafrica.org/documentation/try/setup-ubuntu)** for Ubuntu 16.04.x and newer releases.
 
 **[Amazon Web Services](http://aether.ehealthafrica.org/documentation/try/setup-aws)** is a great way to evaluate Gather without having to install anything on your own computer.  From start to finish, it only takes about an hour to spin up an EC2 instance, configure it and try the following exercises.  The following link will take you to a set of instructions that will help you (even if you are a beginner) get started with AWS and configured to run Gather.  It costs about $3.00 to start up an AWS EC2 instance and run it for 12 hours.
 
