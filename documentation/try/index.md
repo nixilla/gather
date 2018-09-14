@@ -31,4 +31,4 @@ If you are unsure what all of the above means, we have some detailed steps that 
 
 **[Amazon Web Services](http://aether.ehealthafrica.org/documentation/try/setup-aws)** is a great way to evaluate Gather without having to install anything on your own computer.  From start to finish, it only takes about an hour to spin up an EC2 instance, configure it and try the following exercises.  The following link will take you to a set of instructions that will help you (even if you are a beginner) get started with AWS and configured to run Gather.  It costs about $3.00 to start up an AWS EC2 instance and run it for 12 hours.
 
-<div style="margin-top: 2rem; text-align: center"><a href="install">Next Steps: Install Gather</a></div>
+<div style="margin-top: 2rem; text-align: center"><a href="install">Next Step: Install Gather</a></div>
