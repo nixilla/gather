@@ -13,7 +13,7 @@ In this demo we will add the components necessary to spin up a new CKAN instance
 We’re going to use a script to make it easier to install and configure CKAN. This will download Docker images for CKAN and perform the necessary configuration. It will then prompt you for a password for the `admin` user. In your terminal, navigate to the `aether-bootstrap` directory inside your cloned copy of `gather-deploy`, and then run the script:
 
 ```
-cd aether-boostrap
+cd aether-bootstrap
 scripts/setup_ckan.sh
 ```
 
