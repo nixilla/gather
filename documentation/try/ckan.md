@@ -17,9 +17,9 @@ cd aether-boostrap
 scripts/setup_ckan.sh
 ```
 
-Once this has completed, open a new browser window, go to [http://localhost:5000](http://localhost:5000) and login with username `admin` and the password you just entered during the configuration stage.
+Once this has completed, open a new browser window, go to [http://gather.local:5000](http://gather.local:5000) and login with username `admin` and the password you just entered during the configuration stage.
 
-Now go to [http://localhost:5000/organization](http://localhost:5000/organization) and add a new organization:
+Now go to [http://gather.local:5000/organization](http://gather.local:5000/organization) and add a new organization:
 
 ![Adding an Organization in CKAN](/images/ckan-organizations.png)
 
@@ -41,7 +41,7 @@ Aether Connect can publish data to a variety of destinations. For each destinati
 
 ## Setting Up the CKAN Consumer
 
-In order to communicate with CKAN, the CKAN Consumer needs an API Key. This can be found in the CKAN User page at [http://localhost:5000/user/admin](http://localhost:5000/user/admin):
+In order to communicate with CKAN, the CKAN Consumer needs an API Key. This can be found in the CKAN User page at [http://gather.local:5000/user/admin](http://gather.local:5000/user/admin):
 
 ![Getting the CKAN API Key](/images/ckan-api-key.png)
 
@@ -74,7 +74,7 @@ Now we can start the CKAN Consumer:
 scripts/run_ckan_consumer.sh
 ```
 
-Open the datasets screen in CKAN at [http://localhost:5000/dataset/](http://localhost:5000/dataset/). You should see something like this (the name of your dataset will be slightly different):
+Open the datasets screen in CKAN at [http://gather.local:5000/dataset/](http://gather.local:5000/dataset/). You should see something like this (the name of your dataset will be slightly different):
 
 ![Our dataset in CKAN](/images/ckan-datasets.png)
 
