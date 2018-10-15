@@ -19,12 +19,21 @@
  */
 
 import { getData } from './request'
+import { ODK_APP } from './constants'
+
+const DEFAULT_SETTINGS = {
+  ODK_ACTIVE: true,
+
+  CSV_HEADER_RULES: 'remove-prefix;payload.,remove-prefix;None.,replace;.;:;',
+  CSV_HEADER_RULES_SEP: ';',
+  CSV_MAX_ROWS_SIZE: 0
+}
 
 export const getSettings = () => new Promise(resolve => {
   getData('/assets-settings')
     .then(response => {
       resolve({
-        ODK_ACTIVE: !!response.odk_active,
+        ODK_ACTIVE: (response.aether_apps || []).indexOf(ODK_APP) > -1,
 
         CSV_HEADER_RULES: response.csv_header_rules,
         CSV_HEADER_RULES_SEP: response.csv_header_rules_sep,
@@ -33,12 +42,6 @@ export const getSettings = () => new Promise(resolve => {
     })
     .catch(() => {
       // use default values
-      resolve({
-        ODK_ACTIVE: true,
-
-        CSV_HEADER_RULES: 'remove-prefix;payload.,remove-prefix;None.,replace;.;:;',
-        CSV_HEADER_RULES_SEP: ';',
-        CSV_MAX_ROWS_SIZE: 0
-      })
+      resolve(DEFAULT_SETTINGS)
     })
 })
