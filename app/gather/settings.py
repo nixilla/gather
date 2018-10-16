@@ -378,6 +378,25 @@ if 'odk' in AETHER_MODULES:
         logger.critical(msg)
         raise RuntimeError(msg)
 
+
+# check if CouchDB Sync is available in this instance
+if 'couchdb-sync' in AETHER_MODULES:
+    sync = {
+        'token': os.environ.get('AETHER_COUCHDB_SYNC_TOKEN'),
+        'url': os.environ.get('AETHER_COUCHDB_SYNC_URL'),
+        'assets': os.environ.get('AETHER_COUCHDB_SYNC_URL_ASSETS', os.environ.get('AETHER_COUCHDB_SYNC_URL')),
+    }
+    if TESTING:
+        sync['url'] = os.environ.get('AETHER_COUCHDB_SYNC_URL_TEST')
+
+    if sync['url'].strip() and sync['token'].strip():
+        AETHER_APPS['couchdb-sync'] = sync
+    else:
+        msg = 'Aether CouchDB Sync configuration was not properly set!'
+        logger.critical(msg)
+        raise RuntimeError(msg)
+
+
 # Asset settings
 CSV_HEADER_RULES = os.environ.get(
     'CSV_HEADER_RULES',

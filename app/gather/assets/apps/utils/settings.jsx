@@ -19,10 +19,11 @@
  */
 
 import { getData } from './request'
-import { ODK_APP } from './constants'
+import { ODK_APP, COUCHDB_SYNC_APP } from './constants'
 
 const DEFAULT_SETTINGS = {
   ODK_ACTIVE: true,
+  COUCHDB_SYNC_ACTIVE: true,
 
   CSV_HEADER_RULES: 'remove-prefix;payload.,remove-prefix;None.,replace;.;:;',
   CSV_HEADER_RULES_SEP: ';',
@@ -34,6 +35,7 @@ export const getSettings = () => new Promise(resolve => {
     .then(response => {
       resolve({
         ODK_ACTIVE: (response.aether_apps || []).indexOf(ODK_APP) > -1,
+        COUCHDB_SYNC_ACTIVE: (response.aether_apps || []).indexOf(COUCHDB_SYNC_APP) > -1,
 
         CSV_HEADER_RULES: response.csv_header_rules,
         CSV_HEADER_RULES_SEP: response.csv_header_rules_sep,
