@@ -56,7 +56,6 @@ class ViewsTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json(), {
             'aether_apps': ['kernel', 'odk', 'couchdb-sync'],
-            'csv_header_rules': 'remove-prefix;payload.,remove-prefix;None.,replace;.;:;',
-            'csv_header_rules_sep': ';',
-            'csv_max_rows_size': 0,
+            'export_format': 'csv',
+            'export_max_rows_size': 0,
         })

@@ -55,8 +55,7 @@ def assets_settings(*args, **kwargs):
     return JsonResponse({
         'aether_apps': list(settings.AETHER_APPS.keys()),
 
-        # CSV export
-        'csv_header_rules': settings.CSV_HEADER_RULES,
-        'csv_header_rules_sep': settings.CSV_HEADER_RULES_SEP,
-        'csv_max_rows_size': int(settings.CSV_MAX_ROWS_SIZE),
+        # export
+        'export_format': settings.EXPORT_FORMAT,
+        'export_max_rows_size': int(settings.EXPORT_MAX_ROWS_SIZE),
     })

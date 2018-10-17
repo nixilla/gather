@@ -23,11 +23,10 @@ import { ODK_APP, COUCHDB_SYNC_APP } from './constants'
 
 const DEFAULT_SETTINGS = {
   ODK_ACTIVE: true,
-  COUCHDB_SYNC_ACTIVE: true,
+  COUCHDB_SYNC_ACTIVE: false,
 
-  CSV_HEADER_RULES: 'remove-prefix;payload.,remove-prefix;None.,replace;.;:;',
-  CSV_HEADER_RULES_SEP: ';',
-  CSV_MAX_ROWS_SIZE: 0
+  EXPORT_FORMAT: 'xlsx',
+  EXPORT_MAX_ROWS_SIZE: 0
 }
 
 export const getSettings = () => new Promise(resolve => {
@@ -37,9 +36,8 @@ export const getSettings = () => new Promise(resolve => {
         ODK_ACTIVE: (response.aether_apps || []).indexOf(ODK_APP) > -1,
         COUCHDB_SYNC_ACTIVE: (response.aether_apps || []).indexOf(COUCHDB_SYNC_APP) > -1,
 
-        CSV_HEADER_RULES: response.csv_header_rules,
-        CSV_HEADER_RULES_SEP: response.csv_header_rules_sep,
-        CSV_MAX_ROWS_SIZE: response.csv_max_rows_size
+        EXPORT_FORMAT: response.export_format || DEFAULT_SETTINGS.EXPORT_FORMAT,
+        EXPORT_MAX_ROWS_SIZE: response.export_max_rows_size || DEFAULT_SETTINGS.EXPORT_MAX_ROWS_SIZE
       })
     })
     .catch(() => {

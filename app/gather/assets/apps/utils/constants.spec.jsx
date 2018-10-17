@@ -28,6 +28,9 @@ describe('constants', () => {
   it('should define app constants', () => {
     assert(constants.MAX_PAGE_SIZE > 0)
 
+    assert.deepStrictEqual(constants.EXPORT_CSV_FORMAT, 'csv')
+    assert.deepStrictEqual(constants.EXPORT_EXCEL_FORMAT, 'xlsx')
+
     assert.deepStrictEqual(constants.KERNEL_APP, 'kernel')
     assert.deepStrictEqual(constants.ODK_APP, 'odk')
     assert.deepStrictEqual(constants.COUCHDB_SYNC_APP, 'couchdb-sync')

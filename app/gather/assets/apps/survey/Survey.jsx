@@ -22,16 +22,15 @@ import React, { Component } from 'react'
 import { FormattedMessage } from 'react-intl'
 
 import { FetchUrlsContainer, PaginationContainer } from '../components'
-import { range } from '../utils'
-import { MAX_PAGE_SIZE, GATHER_APP } from '../utils/constants'
+import { GATHER_APP } from '../utils/constants'
 import { getSurveysPath, getSurveysAPIPath, getEntitiesAPIPath } from '../utils/paths'
-import { postData } from '../utils/request'
 import { cleanJsonPaths } from '../utils/types'
 
 import SurveyDetail from './SurveyDetail'
 import SurveyMasks from './mask/SurveyMasks'
 import EntitiesList from './entity/EntitiesList'
 import EntityItem from './entity/EntityItem'
+import EntitiesDownload from './entity/EntitiesDownload'
 
 const TABLE_VIEW = 'table'
 const SINGLE_VIEW = 'single'
@@ -88,6 +87,7 @@ export default class Survey extends Component {
       labels: this.state.labels,
       paths: this.state.selectedPaths
     }
+    const filename = this.props.skeleton.name || survey.name
 
     return (
       <div className='survey-data'>
@@ -120,7 +120,14 @@ export default class Survey extends Component {
               </button>
             </li>
             <li>
-              { this.renderDownloadButton() }
+              <EntitiesDownload
+                survey={this.props.survey}
+                total={this.state.total}
+                paths={this.state.selectedPaths}
+                labels={this.state.labels}
+                settings={this.props.settings}
+                filename={filename}
+              />
             </li>
             <li className='toolbar-filter'>
               { this.renderMaskButton() }
@@ -130,107 +137,13 @@ export default class Survey extends Component {
         <PaginationContainer
           pageSize={viewMode === SINGLE_VIEW ? 1 : TABLE_SIZES[0]}
           sizes={viewMode === SINGLE_VIEW ? [] : TABLE_SIZES}
-          url={getEntitiesAPIPath({ project: survey.id, ordering: '-modified' })}
+          url={getEntitiesAPIPath({ project: survey.id })}
           position='top'
           listComponent={listComponent}
           showPrevious
           showNext
           extras={extras}
         />
-      </div>
-    )
-  }
-
-  renderDownloadButton () {
-    const { survey } = this.props
-    const {
-      CSV_HEADER_RULES,
-      CSV_HEADER_RULES_SEP,
-      CSV_MAX_ROWS_SIZE
-    } = this.props.settings
-    const { total, allPaths, selectedPaths } = this.state
-
-    const pageSize = CSV_MAX_ROWS_SIZE || MAX_PAGE_SIZE
-    const params = {
-      ordering: '-modified',
-      project: survey.id,
-      fields: 'modified,payload',
-      action: 'fetch', // this will build the "post as get" API path
-      format: 'csv',
-      pageSize
-    }
-    const payload = {
-      parse_columns: CSV_HEADER_RULES,
-      rule_sep: CSV_HEADER_RULES_SEP
-    }
-
-    // restrict the columns to export with the selected columns
-    if (selectedPaths.length !== allPaths.length) {
-      payload.columns = 'modified,' + selectedPaths
-        .map(key => 'payload.' + key)
-        .join(',')
-    }
-
-    const download = (options, filename) => {
-      postData(getEntitiesAPIPath(options), payload, { download: true, filename })
-    }
-
-    if (total < pageSize) {
-      return (
-        <button
-          type='button'
-          className='tab'
-          onClick={() => { download(params, `${survey.name}.csv`) }}
-        >
-          <i className='fas fa-download mr-2' />
-          <FormattedMessage
-            id='survey.view.action.download'
-            defaultMessage='Download' />
-        </button>
-      )
-    }
-
-    const dropdown = 'downloadLinkChoices'
-    const pages = range(1, Math.ceil(total / pageSize) + 1)
-      .map(index => ({
-        key: index,
-        options: { ...params, page: index },
-        filename: `${survey.name}-${index}.csv`
-      }))
-
-    return (
-      <div className='dropdown'>
-        <button
-          type='button'
-          className='tab'
-          id={dropdown}
-          data-toggle='dropdown'
-        >
-          <i className='fas fa-download mr-2' />
-          <FormattedMessage
-            id='survey.view.action.download'
-            defaultMessage='Download' />
-        </button>
-
-        <div
-          className='dropdown-menu'
-          aria-labelledby={dropdown}
-        >
-          <div className='dropdown-list'>
-            {
-              pages.map(page => (
-                <button
-                  key={page.key}
-                  type='button'
-                  className='dropdown-item'
-                  onClick={() => { download(page.options, page.filename) }}
-                >
-                  { page.filename }
-                </button>
-              ))
-            }
-          </div>
-        </div>
       </div>
     )
   }

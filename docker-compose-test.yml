@@ -51,6 +51,11 @@ services:
       PGPASSWORD: ${TEST_KERNEL_DB_PASSWORD}
 
       WEB_SERVER_PORT: 9000
+    volumes:
+      # volumes in tests
+      - ./tmp/test/kernel/media:/media
+      - ./tmp/test/kernel/static:/var/www/static
+      - ./tmp/test/kernel/tmp:/tmp
     ports:
       - "9000:9000"
     depends_on:
@@ -84,6 +89,10 @@ services:
       PGPASSWORD: ${TEST_ODK_DB_PASSWORD}
 
       WEB_SERVER_PORT: 9002
+    volumes:
+      # volumes in tests
+      - ./tmp/test/odk/media:/media
+      - ./tmp/test/odk/static:/var/www/static
     ports:
       - "9002:9002"
     depends_on:
@@ -128,6 +137,9 @@ services:
       REDIS_PASSWORD: ${TEST_REDIS_PASSWORD}
 
       WEB_SERVER_PORT: 9006
+    volumes:
+      # volumes in tests
+      - ./tmp/test/sync/static:/var/www/static
     ports:
       - "9006:9006"
     depends_on:
@@ -167,6 +179,9 @@ services:
       PGPASSWORD: ${TEST_GATHER_DB_PASSWORD}
 
       WEB_SERVER_PORT: 9005
+    volumes:
+      # volumes in tests
+      - ./tmp/test/gather/static:/var/www/static
     ports:
       - "9005:9005"
     depends_on:

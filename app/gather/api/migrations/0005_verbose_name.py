@@ -68,6 +68,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelOptions(
             name='mask',
-            options={'default_related_name': 'maks', 'verbose_name': 'mask', 'verbose_name_plural': 'masks'},
+            options={'default_related_name': 'masks', 'verbose_name': 'mask', 'verbose_name_plural': 'masks'},
         ),
     ]

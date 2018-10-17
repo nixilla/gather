@@ -82,10 +82,14 @@ services:
       PGPORT: 5432
       PGUSER: postgres
 
+      # Export
+      CSV_SEPARATOR: ","
+
       WEB_SERVER_PORT: 8000
     volumes:
       - ./.persistent_data/media/kernel:/media
       - ./.persistent_data/static/kernel:/var/www/static
+      - ./.persistent_data/tmp/kernel:/tmp
     ports:
       - "8000:8000"
     command: start
@@ -276,10 +280,8 @@ services:
       PGPORT: 5432
       PGUSER: postgres
 
-      # assets variables
-      CSV_HEADER_RULES: remove-prefix;payload.,remove-prefix;None.,replace;.;:;
-      CSV_HEADER_RULES_SEP: ;
-      CSV_MAX_ROWS_SIZE: 0
+      EXPORT_FORMAT: csv
+      EXPORT_MAX_ROWS_SIZE: 0
 
       WEB_SERVER_PORT: 8005
 
