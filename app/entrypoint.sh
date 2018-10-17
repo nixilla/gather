@@ -18,11 +18,11 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-set -e
+set -Eeuo pipefail
 
 
 # Define help message
-show_help() {
+show_help () {
     echo """
     Commands
     ----------------------------------------------------------------------------
@@ -40,6 +40,10 @@ show_help() {
     start         : start webserver behind nginx
     start_dev     : start webserver for development
 
+    health        : checks the system healthy
+    check_kernel  : checks communication with Aether Kernel
+    check_odk     : checks communication with Aether ODK
+
     test          : run tests
     test_lint     : run flake8 tests
     test_coverage : run python tests with coverage output
@@ -48,7 +52,7 @@ show_help() {
     """
 }
 
-pip_freeze() {
+pip_freeze () {
     pip install virtualenv
     rm -rf /tmp/env
 
@@ -59,25 +63,18 @@ pip_freeze() {
     /tmp/env/bin/pip freeze --local | grep -v appdir | tee -a conf/pip/requirements.txt
 }
 
-setup() {
+setup () {
     # check if required environment variables exist
     ./conf/check_vars.sh
 
-    # wait for database
-    export PGPASSWORD=$RDS_PASSWORD
-    export PGHOST=$RDS_HOSTNAME
-    export PGUSER=$RDS_USERNAME
+    # check database
+    pg_isready
 
-    until pg_isready -q; do
-      >&2 echo "Waiting for postgres..."
-      sleep 1
-    done
-
-    if psql -c "" $RDS_DB_NAME; then
-      echo "$RDS_DB_NAME database exists!"
+    if psql -c "" $DB_NAME; then
+        echo "$DB_NAME database exists!"
     else
-      createdb -e $RDS_DB_NAME -e ENCODING=UTF8
-      echo "$RDS_DB_NAME database created!"
+        createdb -e $DB_NAME -e ENCODING=UTF8
+        echo "$DB_NAME database created!"
     fi
 
     # migrate data model if needed
@@ -94,13 +91,25 @@ setup() {
     # copy assets bundles folder into static folder
     rm -r -f ./gather/static/*.*
     cp -r ./gather/assets/bundles/* ./gather/static/
+
+    # copy static files to "/var/www/static" to be served by nginx (even in DEBUG mode)
+    STATIC_ROOT=/var/www/static
+
+    # create static assets
+    ./manage.py collectstatic --noinput --clear --verbosity 0
+    chmod -R 755 $STATIC_ROOT
+
+    # expose version number (if exists)
+    cp ./VERSION $STATIC_ROOT/VERSION   2>/dev/null || :
+    # add git revision (if exists)
+    cp ./REVISION $STATIC_ROOT/REVISION 2>/dev/null || :
 }
 
-test_lint() {
+test_lint () {
     flake8 . --config=./conf/extras/flake8.cfg
 }
 
-test_coverage() {
+test_coverage () {
     export RCFILE=./conf/extras/coverage.rc
     export TESTING=true
 
@@ -111,6 +120,11 @@ test_coverage() {
     cat ./conf/extras/good_job.txt
 }
 
+
+# set DEBUG if missing
+set +u
+DEBUG="$DEBUG"
+set -u
 
 case "$1" in
     bash )
@@ -136,14 +150,11 @@ case "$1" in
     start )
         setup
 
-        # create static assets
-        ./manage.py collectstatic --noinput
-        chmod -R 755 /var/www/static
-
-        # media assets
-        chown gather: /media
-
-        /usr/local/bin/uwsgi --ini ./conf/uwsgi.ini
+        [ -z "$DEBUG" ] && LOGGING="--disable-logging" || LOGGING=""
+        /usr/local/bin/uwsgi \
+            --ini /code/conf/uwsgi.ini \
+            --http 0.0.0.0:$WEB_SERVER_PORT \
+            $LOGGING
     ;;
 
     start_dev )
@@ -151,7 +162,26 @@ case "$1" in
         ./manage.py runserver 0.0.0.0:$WEB_SERVER_PORT
     ;;
 
+    health )
+        ./manage.py check_url --url=http://0.0.0.0:$WEB_SERVER_PORT/health
+    ;;
+
+    check_kernel )
+        ./manage.py check_url --url=$AETHER_KERNEL_URL --token=$AETHER_KERNEL_TOKEN
+    ;;
+
+    check_odk )
+        if [[ "$AETHER_MODULES" == *odk* ]];
+        then
+            ./manage.py check_url --url=$AETHER_ODK_URL --token=$AETHER_ODK_TOKEN
+        else
+            echo "No ODK module enabled!"
+        fi
+    ;;
+
     test )
+        echo "DEBUG=$DEBUG"
+        setup
         test_lint
         test_coverage
     ;;

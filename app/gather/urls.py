@@ -25,23 +25,36 @@ from django.views.generic import TemplateView
 # Any entry here needs the decorator `tokens_required` if it's going to execute
 # AJAX request to any of the other apps
 from .api.decorators import tokens_required
-from .views import health
+from .views import health, check_db, assets_settings
 
 
-auth_urls = 'rest_framework.urls'
+# `accounts` management
 if settings.CAS_SERVER_URL:  # pragma: no cover
-    import django_cas_ng.views
+    from django_cas_ng import views
 
-    auth_urls = ([
-        path('login/', django_cas_ng.views.login, name='login'),
-        path('logout/', django_cas_ng.views.logout, name='logout'),
-    ], 'rest_framework')
+    login_view = views.login
+    logout_view = views.logout
+
+else:  # pragma: no cover
+    from django.contrib.auth import views
+
+    login_view = views.LoginView.as_view(template_name=settings.LOGIN_TEMPLATE)
+    logout_view = views.LogoutView.as_view(template_name=settings.LOGGED_OUT_TEMPLATE)
+
+auth_urls = ([
+    path('login/', view=login_view, name='login'),
+    path('logout/', view=logout_view, name='logout'),
+], 'rest_framework')
 
 
 urlpatterns = [
 
     # `health` endpoint
-    path('health', health, name='health'),
+    path('health', view=health, name='health'),
+    path('check-db', view=check_db, name='check-db'),
+
+    # assets settings
+    path('assets-settings', view=assets_settings, name='assets-settings'),
 
     # `admin` section
     path('admin/', admin.site.urls),
@@ -51,33 +64,40 @@ urlpatterns = [
 
     # ----------------------
     # API
-    path('', include('gather.api.urls', namespace='gather')),
-    path('v1/', include('gather.api.urls', namespace='v1')),
+    path('', include('gather.api.urls', namespace='api')),
+    path('api/', include('gather.api.urls', namespace='api2')),
 
     # ----------------------
     # Welcome page
     path('',
-         login_required(TemplateView.as_view(template_name='pages/index.html')),
+         view=login_required(TemplateView.as_view(template_name='pages/index.html')),
          name='index-page'),
 
     # ----------------------
     # shows the current user app tokens
     path('~tokens',
-         login_required(TemplateView.as_view(template_name='pages/tokens.html')),
+         view=login_required(TemplateView.as_view(template_name='pages/tokens.html')),
          name='tokens'),
     # to check if the user tokens are valid
-    path('check-tokens', login_required(tokens_required(health)), name='check-tokens'),
+    path('check-tokens', view=login_required(tokens_required(health)), name='check-tokens'),
 
     re_path(r'^surveys/(?P<action>\w+)/(?P<survey_id>[0-9a-f-]+)?$',
-            login_required(tokens_required(TemplateView.as_view(template_name='pages/surveys.html'))),
+            view=login_required(tokens_required(TemplateView.as_view(template_name='pages/surveys.html'))),
             name='surveys'),
 ]
 
-if settings.AETHER_ODK:  # pragma: no cover
+if settings.AETHER_APPS.get('odk'):  # pragma: no cover
     urlpatterns += [
         re_path(r'^surveyors/(?P<action>\w+)/(?P<surveyor_id>[0-9]+)?$',
-                login_required(tokens_required(TemplateView.as_view(template_name='pages/surveyors.html'))),
+                view=login_required(tokens_required(TemplateView.as_view(template_name='pages/surveyors.html'))),
                 name='surveyors'),
+    ]
+
+if settings.AETHER_APPS.get('couchdb-sync'):  # pragma: no cover
+    urlpatterns += [
+        re_path(r'^sync-users/(?P<action>\w+)/(?P<sync_user_id>[0-9]+)?$',
+                view=login_required(tokens_required(TemplateView.as_view(template_name='pages/sync-users.html'))),
+                name='sync-users'),
     ]
 
 if settings.DEBUG:  # pragma: no cover

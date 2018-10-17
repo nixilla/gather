@@ -24,7 +24,11 @@
 // the first row would be the header so we reduce in one the value.
 export const MAX_PAGE_SIZE = 1048575
 
+export const EXPORT_CSV_FORMAT = 'csv'
+export const EXPORT_EXCEL_FORMAT = 'xlsx'
+
 // app names (match container names)
 export const KERNEL_APP = 'kernel'
 export const ODK_APP = 'odk'
+export const COUCHDB_SYNC_APP = 'couchdb-sync'
 export const GATHER_APP = 'gather'

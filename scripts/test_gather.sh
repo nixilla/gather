@@ -18,55 +18,44 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-set -e
-
-function prepare_container() {
-  container="$1"-test
-
-  echo "_____________________________________________ Preparing $1"
-  $DC_TEST build $container
-  $DC_TEST run $container setuplocaldb
-}
+set -Eeuo pipefail
 
 function prepare_and_test_container() {
-  container="$1"-test
+    container="$1"-test
 
-  prepare_container $1
-  echo "_____________________________________________ Testing $1"
-  $DC_TEST run $container test --noinput
-  echo "_____________________________________________ $1 Done"
+    echo "_____________________________________________ Building $1"
+    $DC_TEST build $container
+    echo "_____________________________________________ Testing $1"
+    $DC_TEST run "$1"-test test
+    echo "_____________________________________________ $1 Done"
 }
 
 DC_TEST="docker-compose -f docker-compose-test.yml"
 
 echo "_____________________________________________ TESTING"
 
-# kill ALL containers and clean TEST ones
 echo "_____________________________________________ Killing ALL containers"
 docker-compose kill
 $DC_TEST kill
 $DC_TEST down
+$DC_TEST pull db-test couchdb-test redis-test
+$DC_TEST pull kernel-test odk-test couchdb-sync-test
 
-# start database
-echo "_____________________________________________ Starting databases"
-$DC_TEST up -d db-test
-
-echo "_____________________________________________ Preparing kernel and odk"
-prepare_container kernel
-prepare_container odk
-
-echo "_____________________________________________ Starting kernel and odk"
-$DC_TEST up -d kernel-test odk-test
-
-# test a clean Gather Assets TEST container
 prepare_and_test_container gather-assets
-# build assets and distribute into Gather Django container
 $DC_TEST run gather-assets-test build
 
-# test a clean Gather TEST container
+echo "_____________________________________________ Starting databases"
+$DC_TEST up -d db-test
+$DC_TEST up -d couchdb-test
+$DC_TEST up -d redis-test
+
+echo "_____________________________________________ Starting kernel, odk and couchdb-sync"
+$DC_TEST up -d kernel-test
+$DC_TEST up -d odk-test
+$DC_TEST up -d couchdb-sync-test
+
 prepare_and_test_container gather
 
-# kill ALL containers
 echo "_____________________________________________ Killing TEST containers"
 $DC_TEST kill
 

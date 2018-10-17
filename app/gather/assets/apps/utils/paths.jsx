@@ -18,10 +18,10 @@
  * under the License.
  */
 
-import { KERNEL_APP, ODK_APP, GATHER_APP } from './constants'
+import { KERNEL_APP, ODK_APP, COUCHDB_SYNC_APP, GATHER_APP } from './constants'
 
 const API_PREFIX = ''
-const APPS = [ KERNEL_APP, ODK_APP, GATHER_APP ]
+const APPS = [ KERNEL_APP, ODK_APP, COUCHDB_SYNC_APP, GATHER_APP ]
 
 /**
  * Returns the API url to get the Projects/Surveys data
@@ -33,11 +33,11 @@ const APPS = [ KERNEL_APP, ODK_APP, GATHER_APP ]
  * @param {boolean} withStats    - include project/survey stats?
  * @param {object}  params       - query string parameters
  */
-export const getSurveysAPIPath = ({app, id, withStats, ...params}) => {
+export const getSurveysAPIPath = ({ app, id, withStats, ...params }) => {
   const source = (APPS.indexOf(app) === -1 ? KERNEL_APP : app)
   const stats = (source === KERNEL_APP && withStats ? '-stats' : '')
 
-  return buildAPIPath(source, `projects${stats}`, id, {...params})
+  return buildAPIPath(source, `projects${stats}`, id, { ...params })
 }
 
 /**
@@ -46,8 +46,18 @@ export const getSurveysAPIPath = ({app, id, withStats, ...params}) => {
  * @param {number}  id          - surveyor id
  * @param {object}  params      - query string parameters
  */
-export const getSurveyorsAPIPath = ({id, ...params}) => {
+export const getSurveyorsAPIPath = ({ id, ...params }) => {
   return buildAPIPath(ODK_APP, 'surveyors', id, params)
+}
+
+/**
+ * Returns the API url to get the Sync Users data
+ *
+ * @param {number}  id          - sync user id
+ * @param {object}  params      - query string parameters
+ */
+export const getSyncUsersAPIPath = ({ id, ...params }) => {
+  return buildAPIPath(COUCHDB_SYNC_APP, 'sync-users', id, params)
 }
 
 /**
@@ -56,7 +66,7 @@ export const getSurveyorsAPIPath = ({id, ...params}) => {
  * @param {number}  id          - xForm id
  * @param {object}  params      - query string parameters
  */
-export const getXFormsAPIPath = ({id, ...params}) => {
+export const getXFormsAPIPath = ({ id, ...params }) => {
   return buildAPIPath(ODK_APP, 'xforms', id, params)
 }
 
@@ -66,7 +76,7 @@ export const getXFormsAPIPath = ({id, ...params}) => {
  * @param {number}  id          - Media file id *
  * @param {object}  params      - query string parameters
  */
-export const getMediaFileAPIPath = ({id, ...params}) => {
+export const getMediaFileAPIPath = ({ id, ...params }) => {
   return buildAPIPath(ODK_APP, 'media-files', id, params)
 }
 
@@ -76,18 +86,8 @@ export const getMediaFileAPIPath = ({id, ...params}) => {
  * @param {number}  id          - Entity id
  * @param {object}  params      - query string parameters
  */
-export const getEntitiesAPIPath = ({id, ...params}) => {
+export const getEntitiesAPIPath = ({ id, ...params }) => {
   return buildAPIPath(KERNEL_APP, 'entities', id, params)
-}
-
-/**
- * Returns the API url to get the Schemas data
- *
- * @param {number}  id          - schema id
- * @param {object}  params      - query string parameters
- */
-export const getSchemasAPIPath = ({id, ...params}) => {
-  return buildAPIPath(KERNEL_APP, 'schemas', id, params)
 }
 
 /**
@@ -96,7 +96,7 @@ export const getSchemasAPIPath = ({id, ...params}) => {
  * @param {number}  id          - mask id *
  * @param {object}  params      - query string parameters
  */
-export const getMasksAPIPath = ({id, ...params}) => {
+export const getMasksAPIPath = ({ id, ...params }) => {
   return buildAPIPath(GATHER_APP, 'masks', id, params)
 }
 
@@ -105,8 +105,8 @@ export const getMasksAPIPath = ({id, ...params}) => {
  *
  * Without "action":
  *
- *    With    {id} -> {app}/{type}/{id}.json?{queryString}
- *    Without {id} -> {app}/{type}.json?{queryString}
+ *    With    {id} -> {app}/{type}/{id}.{format}?{queryString}
+ *    Without {id} -> {app}/{type}.{format}?{queryString}
  *
  * With "action":
  *
@@ -120,17 +120,16 @@ export const getMasksAPIPath = ({id, ...params}) => {
  * @param {string}  action      - special suffix to include before the format
  * @param {object}  params      - query string parameters
  */
-const buildAPIPath = (app, type, id, {format = 'json', action, ...params}) => {
+const buildAPIPath = (app, type, id, { format = 'json', action, ...params }) => {
   const suffix = (
     (id ? '/' + id : '') +
-    // indicates the ation suffix like "details", "fetch" or "propagates"
+    // indicates the action suffix like "query", "csv", "xlsx" or "propagate"
     (action ? '/' + action : ''))
-  const url = `${API_PREFIX}/${app}/${type}${suffix}.${format}`
+  const formatSuffix = (format === '' ? '/' : '.' + format)
+  const url = `${API_PREFIX}/${app}/${type}${suffix}${formatSuffix}`
   const queryString = id ? '' : buildQueryString(params)
-  if (queryString === '') {
-    return url
-  }
-  return `${url}?${queryString}`
+
+  return queryString === '' ? url : `${url}?${queryString}`
 }
 
 /**
@@ -160,7 +159,7 @@ export const buildQueryString = (params = {}) => (
  * @param {string} action       - action: `list` (default), `view`, `add`, `edit`
  * @param {number} id           - project/survey id
  */
-export const getSurveysPath = ({action, id}) => {
+export const getSurveysPath = ({ action, id }) => {
   switch (action) {
     case 'edit':
       if (id) {
@@ -188,7 +187,7 @@ export const getSurveysPath = ({action, id}) => {
  * @param {string} action       - action: `list` (default), `add`, `edit`
  * @param {number} id           - surveyor id
  */
-export const getSurveyorsPath = ({action, id}) => {
+export const getSurveyorsPath = ({ action, id }) => {
   switch (action) {
     case 'edit':
       if (id) {
@@ -201,5 +200,27 @@ export const getSurveyorsPath = ({action, id}) => {
 
     default:
       return '/surveyors/list/'
+  }
+}
+
+/**
+ * Returns the path to go to any Sync Users page
+ *
+ * @param {string} action       - action: `list` (default), `add`, `edit`
+ * @param {number} id           - surveyor id
+ */
+export const getSyncUsersPath = ({ action, id }) => {
+  switch (action) {
+    case 'edit':
+      if (id) {
+        return `/sync-users/edit/${id}`
+      }
+      return '/sync-users/add/'
+
+    case 'add':
+      return '/sync-users/add/'
+
+    default:
+      return '/sync-users/list/'
   }
 }

@@ -23,14 +23,13 @@
 import React from 'react'
 import { mount } from 'enzyme'
 
-import { AETHER_KERNEL_URL, AETHER_ODK_URL } from '../utils/env'
-import { Link, LinksList, normalizeLinksList } from './Link'
+import { Link, LinksList } from './Link'
 
 describe('Link components', () => {
   describe('Link', () => {
     it('should render a link', () => {
       const component = mount(
-        <Link link={{url: '/link', name: 'click here'}} />
+        <Link link={{ url: '/link', name: 'click here' }} />
       )
 
       const link = component.find('a')
@@ -51,7 +50,7 @@ describe('Link components', () => {
       const component = mount(
         <LinksList list={
           [
-            {url: '/link', name: 'click here'}
+            { url: '/link', name: 'click here' }
           ]
         }
         />
@@ -70,9 +69,9 @@ describe('Link components', () => {
       const component = mount(
         <LinksList list={
           [
-            {url: '/link-1', name: 'click here 1'},
-            {url: '/link-2', name: 'click here 2'},
-            {url: '/link-3', name: 'click here 3'}
+            { url: '/link-1', name: 'click here 1' },
+            { url: '/link-2', name: 'click here 2' },
+            { url: '/link-3', name: 'click here 3' }
           ]
         }
         />
@@ -93,59 +92,6 @@ describe('Link components', () => {
         expect(link.props.href).toEqual(`/link-${i + 1}`)
         expect(link.props.children).toEqual(`click here ${i + 1}`)
       }
-    })
-  })
-
-  describe('normalizeLinksList', () => {
-    it('should return an empty list', () => {
-      expect(normalizeLinksList()).toEqual([])
-      expect(normalizeLinksList([])).toEqual([])
-      expect(normalizeLinksList([], 'app')).toEqual([])
-    })
-
-    it('should prepend the Kernel url', () => {
-      const list = [
-        {url: '/link-1', name: 'click here 1', useless: 1},
-        {url: '/link-2', name: 'click here 2', to_be_ignored: 2},
-        {url: '/link-3', name: 'click here 3', nothing: 'important'}
-      ]
-      const expected = [
-        {url: AETHER_KERNEL_URL + '/link-1', name: 'click here 1'},
-        {url: AETHER_KERNEL_URL + '/link-2', name: 'click here 2'},
-        {url: AETHER_KERNEL_URL + '/link-3', name: 'click here 3'}
-      ]
-      expect(normalizeLinksList(list)).toEqual(expected)
-      expect(normalizeLinksList(list, 'kernel')).toEqual(expected)
-    })
-
-    it('should prepend the ODK url', () => {
-      const list = [
-        {url: '/link-1', name: 'click here 1', useless: 1},
-        {url: '/link-2', name: 'click here 2', to_be_ignored: 2},
-        {url: '/link-3', name: 'click here 3', nothing: 'important'}
-      ]
-      const expected = [
-        {url: AETHER_ODK_URL + '/link-1', name: 'click here 1'},
-        {url: AETHER_ODK_URL + '/link-2', name: 'click here 2'},
-        {url: AETHER_ODK_URL + '/link-3', name: 'click here 3'}
-      ]
-
-      expect(normalizeLinksList(list, 'odk')).toEqual(expected)
-    })
-
-    it('should not prepend anything', () => {
-      const list = [
-        {url: '/link-1', name: 'click here 1', useless: 1},
-        {url: '/link-2', name: 'click here 2', to_be_ignored: 2},
-        {url: '/link-3', name: 'click here 3', nothing: 'important'}
-      ]
-      const expected = [
-        {url: '/link-1', name: 'click here 1'},
-        {url: '/link-2', name: 'click here 2'},
-        {url: '/link-3', name: 'click here 3'}
-      ]
-
-      expect(normalizeLinksList(list, 'zzz')).toEqual(expected)
     })
   })
 })

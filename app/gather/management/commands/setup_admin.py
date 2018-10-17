@@ -84,13 +84,13 @@ class Command(BaseCommand):
         # create admin user if needed
         if not user_model.filter(username=username).exists():
             user_model.create_superuser(username, email, password)
-            print(_('Created admin user "{username}"').format(username=username))
+            self.stdout.write(_('Created admin user "{username}"').format(username=username))
 
         # update password
         admin = user_model.get(username=username)
         admin.set_password(password)
         admin.save()
-        print(_('Updated admin user "{username}"').format(username=username))
+        self.stdout.write(_('Updated admin user "{username}"').format(username=username))
 
         # Skips if no given token or the auth token app is not installed
         if token_key and 'rest_framework.authtoken' in settings.INSTALLED_APPS:
@@ -98,6 +98,7 @@ class Command(BaseCommand):
 
             # delete previous token
             Token.objects.filter(user=admin).delete()
+            self.stdout.write(_('Deleted previous token of admin user "{username}"').format(username=username))
             # assign token value
             Token.objects.create(user=admin, key=token_key)
-            print(_('Created token for admin user "{username}"').format(username=username))
+            self.stdout.write(_('Created token for admin user "{username}"').format(username=username))

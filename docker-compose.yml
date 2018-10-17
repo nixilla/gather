@@ -1,24 +1,43 @@
 version: "2.1"
 
 networks:
-  internal:
+  gather_net:
     driver: bridge
+
+volumes:
+  gather_database_data: {}
 
 services:
 
   # ---------------------------------
-  # Database container
+  # Databases
   # ---------------------------------
 
   db:
     extends:
       file: ./docker-compose-base.yml
       service: postgres-base
+    volumes:
+      - gather_database_data:/var/lib/postgresql/data
     networks:
-      - internal
+      - gather_net
+
+  couchdb:
+    extends:
+      file: ./docker-compose-base.yml
+      service: couchdb-base
+    networks:
+      - gather_net
+
+  redis:
+    extends:
+      file: ./docker-compose-base.yml
+      service: redis-base
+    networks:
+      - gather_net
 
   # ---------------------------------
-  # Aether kernel container
+  # Aether Kernel
   # ---------------------------------
 
   kernel:
@@ -26,14 +45,15 @@ services:
       file: ./docker-compose-base.yml
       service: kernel-base
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
-      internal:
+      gather_net:
         aliases:
           - kernel.aether.local
 
   # ---------------------------------
-  # ODK Adapter container
+  # Aether ODK module
   # ---------------------------------
 
   odk:
@@ -41,15 +61,49 @@ services:
       file: ./docker-compose-base.yml
       service: odk-base
     depends_on:
-      - db
-      - kernel
+      db:
+        condition: service_healthy
+      kernel:
+        condition: service_started
     networks:
-      internal:
+      gather_net:
         aliases:
           - odk.aether.local
 
   # ---------------------------------
-  # Aether UI container
+  # Aether CouchDB Sync module
+  # ---------------------------------
+
+  couchdb-sync:
+    extends:
+      file: ./docker-compose-base.yml
+      service: couchdb-sync-base
+    depends_on:
+      db:
+        condition: service_healthy
+      kernel:
+        condition: service_started
+    networks:
+      gather_net:
+        aliases:
+          - sync.aether.local
+
+  couchdb-sync-rq:
+    extends:
+      file: ./docker-compose-base.yml
+      service: couchdb-sync-rq-base
+    depends_on:
+      db:
+        condition: service_healthy
+      kernel:
+        condition: service_started
+      couchdb-sync:
+        condition: service_started
+    networks:
+      - gather_net
+
+  # ---------------------------------
+  # Aether UI
   # ---------------------------------
 
   ui:
@@ -57,32 +111,17 @@ services:
       file: ./docker-compose-base.yml
       service: ui-base
     depends_on:
-      - db
-      - kernel
+      db:
+        condition: service_healthy
+      kernel:
+        condition: service_started
     networks:
-      internal:
+      gather_net:
         aliases:
           - ui.aether.local
 
   # ---------------------------------
-  # Gather container
-  # ---------------------------------
-
-  gather:
-    extends:
-      file: ./docker-compose-base.yml
-      service: gather-base
-    depends_on:
-      - db
-      - kernel
-      - odk
-    networks:
-      internal:
-        aliases:
-          - gather.local
-
-  # ---------------------------------
-  # Gather Assets container
+  # Gather Assets
   # ---------------------------------
 
   gather-assets:
@@ -90,10 +129,30 @@ services:
       file: ./docker-compose-base.yml
       service: gather-assets-base
     networks:
-      - internal
+      - gather_net
 
   # ---------------------------------
-  # NGINX container
+  # Gather
+  # ---------------------------------
+
+  gather:
+    extends:
+      file: ./docker-compose-base.yml
+      service: gather-base
+    depends_on:
+      db:
+        condition: service_healthy
+      kernel:
+        condition: service_started
+      odk:
+        condition: service_started
+    networks:
+      gather_net:
+        aliases:
+          - gather.local
+
+  # ---------------------------------
+  # NGINX
   # ---------------------------------
 
   nginx:
@@ -101,9 +160,15 @@ services:
       file: ./docker-compose-base.yml
       service: nginx-base
     depends_on:
-      - gather
-      - kernel
-      - odk
-      - ui
+      kernel:
+        condition: service_started
+      odk:
+        condition: service_started
+      couchdb-sync:
+        condition: service_started
+      ui:
+        condition: service_started
+      gather:
+        condition: service_started
     networks:
-      - internal
+      - gather_net

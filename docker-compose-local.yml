@@ -10,13 +10,13 @@
 version: "2.1"
 
 networks:
-  internal:
+  gather_local:
     driver: bridge
 
 services:
 
   # ---------------------------------
-  # Database container
+  # Databases
   # ---------------------------------
 
   db:
@@ -24,10 +24,165 @@ services:
       file: ./docker-compose-base.yml
       service: postgres-base
     networks:
-      - internal
+      - gather_local
+
+  couchdb:
+    extends:
+      file: ./docker-compose-base.yml
+      service: couchdb-base
+    networks:
+      - gather_local
+
+  redis:
+    extends:
+      file: ./docker-compose-base.yml
+      service: redis-base
+    networks:
+      - gather_local
+
 
   # ---------------------------------
-  # NGINX container
+  # Aether kernel
+  # ---------------------------------
+
+  kernel:
+    extends:
+      file: ${AETHER_PATH:-../aether}/docker-compose-base.yml
+      service: kernel-base
+    volumes:
+      - ./.persistent_data/media/kernel:/media
+      - ./.persistent_data/static/kernel:/var/www/static
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      gather_local:
+        aliases:
+          - kernel.aether.local
+
+
+  # ---------------------------------
+  # Aether ODK module
+  # ---------------------------------
+
+  odk:
+    extends:
+      file: ${AETHER_PATH:-../aether}/docker-compose-base.yml
+      service: odk-base
+    volumes:
+      - ./.persistent_data/media/odk:/media
+      - ./.persistent_data/static/odk:/var/www/static
+    depends_on:
+      db:
+        condition: service_healthy
+      kernel:
+        condition: service_started
+    networks:
+      gather_local:
+        aliases:
+          - odk.aether.local
+
+
+  # ---------------------------------
+  # Aether CouchDB Sync module
+  # ---------------------------------
+
+  couchdb-sync:
+    extends:
+      file: ${AETHER_PATH:-../aether}/docker-compose-base.yml
+      service: couchdb-sync-base
+    volumes:
+      - ./.persistent_data/static/sync:/var/www/static
+    depends_on:
+      db:
+        condition: service_healthy
+      kernel:
+        condition: service_started
+    networks:
+      gather_local:
+        aliases:
+          - sync.aether.local
+
+  couchdb-sync-rq:
+    extends:
+      file: ${AETHER_PATH:-../aether}/docker-compose-base.yml
+      service: couchdb-sync-rq-base
+    depends_on:
+      db:
+        condition: service_healthy
+      kernel:
+        condition: service_started
+      couchdb-sync:
+        condition: service_started
+    networks:
+      - gather_local
+
+
+  # ---------------------------------
+  # Aether UI
+  # ---------------------------------
+
+  ui-assets:
+    extends:
+      file: ${AETHER_PATH:-../aether}/docker-compose-base.yml
+      service: ui-assets-base
+    networks:
+      - gather_local
+
+  ui:
+    extends:
+      file: ${AETHER_PATH:-../aether}/docker-compose-base.yml
+      service: ui-base
+    volumes:
+      - ./.persistent_data/static/ui:/var/www/static
+    depends_on:
+      db:
+        condition: service_healthy
+      kernel:
+        condition: service_started
+    networks:
+      gather_local:
+        aliases:
+          - ui.aether.local
+
+
+  # ---------------------------------
+  # Gather Assets
+  # ---------------------------------
+
+  gather-assets:
+    extends:
+      file: ./docker-compose-base.yml
+      service: gather-assets-base
+    networks:
+      - gather_local
+
+
+  # ---------------------------------
+  # Gather
+  # ---------------------------------
+
+  gather:
+    extends:
+      file: ./docker-compose-base.yml
+      service: gather-base
+    depends_on:
+      db:
+        condition: service_healthy
+      kernel:
+        condition: service_started
+      odk:
+        condition: service_started
+      couchdb-sync:
+        condition: service_started
+    networks:
+      gather_local:
+        aliases:
+          - gather.local
+
+
+  # ---------------------------------
+  # NGINX
   # ---------------------------------
 
   nginx:
@@ -35,91 +190,15 @@ services:
       file: ./docker-compose-base.yml
       service: nginx-base
     depends_on:
-      - gather
-      - kernel
-      - odk
-      - ui
+      kernel:
+        condition: service_started
+      odk:
+        condition: service_started
+      couchdb-sync:
+        condition: service_started
+      ui:
+        condition: service_started
+      gather:
+        condition: service_started
     networks:
-      - internal
-
-
-  # ---------------------------------
-  # Gather container
-  # ---------------------------------
-
-  gather:
-    extends:
-      file: ./docker-compose-base.yml
-      service: gather-base
-    environment:
-      AETHER_KERNEL_TOKEN: ${AETHER_KERNEL_TOKEN}
-      AETHER_ODK_TOKEN: ${AETHER_ODK_TOKEN}
-    depends_on:
-      - db
-      - kernel
-      - odk
-    networks:
-      internal:
-        aliases:
-          - gather.local
-
-  # ---------------------------------
-  # Gather Assets container
-  # ---------------------------------
-
-  gather-assets:
-    extends:
-      file: docker-compose-base.yml
-      service: gather-assets-base
-    networks:
-      - internal
-
-
-  # ---------------------------------
-  # Aether kernel container
-  # ---------------------------------
-
-  kernel:
-    extends:
-      file: ${AETHER_PATH:-../aether}/docker-compose-base.yml
-      service: kernel-base
-    depends_on:
-      - db
-    networks:
-      internal:
-        aliases:
-          - kernel.aether.local
-
-
-  # ---------------------------------
-  # ODK container
-  # ---------------------------------
-
-  odk:
-    extends:
-      file: ${AETHER_PATH:-../aether}/docker-compose-base.yml
-      service: odk-base
-    depends_on:
-      - db
-      - kernel
-    networks:
-      internal:
-        aliases:
-          - odk.aether.local
-
-
-  # ---------------------------------
-  # Aether UI module
-  # ---------------------------------
-
-  ui:
-    extends:
-      file: ${AETHER_PATH:-../aether}/docker-compose-base.yml
-      service: ui-base
-    depends_on:
-      - db
-      - kernel
-    networks:
-      internal:
-        aliases:
-          - ui.aether.local
+      - gather_local

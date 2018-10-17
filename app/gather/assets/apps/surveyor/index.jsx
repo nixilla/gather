@@ -22,20 +22,13 @@ import React, { Component } from 'react'
 
 import { FetchUrlsContainer, PaginationContainer } from '../components'
 import { getSurveyorsAPIPath } from '../utils/paths'
-import { ODK_ACTIVE } from '../utils/env'
 
 import SurveyorForm from './SurveyorForm'
 import SurveyorsList from './SurveyorsList'
 
 export default class SurveyorDispatcher extends Component {
   render () {
-    const {action, surveyorId} = this.props
-
-    // ODK check
-    if (!ODK_ACTIVE) {
-      // blank page
-      return <div />
-    }
+    const { action, surveyorId } = this.props
 
     switch (action) {
       case 'add':
@@ -45,7 +38,7 @@ export default class SurveyorDispatcher extends Component {
         const editUrls = [
           {
             name: 'surveyor',
-            url: getSurveyorsAPIPath({id: surveyorId})
+            url: getSurveyorsAPIPath({ id: surveyorId })
           }
         ]
 

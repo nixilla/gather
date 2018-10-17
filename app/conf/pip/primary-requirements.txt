@@ -1,0 +1,43 @@
+################################################################################
+#                                                                              #
+#                             Primary requirements                             #
+#                                                                              #
+#                                 CHANGE ME !!!                                #
+#                                                                              #
+# To check the outdated dependencies run                                       #
+#     docker-compose run --no-deps gather eval pip list --outdated             #
+#                                                                              #
+# To update this first update "primary-requirements.txt" then run              #
+#     docker-compose run --no-deps gather pip_freeze                           #
+#                                                                              #
+################################################################################
+
+
+# Main libraries
+django
+django-cors-headers
+django-webpack-loader
+djangorestframework
+psycopg2-binary
+requests
+
+
+# CAS client
+django-cas-ng
+django-ums-client
+
+
+# Development
+django-debug-toolbar
+
+
+# Server side
+raven    # Sentry
+uwsgi    # Server behind NGINX
+
+
+# Test libraries
+coverage
+flake8
+flake8-quotes
+mock

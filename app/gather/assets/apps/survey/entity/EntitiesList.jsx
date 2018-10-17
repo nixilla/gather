@@ -22,11 +22,11 @@ import React, { Component } from 'react'
 import { FormattedMessage } from 'react-intl'
 
 import { flatten, inflate, getLabel } from '../../utils/types'
-import { JSONViewer, LinksList, normalizeLinksList } from '../../components'
+import { JSONViewer, LinksList } from '../../components'
 
 export default class EntitiesList extends Component {
   render () {
-    const {list} = this.props
+    const { list } = this.props
 
     if (list.length === 0) {
       return <div data-qa='entities-list-empty' />
@@ -88,7 +88,7 @@ export default class EntitiesList extends Component {
 
     ****************************************************************/
 
-    const {paths, labels} = this.props
+    const { paths, labels } = this.props
     const headers = inflate(paths)
     const rows = headers.length
 
@@ -148,9 +148,8 @@ export default class EntitiesList extends Component {
   }
 
   renderEntity (entity, index) {
-    const {paths, labels} = this.props
-    const flattenPayload = flatten({...entity.payload})
-    const links = normalizeLinksList(entity.attachments)
+    const { paths, labels } = this.props
+    const flattenPayload = flatten({ ...entity.payload })
 
     return (
       <tr data-qa={`entity-row-${entity.id}`} key={entity.id}>
@@ -159,7 +158,7 @@ export default class EntitiesList extends Component {
           {entity.status}
         </td>
         <td>
-          <LinksList list={links} />
+          <LinksList list={entity.attachments} />
         </td>
 
         {
@@ -169,7 +168,7 @@ export default class EntitiesList extends Component {
                 data={flattenPayload[key]}
                 labels={labels}
                 labelRoot={key + '.'}
-                links={links}
+                links={entity.attachments}
               />
             </td>
           ))

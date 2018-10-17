@@ -6,51 +6,22 @@ python:
 services:
   - docker
 
-
-env:
-  global:
-    - CACHE_DIR=$HOME/.cache
-
-
-cache:
-  bundler: true
-  directories:
-    - $CACHE_DIR
-
+install: true
 
 before_script:
-  - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
+  - ./scripts/generate-credentials.sh > .env
 
-script:
-  - ./scripts/test_gather.sh
+# use matrix to split jobs and only re-execute the failing one
+matrix:
+  fast_finish: true
+  include:
+    - name: "Gather tests"
+      stage: test
+      script: ./scripts/test_gather.sh
 
-after_failure:
-  - ./scripts/kill_all.sh
-
-
-# before_deploy:
-#   - pip install awscli
-
-# deploy:
-#   - provider: script
-#     script: ./scripts/deploy.sh
-#     skip_cleanup: true
-#     on:
-#       branch: develop
-
-#   - provider: script
-#     script: ./scripts/deploy.sh
-#     skip_cleanup: true
-#     on:
-#       branch: ^\d+\.\d+(\.\d+)?(-\S*)?$
-#       tags: true
-
-#   - provider: script
-#     script: ./scripts/deploy.sh
-#     skip_cleanup: true
-#     on:
-#       branch: ^release-\d+\.\d+(\.\d+)?(-\S*)?$
-
+    - name: "Gather release"
+      stage: deploy
+      script: ./scripts/release.sh
 
 after_script:
   - ./scripts/kill_all.sh

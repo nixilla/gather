@@ -21,12 +21,7 @@
 import React, { Component } from 'react'
 
 import { FetchUrlsContainer, PaginationContainer } from '../components'
-import {
-  getSchemasAPIPath,
-  getSurveyorsAPIPath,
-  getSurveysAPIPath
-} from '../utils/paths'
-import { ODK_ACTIVE } from '../utils/env'
+import { getSurveyorsAPIPath, getSurveysAPIPath } from '../utils/paths'
 import { ODK_APP } from '../utils/constants'
 
 import Survey from './Survey'
@@ -35,7 +30,10 @@ import SurveysList from './SurveysList'
 
 export default class SurveyDispatcher extends Component {
   render () {
-    const {action, surveyId} = this.props
+    const { action, surveyId } = this.props
+    const { ODK_ACTIVE } = this.props.settings
+    // include settings in response
+    const handleResponse = (response) => ({ ...response, settings: this.props.settings })
 
     switch (action) {
       case 'add':
@@ -52,13 +50,19 @@ export default class SurveyDispatcher extends Component {
           odkAddUrls.forEach(url => addUrls.push(url))
         }
 
-        return <FetchUrlsContainer urls={addUrls} targetComponent={SurveyForm} />
+        return (
+          <FetchUrlsContainer
+            urls={addUrls}
+            targetComponent={SurveyForm}
+            handleResponse={handleResponse}
+          />
+        )
 
       case 'edit':
         const editUrls = [
           {
             name: 'survey',
-            url: getSurveysAPIPath({id: surveyId})
+            url: getSurveysAPIPath({ id: surveyId })
           }
         ]
 
@@ -82,29 +86,39 @@ export default class SurveyDispatcher extends Component {
           odkEditUrls.forEach(url => editUrls.push(url))
         }
 
-        return <FetchUrlsContainer urls={editUrls} targetComponent={SurveyForm} />
+        return (
+          <FetchUrlsContainer
+            urls={editUrls}
+            targetComponent={SurveyForm}
+            handleResponse={handleResponse}
+          />
+        )
 
       case 'view':
         const viewUrls = [
           {
             name: 'survey',
-            url: getSurveysAPIPath({id: surveyId, withStats: true})
+            url: getSurveysAPIPath({ id: surveyId, withStats: true })
           },
           {
-            // take the last schemas to extract the paths and labels
-            // TODO: let the user choose the schema and fetch only entities of that one
-            name: 'schemas',
-            url: getSchemasAPIPath({project: surveyId, ordering: '-modified', pageSize: 10})
+            name: 'skeleton',
+            url: getSurveysAPIPath({ id: surveyId, action: 'schemas-skeleton' })
           }
         ]
 
-        return <FetchUrlsContainer urls={viewUrls} targetComponent={Survey} />
+        return (
+          <FetchUrlsContainer
+            urls={viewUrls}
+            targetComponent={Survey}
+            handleResponse={handleResponse}
+          />
+        )
 
       default:
         return (
           <PaginationContainer
             pageSize={12}
-            url={getSurveysAPIPath({withStats: true})}
+            url={getSurveysAPIPath({ withStats: true })}
             position='top'
             listComponent={SurveysList}
             search

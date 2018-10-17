@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='usertokens',
             name='odk_token',
-            field=models.CharField(blank=True, help_text='This token corresponds to an Aether ODK token authorization linked to this user.', max_length=40, null=True, verbose_name='Aether ODK token'),
+            field=models.CharField(blank=True, help_text='This token corresponds to an Aether ODK authorization token linked to this user.', max_length=40, null=True, verbose_name='Aether ODK token'),
         ),
         migrations.AlterField(
             model_name='usertokens',
@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelOptions(
             name='usertokens',
-            options={'verbose_name': 'user authorization tokens', 'verbose_name_plural': 'users authorization tokens'},
+            options={'default_related_name': 'app_tokens', 'verbose_name': 'user authorization tokens', 'verbose_name_plural': 'users authorization tokens'},
         ),
 
 
@@ -47,7 +47,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelOptions(
             name='survey',
-            options={'verbose_name': 'survey', 'verbose_name_plural': 'surveys'},
+            options={'default_related_name': 'surveys', 'verbose_name': 'survey', 'verbose_name_plural': 'surveys'},
         ),
 
 
@@ -68,6 +68,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelOptions(
             name='mask',
-            options={'verbose_name': 'mask', 'verbose_name_plural': 'masks'},
+            options={'default_related_name': 'masks', 'verbose_name': 'mask', 'verbose_name_plural': 'masks'},
         ),
     ]

@@ -20,33 +20,6 @@
 
 import React, { Component } from 'react'
 
-import { AETHER_KERNEL_URL, AETHER_ODK_URL } from '../utils/env'
-
-const getAppUrl = (app) => {
-  if (app === 'kernel') {
-    return AETHER_KERNEL_URL
-  }
-
-  if (app === 'odk' && AETHER_ODK_URL) {
-    return AETHER_ODK_URL
-  }
-
-  return ''
-}
-
-/**
- * Normalize a list of links with the complete url depending on the app
- *
- * @param {Array}  list  - a list of links (name, url).
- * @param {String} app   - app source: `kernel` (default), `odk` or `gather`
- */
-export const normalizeLinksList = (list = [], app = 'kernel') => list
-  .map(link => ({
-    name: link.name,
-    url: `${getAppUrl(app)}${link.url}`
-  }))
-  .sort((a, b) => a.name.localeCompare(b.name))
-
 /**
  * Link component.
  *
@@ -76,7 +49,7 @@ export class LinksList extends Component {
   }
 
   render () {
-    const {list} = this.props
+    const { list } = this.props
 
     if (!list || list.length === 0) {
       return ''

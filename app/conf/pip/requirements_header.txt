@@ -1,0 +1,14 @@
+################################################################################
+#                                                                              #
+#                              Frozen requirements                             #
+#                                                                              #
+#                               DO NOT CHANGE !!!                              #
+#                                                                              #
+# To check the outdated dependencies run                                       #
+#     docker-compose run --no-deps gather eval pip list --outdated             #
+#                                                                              #
+# To update this first update "primary-requirements.txt" then run              #
+#     docker-compose run --no-deps gather pip_freeze                           #
+#                                                                              #
+################################################################################
+

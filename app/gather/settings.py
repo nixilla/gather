@@ -23,18 +23,11 @@ import os
 # Common settings
 # ------------------------------------------------------------------------------
 
-DEBUG = (os.environ.get('DEBUG', '').lower() == 'true')
-TESTING = (os.environ.get('TESTING', '').lower() == 'true')
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
-
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-if DEBUG:  # pragma: no cover
-    logger.setLevel(logging.DEBUG)
-if TESTING:  # pragma: no cover
-    logger.setLevel(logging.CRITICAL)
-
+# Environment variables are false if unset or set to empty string, anything
+# else is considered true.
+DEBUG = bool(os.environ.get('DEBUG'))
+TESTING = bool(os.environ.get('TESTING'))
+SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
@@ -131,12 +124,87 @@ REST_FRAMEWORK = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ.get('RDS_DB_NAME'),
-        'PASSWORD': os.environ.get('RDS_PASSWORD', ''),
-        'USER': os.environ.get('RDS_USERNAME', 'postgres'),
-        'HOST': os.environ.get('RDS_HOSTNAME', 'db'),
-        'PORT': os.environ.get('RDS_PORT', '5432'),
+        'NAME': os.environ['DB_NAME'],
+        'PASSWORD': os.environ['PGPASSWORD'],
+        'USER': os.environ['PGUSER'],
+        'HOST': os.environ['PGHOST'],
+        'PORT': os.environ['PGPORT'],
         'TESTING': {'CHARSET': 'UTF8'},
+    },
+}
+
+
+# Logging Configuration
+# ------------------------------------------------------------------------------
+
+# https://docs.python.org/3.6/library/logging.html#levels
+LOGGING_LEVEL = os.environ.get('LOGGING_LEVEL', logging.INFO)
+LOGGING_CLASS = 'logging.StreamHandler' if not TESTING else 'logging.NullHandler'
+
+logger = logging.getLogger(__name__)
+logger.setLevel(LOGGING_LEVEL)
+
+SENTRY_CLASS = 'logging.NullHandler'
+SENTRY_DSN = os.environ.get('SENTRY_DSN')
+if SENTRY_DSN:
+    INSTALLED_APPS += ['raven.contrib.django.raven_compat', ]
+    MIDDLEWARE = [
+        'raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware',
+    ] + MIDDLEWARE
+
+    SENTRY_CLASS = 'raven.contrib.django.raven_compat.handlers.SentryHandler'
+    SENTRY_CLIENT = 'raven.contrib.django.raven_compat.DjangoClient'
+
+else:
+    logger.info('No SENTRY enabled!')
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'root': {
+        'level': LOGGING_LEVEL,
+        'handlers': ['console'],
+    },
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s  %(asctime)s  %(module)s  %(process)d  %(thread)d  %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': LOGGING_LEVEL,
+            'class': LOGGING_CLASS,
+            'formatter': 'verbose',
+        },
+        'sentry_handler': {
+            'level': logging.ERROR,
+            'class': SENTRY_CLASS,
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'gather': {
+            'level': LOGGING_LEVEL,
+            'handlers': ['console', 'sentry_handler'],
+            'propagate': False,
+        },
+        'django': {
+            'level': LOGGING_LEVEL,
+            'handlers': ['console', 'sentry_handler'],
+            'propagate': False,
+        },
+        # These ones are available with Sentry enabled
+        'raven': {
+            'level': logging.ERROR,
+            'handlers': ['console', 'sentry_handler'],
+            'propagate': False,
+        },
+        'sentry.errors': {
+            'level': logging.ERROR,
+            'handlers': ['console', 'sentry_handler'],
+            'propagate': False,
+        },
     },
 }
 
@@ -166,43 +234,25 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-CAS_VERSION = 3
-CAS_LOGOUT_COMPLETELY = True
-CAS_SERVER_URL = os.environ.get('CAS_SERVER_URL', '')
-HOSTNAME = os.environ.get('HOSTNAME', '')
-
-if CAS_SERVER_URL:  # pragma: no cover
+CAS_SERVER_URL = os.environ.get('CAS_SERVER_URL')
+if CAS_SERVER_URL:
     INSTALLED_APPS += [
-        # UMS apps
+        # CAS apps
         'django_cas_ng',
         'ums_client',
     ]
     AUTHENTICATION_BACKENDS += [
         'ums_client.backends.UMSRoleBackend',
     ]
-else:  # pragma: no cover
-    logger.info('No UMS enable!')
+    CAS_VERSION = 3
+    CAS_LOGOUT_COMPLETELY = True
+    HOSTNAME = os.environ.get('HOSTNAME', '')
 
+else:
+    logger.info('No CAS enabled!')
 
-# Sentry Configuration
-# ------------------------------------------------------------------------------
-
-SENTRY_DSN = os.environ.get('SENTRY_DSN')
-SENTRY_CLIENT = os.environ.get(
-    'DJANGO_SENTRY_CLIENT',
-    'raven.contrib.django.raven_compat.DjangoClient'
-)
-SENTRY_CELERY_LOGLEVEL = logging.INFO
-
-if SENTRY_DSN:  # pragma: no cover
-    INSTALLED_APPS += [
-        'raven.contrib.django.raven_compat',
-    ]
-    MIDDLEWARE = [
-        'raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware',
-    ] + MIDDLEWARE
-else:  # pragma: no cover
-    logger.info('No SENTRY enable!')
+    LOGIN_TEMPLATE = os.environ.get('LOGIN_TEMPLATE', 'pages/login.html')
+    LOGGED_OUT_TEMPLATE = os.environ.get('LOGGED_OUT_TEMPLATE', 'pages/logged_out.html')
 
 
 # Security Configuration
@@ -216,20 +266,20 @@ CSRF_COOKIE_DOMAIN = os.environ.get('CSRF_COOKIE_DOMAIN', '.gather.org')
 CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', CSRF_COOKIE_DOMAIN).split(',')
 SESSION_COOKIE_DOMAIN = CSRF_COOKIE_DOMAIN
 
-if os.environ.get('DJANGO_USE_X_FORWARDED_HOST', False):      # pragma: no cover
+if os.environ.get('DJANGO_USE_X_FORWARDED_HOST', False):
     USE_X_FORWARDED_HOST = True
 
-if os.environ.get('DJANGO_USE_X_FORWARDED_PORT', False):      # pragma: no cover
+if os.environ.get('DJANGO_USE_X_FORWARDED_PORT', False):
     USE_X_FORWARDED_PORT = True
 
-if os.environ.get('DJANGO_HTTP_X_FORWARDED_PROTO', False):    # pragma: no cover
+if os.environ.get('DJANGO_HTTP_X_FORWARDED_PROTO', False):
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Debug Configuration
 # ------------------------------------------------------------------------------
 
-if not TESTING and DEBUG:  # pragma: no cover
+if not TESTING and DEBUG:
     INSTALLED_APPS += ['debug_toolbar', ]
     MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware', ]
 
@@ -244,7 +294,6 @@ if not TESTING and DEBUG:  # pragma: no cover
 # ------------------------------------------------------------------------------
 
 ROOT_URLCONF = 'gather.urls'
-WSGI_APPLICATION = 'gather.wsgi.application'
 
 APP_NAME = 'Gather'
 INSTANCE_NAME = os.environ.get('INSTANCE_NAME', 'Gather 3')
@@ -254,16 +303,18 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50MB
 # Javascript/CSS Files:
 WEBPACK_LOADER = {
     'DEFAULT': {
-        'BUNDLE_DIR_NAME': '/',  # used in prod
+        'CACHE': not DEBUG,
+        'BUNDLE_DIR_NAME': '/',
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json'),
+        'POLL_INTERVAL': 0.1,  # in miliseconds
+        'TIMEOUT': None,
+        'IGNORE': ['.+\.hot-update.js', '.+\.map'],
     },
 }
 
-# gather must be first because of template overrides
-INSTALLED_APPS = [
-    'gather',
-    *INSTALLED_APPS,
+INSTALLED_APPS += [
     'webpack_loader',
+    'gather',
 ]
 
 TEMPLATES[0]['OPTIONS']['context_processors'] += [
@@ -290,29 +341,60 @@ AETHER_MODULES = [
 
 # KERNEL is always a linked module
 kernel = {
-    'token': os.environ.get('AETHER_KERNEL_TOKEN', ''),
-    'url': os.environ.get('AETHER_KERNEL_URL', ''),
+    'token': os.environ.get('AETHER_KERNEL_TOKEN'),
+    'url': os.environ.get('AETHER_KERNEL_URL'),
+    'assets': os.environ.get('AETHER_KERNEL_URL_ASSETS', os.environ.get('AETHER_KERNEL_URL')),
 }
-if TESTING:  # pragma: no cover
-    kernel['url'] = os.environ.get('AETHER_KERNEL_URL_TEST', '')
+if TESTING:
+    kernel['url'] = os.environ.get('AETHER_KERNEL_URL_TEST')
 
-if kernel['url'].strip() and kernel['token'].strip():  # pragma: no cover
+if kernel['url'].strip() and kernel['token'].strip():
     AETHER_APPS['kernel'] = kernel
+else:
+    msg = 'Aether Kernel configuration was not properly set!'
+    logger.critical(msg)
+    raise RuntimeError(msg)
 
 
 # check if ODK is available in this instance
-AETHER_ODK = False
-if 'odk' in AETHER_MODULES:  # pragma: no cover
+if 'odk' in AETHER_MODULES:
     odk = {
-        'token': os.environ.get('AETHER_ODK_TOKEN', ''),
-        'url': os.environ.get('AETHER_ODK_URL', ''),
+        'token': os.environ.get('AETHER_ODK_TOKEN'),
+        'url': os.environ.get('AETHER_ODK_URL'),
+        'assets': os.environ.get('AETHER_ODK_URL_ASSETS', os.environ.get('AETHER_ODK_URL')),
     }
     if TESTING:
-        odk['url'] = os.environ.get('AETHER_ODK_URL_TEST', '')
+        odk['url'] = os.environ.get('AETHER_ODK_URL_TEST')
 
     if odk['url'].strip() and odk['token'].strip():
         AETHER_APPS['odk'] = odk
-        AETHER_ODK = True
+    else:
+        msg = 'Aether ODK configuration was not properly set!'
+        logger.critical(msg)
+        raise RuntimeError(msg)
+
+
+# check if CouchDB Sync is available in this instance
+if 'couchdb-sync' in AETHER_MODULES:
+    sync = {
+        'token': os.environ.get('AETHER_COUCHDB_SYNC_TOKEN'),
+        'url': os.environ.get('AETHER_COUCHDB_SYNC_URL'),
+        'assets': os.environ.get('AETHER_COUCHDB_SYNC_URL_ASSETS', os.environ.get('AETHER_COUCHDB_SYNC_URL')),
+    }
+    if TESTING:
+        sync['url'] = os.environ.get('AETHER_COUCHDB_SYNC_URL_TEST')
+
+    if sync['url'].strip() and sync['token'].strip():
+        AETHER_APPS['couchdb-sync'] = sync
+    else:
+        msg = 'Aether CouchDB Sync configuration was not properly set!'
+        logger.critical(msg)
+        raise RuntimeError(msg)
+
+
+# Assets settings
+EXPORT_FORMAT = os.environ.get('EXPORT_FORMAT', 'csv')
+EXPORT_MAX_ROWS_SIZE = os.environ.get('EXPORT_MAX_ROWS_SIZE', '0')
 
 
 # ------------------------------------------------------------------------------
@@ -323,4 +405,4 @@ if 'odk' in AETHER_MODULES:  # pragma: no cover
 try:
     from local_settings import *  # noqa
 except ImportError:
-    logger.info('No local settings!')
+    logger.debug('No local settings!')

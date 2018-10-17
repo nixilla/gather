@@ -16,7 +16,11 @@
 # specific language governing permissions and limitations
 # under the License.
 
+from django.conf import settings
+from django.db import connection
+from django.db.utils import OperationalError
 from django.http import JsonResponse
+from django.utils.translation import ugettext as _
 
 
 def health(*args, **kwargs):
@@ -25,3 +29,33 @@ def health(*args, **kwargs):
     '''
 
     return JsonResponse({})
+
+
+def check_db(*args, **kwargs):
+    '''
+    Health check for the database connection.
+    '''
+
+    try:
+        connection.cursor()
+        return JsonResponse({})
+
+    except OperationalError as e:
+        return JsonResponse({'message': str(e)}, status=500)
+
+    except Exception:
+        return JsonResponse({'message': _('Connection with database was not possible')}, status=500)
+
+
+def assets_settings(*args, **kwargs):
+    '''
+    Returns the list of settings needed by the assets
+    '''
+
+    return JsonResponse({
+        'aether_apps': list(settings.AETHER_APPS.keys()),
+
+        # export
+        'export_format': settings.EXPORT_FORMAT,
+        'export_max_rows_size': int(settings.EXPORT_MAX_ROWS_SIZE),
+    })
