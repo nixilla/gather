@@ -10,7 +10,7 @@
   - [Dependencies](#dependencies)
   - [Installation](#installation)
   - [Environment Variables](#environment-variables)
-    - [Gather](#gather)
+    - [Gather instance](#gather-instance)
 - [Usage](#usage)
   - [Users & Authentication](#users--authentication)
     - [Token Authentication](#token-authentication)
@@ -18,6 +18,8 @@
   - [Frontend assets](#frontend-assets)
 - [Containers and services](#containers-and-services)
 - [Run commands in the containers](#run-commands-in-the-containers)
+  - [Python container](#python-container)
+  - [Node container](#node-container)
   - [Run tests](#run-tests)
   - [Upgrade python dependencies](#upgrade-python-dependencies)
     - [Check outdated dependencies](#check-outdated-dependencies)
@@ -49,6 +51,8 @@ git clone git@github.com:eHealthAfrica/gather.git
 cd gather
 ```
 
+*[Return to TOC](#table-of-contents)*
+
 #### Build containers
 
 ```bash
@@ -57,6 +61,8 @@ cd gather
 
 **IMPORTANT NOTE**: the docker-compose files are intended to be used exclusively
 for local development. Never deploy these to publicly accessible servers.
+
+*[Return to TOC](#table-of-contents)*
 
 #### Include this entry in your `/etc/hosts` or `C:\Windows\System32\Drivers\etc\hosts` file
 
@@ -67,6 +73,8 @@ for local development. Never deploy these to publicly accessible servers.
 # aether
 127.0.0.1    kernel.aether.local odk.aether.local sync.aether.local ui.aether.local
 ```
+
+*[Return to TOC](#table-of-contents)*
 
 #### Generate credentials for local development with docker-compose
 
@@ -88,16 +96,18 @@ of the most common ones with non default values. For more info take a look at th
 [docker-compose-base.yml](docker-compose-base.yml) and
 [/scripts/generate-credentials.sh](/scripts/generate-credentials.sh).
 
-See also [Django settings](https://docs.djangoproject.com/en/2.0/ref/settings/).
+See also [Django settings](https://docs.djangoproject.com/en/2.1/ref/settings/).
 
-#### Gather
+#### Gather instance
 
 - Gather specific:
   - `INSTANCE_NAME`: `Gather 3` identifies the current instance among others.
 
 - Data export:
   - `EXPORT_FORMAT`: `csv` the default export format. Possible values: `xlsx` or `csv`.
-  - `EXPORT_MAX_ROWS_SIZE`: `1048575` indicates the maximum number of rows to include in the export file.
+  - `EXPORT_MAX_ROWS_SIZE`: between `0` and `1048575` indicates the maximum
+    number of rows to include in the export file.
+    The limit is an [Excel 2007 restriction](https://support.office.com/en-us/article/Excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3).
 
 - Authentication (Central Authentication Service):
   - `CAS_SERVER_URL`: `https://your.cas.server`.
@@ -142,9 +152,12 @@ See also [Django settings](https://docs.djangoproject.com/en/2.0/ref/settings/).
   - Aether CouchDB Sync:
     - `AETHER_COUCHDB_SYNC_TOKEN`: `aether_couchdb_sync_admin_user_auth_token`
       Token to connect to Aether ODK Server.
-    - `AETHER_COUCHDB_SYNC_URL`: `http://sync:8002` Aether CouchDB Sync Server url.
-    - `AETHER_COUCHDB_SYNC_URL_TEST`: `http://sync-test:9002` Aether CouchDB Sync Testing Server url.
+    - `AETHER_COUCHDB_SYNC_URL`: `http://sync:8006` Aether CouchDB Sync Server url.
+    - `AETHER_COUCHDB_SYNC_URL_TEST`: `http://sync-test:9006` Aether CouchDB Sync Testing Server url.
     - `AETHER_COUCHDB_SYNC_URL_ASSETS`: `http://sync.aether.local` Aether CouchDB Sync url used in NGINX.
+
+*[Return to TOC](#table-of-contents)*
+
 
 ##### AETHER_XXX_URL vs AETHER_XXX_URL_ASSETS
 
@@ -158,11 +171,13 @@ For an unexpected reason `gather` container cannot communicate with
 If we are running the containers separately (with kubernetes, in AWS...)
 both urls are external to the gather container and should be the same.
 
+*[Return to TOC](#table-of-contents)*
+
 
 ## Usage
 
 ```bash
-docker-compose up --build    # this will update the cointainers if needed
+docker-compose up
 ```
 
 This will start:
@@ -188,7 +203,7 @@ This will start:
 All the created superusers have username `${ADMIN_USERNAME}` and
 password `${ADMIN_PASSWORD}` in each container.
 
-If the `nginx` container is also started the url ports can be removed.
+If the `nginx` container is also started then the url ports can be removed.
 - `http://gather.local`
 - `http://kernel.aether.local`
 - `http://odk.aether.local`
@@ -196,8 +211,8 @@ If the `nginx` container is also started the url ports can be removed.
 - `http://sync.aether.local`
 - `http://ui.aether.local`
 
-
 *[Return to TOC](#table-of-contents)*
+
 
 ### Users & Authentication
 
@@ -214,6 +229,7 @@ variables:
 - `LOGGED_OUT_TEMPLATE`: `pages/logged_out.html`.
 
 *[Return to TOC](#table-of-contents)*
+
 
 #### Token Authentication
 
@@ -273,11 +289,12 @@ The list of the main containers:
 | **odk**           | Aether ODK Collect Adapter app (imports data from ODK Collect)    |
 | **couchdb-sync**  | Aether CouchDB Sync app (imports data from Aether Mobile App)     |
 | **ui**            | Aether Kernel UI (only needed for advanced mapping functionality) |
-| kernel-test       | Aether Kernel TESTING app (used only in e2e testss)               |
-| odk-test          | Aether ODK TESTING app (used only in e2e testss)                  |
+| kernel-test       | Aether Kernel TESTING app (used only in e2e tests)                |
+| odk-test          | Aether ODK TESTING app (used only in e2e tests)                   |
+| couchdb-sync-test | Aether CouchDB Sync TESTING app (used only in e2e tests)          |
 
 
-All of the containers definition for development can be found in the
+All the containers definition for development can be found in the
 [docker-compose-base.yml](docker-compose-base.yml) file.
 
 *[Return to TOC](#table-of-contents)*
@@ -285,12 +302,67 @@ All of the containers definition for development can be found in the
 
 ## Run commands in the containers
 
-The [entrypoint.sh](app/entrypoint.sh)
+The pattern to run a command is always
+
+```bash
+docker-compose run [--no-deps] <container-name> <entrypoint-command> <...args>
+```
+
+If there is no interaction with any other container then include the option `--no-deps`.
+
+See more in [docker-compose run](https://docs.docker.com/compose/reference/run).
+
+*[Return to TOC](#table-of-contents)*
+
+
+### Python container
+
+The [app/entrypoint.sh](app/entrypoint.sh) script offers a range of commands
+to start services or run commands.
+The full list of commands can be seen in the script file.
+
+The following are some examples:
+
+| Action                                     | Command                                              |
+| ------------------------------------------ | ---------------------------------------------------- |
+| List predefined commands                   | `docker-compose run gather help`                     |
+| Run tests                                  | `docker-compose run gather test`                     |
+| Run code style tests                       | `docker-compose run gather test_lint`                |
+| Run python tests                           | `docker-compose run gather test_coverage`            |
+| Create a shell inside the container        | `docker-compose run gather bash`                     |
+| Execute shell command inside the container | `docker-compose run gather eval <command>`           |
+| Run django manage.py                       | `docker-compose run gather manage help`              |
+| Create a python shell                      | `docker-compose run gather manage shell`             |
+| Create a postgresql shell                  | `docker-compose run gather manage dbshell`           |
+| Show ORM migrations                        | `docker-compose run gather manage showmigrations`    |
+| Create pending ORM migration files         | `docker-compose run gather manage makemigrations`    |
+| Apply pending ORM migrations               | `docker-compose run gather manage migrate`           |
+| Check outdated python libraries            | `docker-compose run gather eval pip list --outdated` |
+| Update outdated python libraries           | `docker-compose run gather pip_freeze`               |
+| Start django development server            | `docker-compose run gather start_dev`                |
+| Start uwsgi server                         | `docker-compose run gather start`                    |
+
+*[Return to TOC](#table-of-contents)*
+
+
+### Node container
+
+The [app/gather/assets/conf/entrypoint.sh](app/gather/assets/conf/entrypoint.sh)
 script offers a range of commands to start services or run commands.
 The full list of commands can be seen in the script file.
 
-The pattern to run a command is always
-``docker-compose run <container-name> <entrypoint-command> <...args>``
+The following are some examples:
+
+| Action                                     | Command                                           |
+| ------------------------------------------ | ------------------------------------------------- |
+| List predefined commands                   | `docker-compose run gather-assets help`           |
+| Run tests                                  | `docker-compose run gather-assets test`           |
+| Run code style tests                       | `docker-compose run gather-assets test_lint`      |
+| Run JS tests                               | `docker-compose run gather-assets test_js`        |
+| Create a shell inside the container        | `docker-compose run gather-assets bash`           |
+| Execute shell command inside the container | `docker-compose run gather-assets eval <command>` |
+| Build assets used in the Django app        | `docker-compose run gather-assets build`          |
+| Start webpack server with HRM              | `docker-compose run gather-assets start_dev`      |
 
 *[Return to TOC](#table-of-contents)*
 
@@ -332,10 +404,10 @@ docker-compose -f docker-compose-test.yml up -d <container-name>-test
 **WARNING**
 
 Never run `gather` tests against any PRODUCTION server.
-The tests clean up could **DELETE ALL PROJECTS!!!**
+The tests would create random users with tokens in the different apps.
 
 Look into [docker-compose-base.yml](docker-compose-base.yml), the variable
-`AETHER_KERNEL_URL_TEST` indicates the Aether Kernel Server used in tests.
+`AETHER_<<APP>>_URL_TEST` indicates the Aether Server used in tests.
 
 *[Return to TOC](#table-of-contents)*
 
