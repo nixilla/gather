@@ -70,13 +70,26 @@ export default class FetchUrlsContainer extends Component {
     this.loadData()
   }
 
+  componentWillUnmount () {
+    this.abortFetch()
+  }
+
+  abortFetch () {
+    this.state.controller && this.state.controller.abort()
+  }
+
   refreshData () {
     this.setState({ isRefreshing: true })
     this.loadData()
   }
 
   loadData () {
-    return fetchUrls(this.props.urls)
+    this.abortFetch()
+
+    const controller = new window.AbortController()
+    this.setState({ controller })
+
+    return fetchUrls(this.props.urls, { signal: controller.signal })
       .then(response => {
         const { handleResponse } = this.props
         isMounted(this) && this.setState({

@@ -93,12 +93,24 @@ export default class PaginationContainer extends Component {
     }
   }
 
+  componentWillUnmount () {
+    this.abortFetch()
+  }
+
+  abortFetch () {
+    this.state.controller && this.state.controller.abort()
+  }
+
   loadData () {
     const { page, pageSize, search } = this.state
     const sep = this.props.url.indexOf('?') > -1 ? '&' : '?'
     const url = `${this.props.url}${sep}${buildQueryString({ page, pageSize, search })}`
 
-    return getData(url)
+    this.abortFetch()
+    const controller = new window.AbortController()
+    this.setState({ controller })
+
+    return getData(url, { signal: controller.signal })
       .then(response => {
         isMounted(this) && this.setState({
           list: response,
