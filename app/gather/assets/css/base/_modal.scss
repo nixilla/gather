@@ -22,7 +22,7 @@
   background-color: rgba($text-color, .7);
 
   // reset font-settings to override inherited styles from parent element
-  font-size: 1rem;
+  font-size: $font-size-standard;
   font-weight: normal;
   text-align: left;
   color: $text-color;
@@ -44,6 +44,77 @@
     box-shadow: 2px 2px 4px $darker-grey;
     border: 0;
     border-radius: $border-radius;
+  }
+
+  .title {
+    border-bottom: 1px solid $dark-grey;
+    margin-bottom: 1rem;
+    padding-bottom: .5rem;
+  }
+
+  .modal-options {
+    background: $background-color;
+
+    .form-group {
+      align-items: baseline;
+      min-height: 2rem;
+
+      .fa-toggle-on {
+        color: $action-color;
+        font-size: $font-size-m;
+      }
+
+      .fa-toggle-off {
+        color: $grey;
+        font-size: $font-size-m;
+      }
+    }
+
+    .radio {
+      height: 1rem;
+      width: 2rem;
+
+      &::before {
+        content: '';
+        display: inline-block;
+        @include radio;
+        box-shadow: 0 0 0 2px $grey;
+      }
+    }
+
+    .selected.d-inline {
+      background: $background-color;
+    }
+
+    .selected {
+      background: rgba($action-color, .1);
+      border-radius: $border-radius;
+
+      .radio {
+        &::before {
+          @include radio-selected;
+          box-shadow: 0 0 0 6px $action-color;
+        }
+      }
+    }
+
+    .modal-footer {
+      border: 0;
+    }
+
+    .actions {
+      padding-bottom: 0;
+    }
+  }
+
+  .d-inline-flex, .d-inline {
+    label {
+      margin-bottom: 0;
+    }
+  }
+
+  .form-inline {
+    align-items: baseline;
   }
 
   .close {
