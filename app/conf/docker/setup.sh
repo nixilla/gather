@@ -25,9 +25,6 @@ set -Eeuox pipefail
 # install packages
 ################################################################################
 
-# upgrade pip
-pip install --upgrade pip
-
 # install missing packages of slim distribution and Gather required ones
 PACKAGE_LIST=/tmp/apt-packages.txt
 if [ -f "$PACKAGE_LIST" ]; then
@@ -36,7 +33,7 @@ if [ -f "$PACKAGE_LIST" ]; then
 fi
 
 # add postgres apt repo to get more recent postgres versions
-echo 'deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main' > /etc/apt/sources.list.d/pgdg.list
+echo 'deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main' > /etc/apt/sources.list.d/pgdg.list
 wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
 apt-get update -qq
 apt-get -qq --yes --force-yes install postgresql-client-9.6
