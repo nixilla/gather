@@ -26,19 +26,22 @@ class ContextProcessorsTests(TestCase):
 
     def test_gather_context(self):
         request = RequestFactory().get('/')
+        context = gather_context(request)
 
-        self.assertEqual(gather_context(request), {
-            'dev_mode': False,
-            'app_name': 'Gather',
-            'instance_name': 'Gather 3',
-            'navigation_list': ['surveys', 'surveyors', 'sync-users'],
-            'kernel_url': 'http://kernel.aether.local',
-            'odk_url': 'http://odk.aether.local',
-            'couchdb_sync_url': 'http://sync.aether.local',
-        })
+        self.assertFalse(context['dev_mode'])
+
+        self.assertEqual(context['app_name'], 'Gather')
+        self.assertNotEqual(context['app_version'], '#.#.#')
+        self.assertNotEqual(context['app_revision'], '---')
+        self.assertEqual(context['instance_name'], 'Gather 3')
+
+        self.assertEqual(context['navigation_list'], ['surveys', 'surveyors', 'sync-users'])
+        self.assertEqual(context['kernel_url'], 'http://kernel-test:9100')
+        self.assertEqual(context['odk_url'], 'http://odk-test:9102')
+        self.assertEqual(context['couchdb_sync_url'], 'http://couchdb-sync-test:9106')
 
     @mock.patch('gather.context_processors.settings.AETHER_APPS',
-                {'kernel': {'assets': 'http://localhost'}})
+                {'kernel': {'url': 'http://localhost'}})
     def test_gather_context__mocked(self):
         request = RequestFactory().get('/')
         context = gather_context(request)

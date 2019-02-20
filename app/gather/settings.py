@@ -39,6 +39,22 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.environ.get('STATIC_ROOT', '/var/www/static/')
 
 
+# Version and revision
+# ------------------------------------------------------------------------------
+
+try:
+    with open('/var/tmp/VERSION') as fp:
+        VERSION = fp.read().strip()
+except Exception:
+    VERSION = '#.#.#'
+
+try:
+    with open('/var/tmp/REVISION') as fp:
+        REVISION = fp.read().strip()
+except Exception:
+    REVISION = '---'
+
+
 # Django Basic Configuration
 # ------------------------------------------------------------------------------
 
@@ -79,7 +95,6 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
-                'django.template.context_processors.media',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -242,8 +257,8 @@ if CAS_SERVER_URL:
 else:
     logger.info('No CAS enabled!')
 
-    LOGIN_TEMPLATE = os.environ.get('LOGIN_TEMPLATE', 'pages/login.html')
-    LOGGED_OUT_TEMPLATE = os.environ.get('LOGGED_OUT_TEMPLATE', 'pages/logged_out.html')
+LOGIN_TEMPLATE = os.environ.get('LOGIN_TEMPLATE', 'pages/login.html')
+LOGGED_OUT_TEMPLATE = os.environ.get('LOGGED_OUT_TEMPLATE', 'pages/logged_out.html')
 
 
 # Security Configuration
@@ -341,7 +356,6 @@ AETHER_MODULES = [
 kernel = {
     'token': os.environ.get('AETHER_KERNEL_TOKEN'),
     'url': os.environ.get('AETHER_KERNEL_URL'),
-    'assets': os.environ.get('AETHER_KERNEL_URL_ASSETS', os.environ.get('AETHER_KERNEL_URL')),
 }
 if TESTING:
     kernel['url'] = os.environ.get('AETHER_KERNEL_URL_TEST')
@@ -359,7 +373,6 @@ if 'odk' in AETHER_MODULES:
     odk = {
         'token': os.environ.get('AETHER_ODK_TOKEN'),
         'url': os.environ.get('AETHER_ODK_URL'),
-        'assets': os.environ.get('AETHER_ODK_URL_ASSETS', os.environ.get('AETHER_ODK_URL')),
     }
     if TESTING:
         odk['url'] = os.environ.get('AETHER_ODK_URL_TEST')
@@ -377,7 +390,6 @@ if 'couchdb-sync' in AETHER_MODULES:
     sync = {
         'token': os.environ.get('AETHER_COUCHDB_SYNC_TOKEN'),
         'url': os.environ.get('AETHER_COUCHDB_SYNC_URL'),
-        'assets': os.environ.get('AETHER_COUCHDB_SYNC_URL_ASSETS', os.environ.get('AETHER_COUCHDB_SYNC_URL')),
     }
     if TESTING:
         sync['url'] = os.environ.get('AETHER_COUCHDB_SYNC_URL_TEST')

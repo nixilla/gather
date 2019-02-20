@@ -28,13 +28,17 @@ def gather_context(request):
 
     context = {
         'dev_mode': settings.DEBUG,
+
         'app_name': settings.APP_NAME,
+        'app_version': settings.VERSION,
+        'app_revision': settings.REVISION,
+
         'instance_name': settings.INSTANCE_NAME,
         'navigation_list': navigation_list,
     }
 
     for key, value in settings.AETHER_APPS.items():
         name = key.replace('-', '_')
-        context[f'{name}_url'] = value['assets']
+        context[f'{name}_url'] = value['url']
 
     return context
