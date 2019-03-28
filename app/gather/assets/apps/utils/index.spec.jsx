@@ -42,6 +42,14 @@ describe('utils', () => {
   })
 
   describe('deepEqual', () => {
+    it('should compare different types', () => {
+      assert(!deepEqual(null, undefined), 'null and undefined are not equal')
+      assert(!deepEqual(1, {}), 'Primitives and objects are not equal')
+      assert(!deepEqual('1', []), 'Primitives and arrays are not equal')
+      assert(!deepEqual({}, []), 'Blank objects and empty arrays are not equal')
+      assert(!deepEqual({ '0': 1 }, [1]), 'Objects and arrays are not equal')
+    })
+
     it('should compare primitives', () => {
       let a = 1
       let b = 1

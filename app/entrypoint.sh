@@ -20,15 +20,6 @@
 #
 set -Eeuo pipefail
 
-# set DEBUG if missing
-set +u
-DEBUG="$DEBUG"
-set -u
-
-BACKUPS_FOLDER=/backups
-
-
-# Define help message
 function show_help {
     echo """
     Commands
@@ -158,16 +149,20 @@ function test_lint {
 }
 
 function test_coverage {
-    export RCFILE=./conf/extras/coverage.rc
-    export TESTING=true
+    RCFILE=/code/conf/extras/coverage.rc
+    PARALLEL_COV="--concurrency=multiprocessing --parallel-mode"
+    PARALLEL_PY="--parallel=${TEST_PARALLEL:-4}"
 
-    coverage run    --rcfile="$RCFILE" manage.py test "${@:1}"
-    coverage report --rcfile="$RCFILE"
+    rm -R /code/.coverage* 2>/dev/null || :
+    coverage run     --rcfile="$RCFILE" $PARALLEL_COV manage.py test --noinput "${@:1}" $PARALLEL_PY
+    coverage combine --rcfile="$RCFILE" --append
+    coverage report  --rcfile="$RCFILE"
     coverage erase
 
-    cat ./conf/extras/good_job.txt
+    cat /code/conf/extras/good_job.txt
 }
 
+BACKUPS_FOLDER=/backups
 
 case "$1" in
     bash )
@@ -200,12 +195,21 @@ case "$1" in
 
     start )
         setup
+        [ -z "${DEBUG:-}" ] && UWSGI_LOGGING="--disable-logging" || UWSGI_LOGGING=""
 
-        [ -z "$DEBUG" ] && LOGGING="--disable-logging" || LOGGING=""
+        UWSGI_STATIC="--static-map ${APP_URL:-/}static=/var/www/static"
+        UWSGI_FAVICO="--static-map ${APP_URL:-/}favicon.ico=/var/www/static/images/gather.ico"
+        [ -z "${UWSGI_SERVE_STATIC:-}" ] && UWSGI_STATIC="" && UWSGI_FAVICO=""
+
+        export DEBUG=''
         /usr/local/bin/uwsgi \
             --ini /code/conf/uwsgi.ini \
-            --http 0.0.0.0:$WEB_SERVER_PORT \
-            $LOGGING
+            --http 0.0.0.0:${WEB_SERVER_PORT} \
+            --processes ${UWSGI_PROCESSES:-4} \
+            --threads ${UWSGI_THREADS:-2} \
+            ${UWSGI_STATIC} \
+            ${UWSGI_FAVICO} \
+            ${UWSGI_LOGGING}
     ;;
 
     start_dev )
@@ -244,21 +248,19 @@ case "$1" in
     ;;
 
     test )
-        echo "DEBUG=$DEBUG"
+        export TESTING=true
         setup
         test_lint
         test_coverage
     ;;
 
     test_lint )
+        export TESTING=true
         test_lint
     ;;
 
-    test_coverage )
-        test_coverage "${@:2}"
-    ;;
-
-    test_py )
+    test_coverage | test_py )
+        export TESTING=true
         test_coverage "${@:2}"
     ;;
 
