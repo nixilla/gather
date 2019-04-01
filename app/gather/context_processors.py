@@ -17,14 +17,15 @@
 # under the License.
 
 from django.conf import settings
+from django.utils.translation import ugettext as _
 
 
 def gather_context(request):
-    navigation_list = ['surveys', ]
+    navigation_list = [('surveys', _('Surveys')), ]
     if settings.AETHER_APPS.get('odk'):
-        navigation_list.append('surveyors')
+        navigation_list.append(('odk-surveyors', _('Surveyors')))
     if settings.AETHER_APPS.get('couchdb-sync'):
-        navigation_list.append('sync-users')
+        navigation_list.append(('couchdb-sync-mobile-users', _('Mobile users')))
 
     context = {
         'dev_mode': settings.DEBUG,

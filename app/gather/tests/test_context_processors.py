@@ -35,10 +35,14 @@ class ContextProcessorsTests(TestCase):
         self.assertNotEqual(context['app_revision'], '---')
         self.assertEqual(context['instance_name'], 'Gather 3')
 
-        self.assertEqual(context['navigation_list'], ['surveys', 'surveyors', 'sync-users'])
-        self.assertEqual(context['kernel_url'], 'http://kernel-test:9100')
-        self.assertEqual(context['odk_url'], 'http://odk-test:9102')
-        self.assertEqual(context['couchdb_sync_url'], 'http://couchdb-sync-test:9106')
+        self.assertEqual(len(context['navigation_list']), 3)
+        self.assertEqual(context['navigation_list'][0][0], 'surveys')
+        self.assertEqual(context['navigation_list'][1][0], 'odk-surveyors')
+        self.assertEqual(context['navigation_list'][2][0], 'couchdb-sync-mobile-users')
+
+        self.assertIn('kernel_url', context)
+        self.assertIn('odk_url', context)
+        self.assertIn('couchdb_sync_url', context)
 
     @mock.patch('gather.context_processors.settings.AETHER_APPS',
                 {'kernel': {'url': 'http://localhost'}})
@@ -46,6 +50,9 @@ class ContextProcessorsTests(TestCase):
         request = RequestFactory().get('/')
         context = gather_context(request)
 
+        self.assertEqual(len(context['navigation_list']), 1)
+        self.assertEqual(context['navigation_list'][0][0], 'surveys')
+
+        self.assertIn('kernel_url', context)
         self.assertNotIn('odk_url', context)
         self.assertNotIn('couchdb_sync_url', context)
-        self.assertEqual(context['navigation_list'], ['surveys', ])
