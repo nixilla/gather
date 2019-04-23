@@ -29,7 +29,7 @@ Now that we have CKAN running, we need to turn to Aether Connect, the data publi
 
 ## Setting Up Aether Connect
 
-To start Aether Connect, run the following `docker-compose` command:
+To start Aether Connect, run the following `docker-compose` command from the `aether-bootstrap` folder:
 
 ```
 docker-compose -f docker-compose-connect.yml up -d
@@ -45,7 +45,7 @@ In order to communicate with CKAN, the CKAN Consumer needs an API Key. This can 
 
 ![Getting the CKAN API Key](/images/ckan-api-key.png)
 
-Now you need to edit the CKAN Consumer config file. It’s in the `aether-connect` directory, under `ckan-consumer/config/config.json`. Open it in your favourite text editor. If, for example, you like to use `Vi`, you should type
+Now you need to edit the CKAN Consumer config file. It’s in the `aether-bootstrap` directory, under `ckan-consumer/config/config.json`. Open it in your favourite text editor. If, for example, you like to use `Vi`, you should type
 
 ```
 vi ./ckan-consumer/config/config.json
@@ -68,7 +68,7 @@ The config file is JSON. We need to set the API Key field. Copy the API key from
 
 ## View the Data in CKAN
 
-Now we can start the CKAN Consumer:
+Now we can start the CKAN Consumer from the `aether-bootstrap` folder:
 
 ```
 scripts/run_ckan_consumer.sh
