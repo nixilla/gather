@@ -24,22 +24,28 @@ class SettingsTest(TestCase):
 
     def test_default_variables(self):
 
+        self.assertTrue(settings.MULTITENANCY)
         self.assertTrue(settings.TESTING)
         self.assertFalse(settings.DEBUG)
 
-        self.assertNotEqual(settings.VERSION, '#.#.#')
-        self.assertNotEqual(settings.REVISION, '---')
+        self.assertFalse(settings.STORAGE_REQUIRED)
+        self.assertFalse(settings.SCHEDULER_REQUIRED)
+        self.assertTrue(settings.WEBPACK_REQUIRED)
 
+        self.assertEqual(settings.APP_MODULE, 'gather')
         self.assertEqual(settings.ROOT_URLCONF, 'gather.urls')
+
+        self.assertTrue(settings.TESTING)
+        self.assertFalse(settings.DEBUG)
+
         self.assertEqual(settings.APP_NAME, 'Gather')
         self.assertEqual(settings.INSTANCE_NAME, 'Gather 3')
-        self.assertEqual(settings.AETHER_MODULES, ['kernel', 'odk', 'couchdb-sync'])
 
         self.assertIn('kernel', settings.AETHER_APPS)
-        self.assertEqual(settings.AETHER_APPS['kernel']['url'], 'http://kernel-test:9100')
+        self.assertEqual(settings.AETHER_APPS['kernel']['url'], 'http://kernel-test')
 
         self.assertIn('odk', settings.AETHER_APPS)
-        self.assertEqual(settings.AETHER_APPS['odk']['url'], 'http://odk-test:9102')
+        self.assertEqual(settings.AETHER_APPS['odk']['url'], 'http://odk-test')
 
         self.assertIn('couchdb-sync', settings.AETHER_APPS)
-        self.assertEqual(settings.AETHER_APPS['couchdb-sync']['url'], 'http://couchdb-sync-test:9106')
+        self.assertEqual(settings.AETHER_APPS['couchdb-sync']['url'], 'http://couchdb-sync-test')

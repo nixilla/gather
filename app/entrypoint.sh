@@ -90,7 +90,7 @@ function setup {
     #    -p=secretsecret
     #    -e=admin@gather2.org
     #    -t=01234656789abcdefghij
-    python ./manage.py setup_admin -u=$ADMIN_USERNAME -p=$ADMIN_PASSWORD
+    python ./manage.py setup_admin -u=$ADMIN_USERNAME -p=$ADMIN_PASSWORD -t=${ADMIN_TOKEN:-}
 
     # copy assets bundles folder into static folder
     rm -r -f ./gather/static/*.*
@@ -103,9 +103,9 @@ function setup {
     python ./manage.py collectstatic --noinput --clear --verbosity 0
 
     # expose version number (if exists)
-    cp /var/tmp/VERSION $STATIC_ROOT/VERSION   2>/dev/null || :
+    cp /var/tmp/VERSION $STATIC_ROOT/VERSION   2>/dev/null || true
     # add git revision (if exists)
-    cp /var/tmp/REVISION $STATIC_ROOT/REVISION 2>/dev/null || :
+    cp /var/tmp/REVISION $STATIC_ROOT/REVISION 2>/dev/null || true
 
     chmod -R 755 $STATIC_ROOT
 }
@@ -145,24 +145,32 @@ function restore_db {
 }
 
 function test_lint {
-    flake8 . --config=./conf/extras/flake8.cfg
+    flake8
 }
 
 function test_coverage {
-    RCFILE=/code/conf/extras/coverage.rc
-    PARALLEL_COV="--concurrency=multiprocessing --parallel-mode"
-    PARALLEL_PY="--parallel=${TEST_PARALLEL:-4}"
+    rm -R /code/.coverage* 2>/dev/null || true
 
-    rm -R /code/.coverage* 2>/dev/null || :
-    coverage run     --rcfile="$RCFILE" $PARALLEL_COV manage.py test --noinput "${@:1}" $PARALLEL_PY
-    coverage combine --rcfile="$RCFILE" --append
-    coverage report  --rcfile="$RCFILE"
+    coverage run \
+        --concurrency=multiprocessing \
+        --parallel-mode \
+        manage.py test \
+        --noinput \
+        --parallel ${TEST_PARALLEL:-} \
+        "${@:1}"
+    coverage combine --append
+    coverage report
     coverage erase
 
     cat /code/conf/extras/good_job.txt
 }
 
 BACKUPS_FOLDER=/backups
+
+export APP_MODULE=gather
+export DJANGO_SETTINGS_MODULE="${APP_MODULE}.settings"
+
+export WEBPACK_REQUIRED=true
 
 case "$1" in
     bash )
@@ -194,16 +202,21 @@ case "$1" in
     ;;
 
     start )
+        # ensure that DEBUG mode is disabled
+        export DEBUG=
+
         setup
 
         # Export woraround: in seconds: 20min
         export UWSGI_HARAKIRI=${UWSGI_HARAKIRI:-1200}
 
-        export DJANGO_SETTINGS_MODULE="gather.settings"
         ./conf/uwsgi/start.sh
     ;;
 
     start_dev )
+        # ensure that DEBUG mode is enabled
+        export DEBUG=true
+
         setup
 
         python ./manage.py runserver 0.0.0.0:$WEB_SERVER_PORT
@@ -219,7 +232,7 @@ case "$1" in
             --url=$AETHER_KERNEL_URL \
             --token=$AETHER_KERNEL_TOKEN
 
-        if [[ "$AETHER_MODULES" == *odk* ]];
+        if [[ "$EXTERNAL_APPS" == *odk* ]];
         then
             python ./manage.py check_url \
                 --url=$AETHER_ODK_URL \
@@ -228,7 +241,7 @@ case "$1" in
             echo "No ODK module enabled!"
         fi
 
-        if [[ "$AETHER_MODULES" == *couchdb-sync* ]];
+        if [[ "$EXTERNAL_APPS" == *couchdb-sync* ]];
         then
             python ./manage.py check_url \
                 --url=$AETHER_COUCHDB_SYNC_URL \
@@ -240,18 +253,21 @@ case "$1" in
 
     test )
         export TESTING=true
+
         setup
         test_lint
-        test_coverage
+        test_coverage "${@:2}"
     ;;
 
     test_lint )
         export TESTING=true
+
         test_lint
     ;;
 
     test_coverage | test_py )
         export TESTING=true
+
         test_coverage "${@:2}"
     ;;
 

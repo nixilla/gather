@@ -28,6 +28,9 @@ from django.views import View
 
 from rest_framework import viewsets
 
+from django_eha_sdk.multitenancy.views import MtViewSetMixin
+from django_eha_sdk.multitenancy.utils import add_current_realm_in_headers
+
 from . import models, serializers
 
 logger = logging.getLogger(__name__)
@@ -113,7 +116,7 @@ class TokenProxyView(View):
         method = request.method
 
         # builds request headers
-        headers = {}
+        headers = add_current_realm_in_headers(request, {})
         for header, value in request.META.items():
             # Fixes:
             # django.http.request.RawPostDataException:
@@ -183,7 +186,7 @@ class TokenProxyView(View):
         return http_response
 
 
-class SurveyViewSet(viewsets.ModelViewSet):
+class SurveyViewSet(MtViewSetMixin, viewsets.ModelViewSet):
     '''
     Handle Survey entries.
     '''
@@ -194,7 +197,7 @@ class SurveyViewSet(viewsets.ModelViewSet):
     ordering = ('name',)
 
 
-class MaskViewSet(viewsets.ModelViewSet):
+class MaskViewSet(MtViewSetMixin, viewsets.ModelViewSet):
     '''
     Handle Survey Mask entries.
     '''
@@ -203,6 +206,7 @@ class MaskViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.MaskSerializer
     search_fields = ('survey__name', 'name', 'columns',)
     ordering = ('survey', 'name',)
+    mt_field = 'survey'
 
 
 def log(message):
