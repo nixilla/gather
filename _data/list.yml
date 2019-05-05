@@ -15,7 +15,11 @@ toc:
         url: /documentation/try/install.html
       - page: Collecting Data
         url: /documentation/try/collect-data.html
-      - page: Connecting to CKAN
+      - page: Aether Connect
+        url: /documentation/try/aether-connect.html
+      - page: Sending Data to CKAN
         url: /documentation/try/ckan.html
+      - page: Sending Data to Elasticsearch/Kibana
+        url: /documentation/try/elk.html
       - page: Cleaning Up
         url: /documentation/try/clean-up.html

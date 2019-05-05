@@ -17,7 +17,7 @@ If you are running both the Gather server and web browser client on the same com
 ```
 127.0.0.1    localhost odk.aether.local ui.aether.local kernel.aether.local gather.local
 ```
-If your server is running remotely from your web browser, for example on AWS,  add a line to your **/etc/hosts** substsituting the IP address of your Gather server for **XX.XX.XX.XX**.  The new line should look like:
+If your server is running remotely from your web browser, for example on AWS,  add a line to your **/etc/hosts** substituting the IP address of your Gather server for **XX.XX.XX.XX**.  The new line should look like:
 ```
 XX.XX.XX.XX  ui.aether.local kernel.aether.local odk.aether.local gather.local
 ```

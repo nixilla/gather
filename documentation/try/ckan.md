@@ -1,19 +1,18 @@
 ---
-title: Gather – Sending data through to CKAN
+title: Gather – Sending Data to CKAN
 permalink: documentation/try/ckan.html
 description: Gather Documentation – Try it for yourself
 ---
 
 # Sending Data to a CKAN Data Portal
 
-In this demo we will add the components necessary to spin up a new CKAN instance and have our collected published to it in real time. To get this working we need to setup the publishing functionality in Aether (“Aether Connect”), then install and configure CKAN.
+In this section we will add the components necessary to spin up a new CKAN instance and have our collected data published to it in real time.  You should have a Gather server running, have submitted some data to it and have Aether Connect running.  If not, go to the [previous section](aether-connect)
 
 ## Setting Up CKAN
 
 We’re going to use a script to make it easier to install and configure CKAN. This will download Docker images for CKAN and perform the necessary configuration. It will then prompt you for a password for the `admin` user. In your terminal, navigate to the `aether-bootstrap` directory inside your cloned copy of `gather-deploy`, and then run the script:
 
 ```
-cd aether-bootstrap
 scripts/setup_ckan.sh
 ```
 
@@ -26,18 +25,6 @@ Now go to [http://gather.local:5000/organization](http://gather.local:5000/organ
 Name it `eHADemo` and click **Create Organisation**.
 
 Now that we have CKAN running, we need to turn to Aether Connect, the data publishing half of the Aether platform.
-
-## Setting Up Aether Connect
-
-To start Aether Connect, run the following `docker-compose` command from the `aether-bootstrap` folder:
-
-```
-docker-compose -f docker-compose-connect.yml up -d
-```
-
-This will start the distributed streaming platform [Kafka](https://kafka.apache.org/), Zookeeper (which manages Kafka) and the Aether Producer (which handles communication between Aether and Kafka). 
-
-Aether Connect can publish data to a variety of destinations. For each destination, it requires a ”Consumer”. Since we want to publish our data to CKAN, we will use the *CKAN Consumer*.
 
 ## Setting Up the CKAN Consumer
 
@@ -94,6 +81,6 @@ If you now fill in the `example-microcensus` form again in ODK Collect and submi
 
 ## Recap 
 
-In this section we created configured and span up a local CKAN instance. We then configured and deployed Aether Connect, the data publishing half of the Aether platform. We then viewed in CKAN the data that we collected in the previous section.
+In this section we created, configured and started a local CKAN instance. We then configured and deployed the Aether-CKAN consumer that reads messages from the Kafka message queue and posts that data to CKAN. We then viewed in CKAN the data that we collected earlier via ODK.
 
 <div style="margin-top: 2rem; text-align: center"><a href="clean-up">Final Steps: Cleaning Up</a></div>
