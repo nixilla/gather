@@ -1,4 +1,4 @@
-# Copyright (C) 2018 by eHealth Africa : http://www.eHealthAfrica.org
+# Copyright (C) 2019 by eHealth Africa : http://www.eHealthAfrica.org
 #
 # See the NOTICE file distributed with this work for additional information
 # regarding copyright ownership.
@@ -18,11 +18,22 @@
 
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from django.urls import reverse
 
+from django_eha_sdk.multitenancy.utils import get_path_realm
 from django_eha_sdk.health.utils import get_external_app_url
 
 
 def gather_context(request):
+    def get_url(view_name, kwargs=None):
+        # get the url using the gateway path if needed.
+        realm = get_path_realm(request)
+        kwargs = kwargs or {}
+        kwargs = {**kwargs, 'realm': realm} if realm else kwargs
+        return reverse(view_name, kwargs=kwargs)
+
+    gather_url = get_url('index-page')[:-1]
+
     navigation_list = [('surveys', _('Surveys')), ]
     if 'odk' in settings.AETHER_APPS:
         navigation_list.append(('odk-surveyors', _('Surveyors')))
@@ -32,11 +43,12 @@ def gather_context(request):
     context = {
         'instance_name': settings.INSTANCE_NAME,
         'navigation_list': navigation_list,
+        'gather_url': gather_url,
     }
 
     for app in settings.AETHER_APPS:
         name = app.replace('-', '_')
         external_app = f'{settings.AETHER_PREFIX}{app}'
-        context[f'{name}_url'] = get_external_app_url(external_app)
+        context[f'{name}_url'] = get_external_app_url(external_app, request)
 
     return context

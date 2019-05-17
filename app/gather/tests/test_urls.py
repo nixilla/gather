@@ -1,4 +1,4 @@
-# Copyright (C) 2018 by eHealth Africa : http://www.eHealthAfrica.org
+# Copyright (C) 2019 by eHealth Africa : http://www.eHealthAfrica.org
 #
 # See the NOTICE file distributed with this work for additional information
 # regarding copyright ownership.
@@ -29,9 +29,9 @@ class UrlsTest(UrlsTestCase):
         self.assertEqual(reverse('odk-surveyors', kwargs={'action': 'b'}), '/surveyors/b/')
         self.assertEqual(reverse('couchdb-sync-mobile-users', kwargs={'action': 'c'}), '/mobile-users/c')
 
-        self.assertEqual(reverse('api:kernel-proxy-root'), '/api/kernel/')
-        self.assertEqual(reverse('api:odk-proxy-root'), '/api/odk/')
-        self.assertEqual(reverse('api:couchdb-sync-proxy-root'), '/api/couchdb-sync/')
+        self.assertEqual(reverse('kernel-proxy-root'), '/api/kernel/')
+        self.assertEqual(reverse('odk-proxy-root'), '/api/odk/')
+        self.assertEqual(reverse('couchdb-sync-proxy-root'), '/api/couchdb-sync/')
 
 
 @override_settings(AETHER_APPS=['aether-kernel'])

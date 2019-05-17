@@ -1,4 +1,4 @@
-# Copyright (C) 2018 by eHealth Africa : http://www.eHealthAfrica.org
+# Copyright (C) 2019 by eHealth Africa : http://www.eHealthAfrica.org
 #
 # See the NOTICE file distributed with this work for additional information
 # regarding copyright ownership.
@@ -48,5 +48,3 @@ for app in settings.AETHER_APPS:
              view=app_token_required(TokenProxyView.as_view(app_name=external_app)),
              name=f'{app}-proxy-path'),
     ]
-
-app_name = 'api'

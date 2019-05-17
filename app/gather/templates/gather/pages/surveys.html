@@ -1,7 +1,7 @@
 {% extends 'gather/base.html' %}
 
 {% comment 'LICENSE' %}
-Copyright (C) 2018 by eHealth Africa : http://www.eHealthAfrica.org
+Copyright (C) 2019 by eHealth Africa : http://www.eHealthAfrica.org
 
 See the NOTICE file distributed with this work for additional information
 regarding copyright ownership.
@@ -35,7 +35,7 @@ under the License.
 
       {# include the ADD NEW button within the LIST view #}
       <a
-        href="{% url 'surveys' action='add' %}"
+        href="{{ gather_url }}{% url 'surveys' action='add' %}"
         role="button"
         class="btn btn-primary btn-icon">
         <i class="fas fa-plus-circle mr-3"></i>
