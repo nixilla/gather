@@ -181,17 +181,17 @@ class Survey extends Component {
         </div>
         {
           this.state.viewMode === DASHBOARD_VIEW
-          ? <SurveyDashboard survey={survey} consumerState={this.state.isConsumerActive}/>
-          : <PaginationContainer
-          pageSize={viewMode === SINGLE_VIEW ? 1 : TABLE_SIZES[0]}
-          sizes={viewMode === SINGLE_VIEW ? [] : TABLE_SIZES}
-          url={getEntitiesAPIPath({ project: survey.id })}
-          position='top'
-          listComponent={listComponent}
-          showPrevious
-          showNext
-          extras={extras}
-        />
+            ? <SurveyDashboard survey={survey} consumerState={this.state.isConsumerActive} />
+            : <PaginationContainer
+              pageSize={viewMode === SINGLE_VIEW ? 1 : TABLE_SIZES[0]}
+              sizes={viewMode === SINGLE_VIEW ? [] : TABLE_SIZES}
+              url={getEntitiesAPIPath({ project: survey.id })}
+              position='top'
+              listComponent={listComponent}
+              showPrevious
+              showNext
+              extras={extras}
+            />
         }
       </div>
     )
