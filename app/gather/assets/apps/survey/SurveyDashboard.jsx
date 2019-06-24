@@ -23,7 +23,7 @@ const SurveyDashboard = props => (
           defaultMessage='Activate Dashboard Now' />
       </button>
     </div>
-    : <iframe style={{ width: '100%', height: '500px' }} src='../../api/gather' />
+    : <iframe style={{ width: '100%', height: '500px' }} src={props.url} />
 )
 
 export default SurveyDashboard

@@ -23,8 +23,14 @@ import { FormattedMessage, defineMessages, injectIntl } from 'react-intl'
 
 import { FetchUrlsContainer, PaginationContainer } from '../components'
 import { GATHER_APP } from '../utils/constants'
-import { getSurveysPath, getSurveysAPIPath, getEntitiesAPIPath } from '../utils/paths'
+import {
+  getSurveysPath,
+  getSurveysAPIPath,
+  getEntitiesAPIPath,
+  getMappingTopicsAPIPath
+} from '../utils/paths'
 import { cleanJsonPaths } from '../utils/types'
+import { fetchUrls } from '../utils/request'
 
 import SurveyDetail from './SurveyDetail'
 import SurveyDashboard from './SurveyDashboard'
@@ -60,15 +66,32 @@ class Survey extends Component {
       labels: props.skeleton.docs,
       allPaths: paths,
       selectedPaths: paths,
-      isConsumerActive: false
+      isConsumerActive: false,
+      activationError: null
     }
     this.consumerToggle = this.consumerToggle.bind(this)
   }
 
   consumerToggle () {
-    this.setState({
-      isConsumerActive: !this.state.isConsumerActive
-    })
+    const xform = this.props.xform && this.props.xform.results.length && this.props.xform.results[0]
+    const url = getMappingTopicsAPIPath({ id: xform ? xform.kernel_id : '' })
+
+    // get list of survey topics from kernel
+    fetchUrls([{ name: 'topics', url }])
+      .then(response => {
+        // TODO: Check consumer state
+        // if off, register topics and start consumer job
+        // if on, unregister topics and stop consumer job
+        this.setState({
+          isConsumerActive: !this.state.isConsumerActive,
+          activationError: null
+        })
+      })
+      .catch(error => {
+        this.setState({
+          activationError: error
+        })
+      })
   }
 
   render () {
@@ -181,7 +204,11 @@ class Survey extends Component {
         </div>
         {
           this.state.viewMode === DASHBOARD_VIEW
-            ? <SurveyDashboard survey={survey} consumerState={this.state.isConsumerActive} />
+            ? <SurveyDashboard
+              survey={survey}
+              consumerState={this.state.isConsumerActive}
+              url={this.props.consumerUrl}
+            />
             : <PaginationContainer
               pageSize={viewMode === SINGLE_VIEW ? 1 : TABLE_SIZES[0]}
               sizes={viewMode === SINGLE_VIEW ? [] : TABLE_SIZES}

@@ -98,6 +98,15 @@ export const getEntitiesAPIPath = ({ id, ...params }) => {
 }
 
 /**
+ * Returns the API url to get the list of topics by Survey (Mapping)
+ *
+ * @param {number}  id          - Mapping id
+ */
+export const getMappingTopicsAPIPath = ({ id }) => {
+  return buildAPIPath(KERNEL_APP, 'mappings', id, { action: 'topics', format: '' })
+}
+
+/**
  * Returns the API url to get the Masks data
  *
  * @param {number}  id          - mask id *
@@ -105,6 +114,13 @@ export const getEntitiesAPIPath = ({ id, ...params }) => {
  */
 export const getMasksAPIPath = ({ id, ...params }) => {
   return buildAPIPath(GATHER_APP, 'masks', id, params)
+}
+
+/**
+ * Returns the API url to get the Elasticsearch consumer url
+ */
+export const getESConsumerUrlAPIPath = () => {
+  return buildAPIPath(GATHER_APP, 'consumer-url', null, { format: '' })
 }
 
 /**
