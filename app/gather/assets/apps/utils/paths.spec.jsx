@@ -33,8 +33,7 @@ import {
   getSyncUsersAPIPath,
   getSyncUsersPath,
   getXFormsAPIPath,
-  getMappingTopicsAPIPath,
-  getESConsumerUrlAPIPath
+  getMappingTopicsAPIPath
 } from './paths'
 
 describe('paths utils', () => {
@@ -250,12 +249,6 @@ describe('paths utils', () => {
     const prefix = '/api/kernel/'
     it('should return the kernel mapping topics path based on kernel_id', () => {
       assert.strictEqual(getMappingTopicsAPIPath({ id: 2 }), prefix + 'mappings/2/topics/?passthrough=true')
-    })
-  })
-
-  describe('getESConsumerUrlAPIPath', () => {
-    it('should return endpoint for consumer url', () => {
-      assert.strictEqual(getESConsumerUrlAPIPath(), '/api/gather/consumer-url/')
     })
   })
 

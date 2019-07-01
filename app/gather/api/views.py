@@ -17,14 +17,10 @@
 # under the License.
 
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
 
 from aether.sdk.multitenancy.views import MtViewSetMixin
-
 from .models import Survey, Mask
 from .serializers import SurveySerializer, MaskSerializer
-from ..settings import ES_CONSUMER_URL
 
 
 class SurveyViewSet(MtViewSetMixin, ModelViewSet):
@@ -48,8 +44,3 @@ class MaskViewSet(MtViewSetMixin, ModelViewSet):
     search_fields = ('survey__name', 'name', 'columns',)
     ordering = ('survey', 'name',)
     mt_field = 'survey'
-
-
-@api_view(['GET'])
-def get_es_consumer_url(request, *args, **kwargs):
-    return Response(ES_CONSUMER_URL)

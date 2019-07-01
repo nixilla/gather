@@ -46,11 +46,11 @@ const TABLE_SIZES = [ 10, 25, 50, 100 ]
 
 const MESSAGES = defineMessages({
   activate: {
-    id: 'survey.button.actiavte',
+    id: 'survey.button.activate',
     defaultMessage: 'Activate Survey'
   },
   deactivate: {
-    id: 'survey.button.deactiavte',
+    id: 'survey.button.deactivate',
     defaultMessage: 'Deactivate Survey'
   }
 })
@@ -69,16 +69,16 @@ class Survey extends Component {
       isConsumerActive: false,
       activationError: null
     }
-    this.consumerToggle = this.consumerToggle.bind(this)
+    this.toggleConsumer = this.toggleConsumer.bind(this)
   }
 
-  consumerToggle () {
+  toggleConsumer () {
     const xform = this.props.xform && this.props.xform.results.length && this.props.xform.results[0]
     const url = getMappingTopicsAPIPath({ id: xform ? xform.kernel_id : '' })
 
     // get list of survey topics from kernel
     fetchUrls([{ name: 'topics', url }])
-      .then(response => {
+      .then(() => {
         // TODO: Check consumer state
         // if off, register topics and start consumer job
         // if on, unregister topics and stop consumer job
@@ -104,7 +104,7 @@ class Survey extends Component {
           <h2>{survey.name}</h2>
           <div style={{ display: 'flex' }}>
             <button
-              onClick={this.consumerToggle}
+              onClick={this.toggleConsumer}
               role='button'
               style={{ marginRight: '15px' }}
               className='btn btn-primary btn-icon'>
@@ -207,7 +207,7 @@ class Survey extends Component {
             ? <SurveyDashboard
               survey={survey}
               consumerState={this.state.isConsumerActive}
-              url={this.props.consumerUrl}
+              url={this.props.settings.ES_CONSUMER_URL}
             />
             : <PaginationContainer
               pageSize={viewMode === SINGLE_VIEW ? 1 : TABLE_SIZES[0]}

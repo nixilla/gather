@@ -117,13 +117,6 @@ export const getMasksAPIPath = ({ id, ...params }) => {
 }
 
 /**
- * Returns the API url to get the Elasticsearch consumer url
- */
-export const getESConsumerUrlAPIPath = () => {
-  return buildAPIPath(GATHER_APP, 'consumer-url', null, { format: '' })
-}
-
-/**
  * Return the REST API url
  *
  * Without "action":
