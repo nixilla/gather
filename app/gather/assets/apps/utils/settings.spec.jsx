@@ -42,7 +42,7 @@ describe('Settings utils', () => {
         .reply(200, {
           aether_apps: ['kernel', 'odk', 'couchdb-sync'],
           export_max_rows_size: 10000,
-          'es_consumer_url': 'http://localhost:5601/'
+          es_consumer_url: 'http://localhost:5601/'
         })
 
       return getSettings().then(settings => {
