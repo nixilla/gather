@@ -18,27 +18,11 @@
  * under the License.
  */
 
+import { getAttachmentContentPath } from '../../utils/paths'
 
-/* Google Fonts */
-@import url('https://fonts.googleapis.com/css?family=Asap:400,400i|Quicksand:400,500,700');
-
-/* Font Awesome 5 */
-/* https://fontawesome.com/ */
-@import url('https://use.fontawesome.com/releases/v5.9.0/css/solid.css');
-@import url('https://use.fontawesome.com/releases/v5.9.0/css/fontawesome.css');
-
-
-/* override eha-bg */
-
-.eha-bg {
-  background: #4f6b81;
-  font-family: Quicksand, Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 1.3rem;
-}
-
-/* overrride tokens page */
-
-.tokens-info table td {
-  font-family: Asap, Helvetica, Arial, sans-serif;
-}
+export const attachmentsToLinks = (attachments) => (
+  attachments.map(({ id, name }) => ({
+    name,
+    url: id ? getAttachmentContentPath({ id }) : '#'
+  }))
+)

@@ -18,27 +18,27 @@
  * under the License.
  */
 
+/* global describe, it */
 
-/* Google Fonts */
-@import url('https://fonts.googleapis.com/css?family=Asap:400,400i|Quicksand:400,500,700');
+import assert from 'assert'
+import { attachmentsToLinks } from './utils'
 
-/* Font Awesome 5 */
-/* https://fontawesome.com/ */
-@import url('https://use.fontawesome.com/releases/v5.9.0/css/solid.css');
-@import url('https://use.fontawesome.com/releases/v5.9.0/css/fontawesome.css');
-
-
-/* override eha-bg */
-
-.eha-bg {
-  background: #4f6b81;
-  font-family: Quicksand, Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 1.3rem;
-}
-
-/* overrride tokens page */
-
-.tokens-info table td {
-  font-family: Asap, Helvetica, Arial, sans-serif;
-}
+describe('Entity utils', () => {
+  describe('parseAttachments', () => {
+    it('should return the list of attachments with the name and URL', () => {
+      assert.deepStrictEqual(attachmentsToLinks([]), [])
+      assert.deepStrictEqual(
+        attachmentsToLinks([
+          { id: 1, label: 'one' },
+          { id: 2, name: 'sample.txt' },
+          { name: '' }
+        ]),
+        [
+          { name: undefined, url: '/api/kernel/attachments/1/content/?passthrough=true' },
+          { name: 'sample.txt', url: '/api/kernel/attachments/2/content/?passthrough=true' },
+          { name: '', url: '#' }
+        ]
+      )
+    })
+  })
+})
