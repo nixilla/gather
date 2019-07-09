@@ -148,14 +148,14 @@ class Survey extends Component {
       <div className='survey-data'>
         <div className='survey-data-toolbar'>
           <ul className='survey-data-tabs'>
-            <li>
+            <li className='dashboard-tab'>
               <button
                 type='button'
                 disabled={viewMode === DASHBOARD_VIEW}
                 className={`tab ${viewMode === DASHBOARD_VIEW ? 'active' : ''}`}
                 onClick={() => { this.setState({ viewMode: DASHBOARD_VIEW }) }}
               >
-                <i className='fas fa-th-list mr-2' />
+                <i className='fas fa-chart-area mr-2' />
                 <FormattedMessage
                   id='survey.view.action.dashboard'
                   defaultMessage='Dashboard' />
@@ -197,9 +197,13 @@ class Survey extends Component {
                 filename={filename}
               />
             </li>
-            <li className='toolbar-filter'>
-              { this.renderMaskButton() }
-            </li>
+            {
+              this.state.viewMode != DASHBOARD_VIEW &&
+                <li className='toolbar-filter'>
+                  { this.renderMaskButton() }
+                </li>
+            }
+
           </ul>
         </div>
         {
@@ -252,6 +256,7 @@ class Survey extends Component {
       urls={urls}
       handleResponse={handleResponse}
       targetComponent={SurveyMasks}
+
     />
   }
 }
