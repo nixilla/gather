@@ -23,8 +23,8 @@ import { FormattedMessage } from 'react-intl'
 
 const SurveyDashboard = props => (
   !props.consumerState
-    ? <div style={{ textAlign: '-webkit-center', padding: '20px' }}>
-      <h4>
+    ? <div className='survey-content no-dashboard'>
+      <h4 className='headline'>
         <FormattedMessage
           id='survey.no.dashboard.help-1'
           defaultMessage='No Dashboard here?' />
@@ -35,15 +35,15 @@ const SurveyDashboard = props => (
       <button
         onClick={() => {}}
         role='button'
-        style={{ marginTop: '10px' }}
-        className='btn btn-primary btn-icon'>
-        <i className='fas fa-pencil-alt invert mr-3' />
+        className='btn btn-secondary btn-lg mt-4'>
         <FormattedMessage
           id='survey.no.dashboard.activate'
           defaultMessage='Activate Dashboard Now' />
       </button>
     </div>
-    : <iframe style={{ width: '100%', height: '500px' }} src={props.url} />
+    : <div className='survey-content dashboard'>
+      <iframe style={{ width: '100%', height: '500px' }} src={props.url} />
+    </div>
 )
 
 export default SurveyDashboard

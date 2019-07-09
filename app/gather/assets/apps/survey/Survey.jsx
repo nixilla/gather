@@ -102,20 +102,20 @@ class Survey extends Component {
       <div data-qa={`survey-item-${survey.id}`} className='survey-view'>
         <div className='survey-header'>
           <h2>{survey.name}</h2>
-          <div style={{ display: 'flex' }}>
+          <div className='header-actions'>
             <button
               onClick={this.toggleConsumer}
               role='button'
               style={{ marginRight: '15px' }}
-              className='btn btn-primary btn-icon'>
-              <i className='fas fa-pencil-alt invert mr-3' />
+              className='btn btn-secondary btn-icon'>
+              <i className={`fas mr-3 ${this.state.isConsumerActive ? 'fa-pause-circle' : 'fa-play-circle'}`}/>
               { formatMessage(MESSAGES[this.state.isConsumerActive ? 'deactivate' : 'activate']) }
             </button>
             <a
               href={getSurveysPath({ action: 'edit', id: survey.id })}
               role='button'
               className='btn btn-primary btn-icon'>
-              <i className='fas fa-pencil-alt invert mr-3' />
+              <i className='fas fa-pen invert mr-3' />
               <FormattedMessage
                 id='survey.view.action.edit'
                 defaultMessage='Edit survey' />

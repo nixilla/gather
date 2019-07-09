@@ -30,6 +30,10 @@
     font-weight: 400;
     margin: 0 0 .5rem;
   }
+
+  .header-actions {
+    display: flex;
+  }
 }
 
 .survey-detail {
@@ -317,6 +321,21 @@
 
   .btn {
     position: absolute;
+  }
+}
+
+.survey-content.no-dashboard {
+  display: flex;
+  flex-direction: column;
+  padding: 10vh 20vw;
+  align-items: center;
+  text-align: center;
+
+  .headline {
+    font-style: italic;
+    color: $light-grey;
+    font-size: $font-size-l;
+    margin-bottom: 1rem;
   }
 }
 
