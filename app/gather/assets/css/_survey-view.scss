@@ -127,6 +127,15 @@
 .toolbar-filter {
   margin-left: auto;
   padding-right: 5vw;
+  .alert {
+    background: none;
+    color: white;
+    font-size: $font-size-s;
+  }
+  .loading-spinner {
+    border-top-color: lighten($action-color, 30);
+    border-right-color: lighten($action-color, 30);
+  }
 }
 
 .tab {
@@ -355,6 +364,13 @@
     color: $light-grey;
     font-size: $font-size-l;
     margin-bottom: 1rem;
+  }
+}
+
+.survey-content.dashboard {
+  iframe {
+    width: 100%;
+    height: calc(100vh - #{$toolbar-height});
   }
 }
 

@@ -42,7 +42,7 @@ const SurveyDashboard = props => (
       </button>
     </div>
     : <div className='survey-content dashboard'>
-      <iframe style={{ width: '100%', height: '500px' }} src={props.url} />
+      <iframe src={props.url} />
     </div>
 )
 
