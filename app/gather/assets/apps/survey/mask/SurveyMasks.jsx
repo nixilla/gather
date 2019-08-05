@@ -67,6 +67,38 @@ const MESSAGES = defineMessages({
   }
 })
 
+const buildStateWithProps = (props, includeColumns = false) => {
+  const { formatMessage } = props.intl
+  const newState = {
+    initialSurvey: props.survey,
+    initialColumns: props.columns,
+    masks: [
+      {
+        id: -2,
+        name: formatMessage(MESSAGES.all),
+        columns: []
+      },
+
+      ...props.survey.masks,
+
+      {
+        id: -1,
+        name: formatMessage(MESSAGES.none),
+        columns: [...props.columns]
+      }
+    ]
+  }
+
+  if (includeColumns) {
+    newState.columns = {}
+    props.columns.forEach(column => {
+      newState.columns[column] = props.initialSelected.indexOf(column) > -1
+    })
+  }
+
+  return newState
+}
+
 /**
  * SurveyMasks component.
  *
@@ -79,17 +111,17 @@ class SurveyMasks extends Component {
 
     this.state = {
       showColumns: false,
-      ...this.buildStateWithProps(props, true)
+      ...buildStateWithProps(props, true)
     }
   }
 
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.survey !== this.props.survey ||
-      nextProps.columns !== this.props.columns) {
-      this.setState({
-        ...this.buildStateWithProps(nextProps, (nextProps.columns !== this.props.columns))
-      })
+  static getDerivedStateFromProps (props, state) {
+    if (state.initialSurvey !== props.survey || state.initialColumns !== props.columns) {
+      return {
+        ...buildStateWithProps(props, (state.initialColumns !== props.columns))
+      }
     }
+    return null
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -98,36 +130,6 @@ class SurveyMasks extends Component {
         .filter(key => this.state.columns[key])
       this.props.onChange(selectedColumns)
     }
-  }
-
-  buildStateWithProps (props, includeColumns = false) {
-    const { formatMessage } = props.intl
-    const newState = {
-      masks: [
-        {
-          id: -2,
-          name: formatMessage(MESSAGES.all),
-          columns: []
-        },
-
-        ...props.survey.masks,
-
-        {
-          id: -1,
-          name: formatMessage(MESSAGES.none),
-          columns: [...props.columns]
-        }
-      ]
-    }
-
-    if (includeColumns) {
-      newState.columns = {}
-      props.columns.forEach(column => {
-        newState.columns[column] = props.initialSelected.indexOf(column) > -1
-      })
-    }
-
-    return newState
   }
 
   isMaskSelected (mask) {
