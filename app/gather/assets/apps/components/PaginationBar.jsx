@@ -61,6 +61,10 @@ const MESSAGES = defineMessages({
   }
 })
 
+const getNumberOfPages = (props) => {
+  return Math.ceil(props.records / props.pageSize)
+}
+
 /**
  * PaginationBar component.
  *
@@ -80,14 +84,19 @@ class PaginationBar extends Component {
     super(props)
 
     this.state = {
+      initialPage: props.currentPage,
       currentPage: props.currentPage
     }
   }
 
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.currentPage !== this.state.currentPage) {
-      this.setState({ currentPage: Math.min(Math.max(1, nextProps.currentPage), this.getNumberOfPages()) })
+  static getDerivedStateFromProps (props, state) {
+    if (props.currentPage !== state.initialPage) {
+      return {
+        initialPage: props.currentPage,
+        currentPage: Math.min(Math.max(1, props.currentPage), getNumberOfPages(props))
+      }
     }
+    return null
   }
 
   render () {
@@ -124,10 +133,6 @@ class PaginationBar extends Component {
         { showPageSizesSelect && this.renderPageSizes() }
       </nav>
     )
-  }
-
-  getNumberOfPages () {
-    return Math.ceil(this.props.records / this.props.pageSize)
   }
 
   renderSearchBar () {
@@ -189,13 +194,13 @@ class PaginationBar extends Component {
   renderNumberOfPages () {
     return (
       <span data-qa='data-pagination-total'>
-        <FormattedNumber value={this.getNumberOfPages()} />
+        <FormattedNumber value={getNumberOfPages(this.props)} />
       </span>
     )
   }
 
   renderCurrentPage () {
-    const numberOfPages = this.getNumberOfPages()
+    const numberOfPages = getNumberOfPages(this.props)
 
     // indicates if the value in the input reflects the current page or
     // if it is still pending.
@@ -241,7 +246,7 @@ class PaginationBar extends Component {
   renderLinkToPage (pageName) {
     const { formatMessage } = this.props.intl
     const { currentPage } = this.props
-    const numberOfPages = this.getNumberOfPages()
+    const numberOfPages = getNumberOfPages(this.props)
     let newPage = currentPage
 
     switch (pageName) {

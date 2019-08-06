@@ -33,6 +33,9 @@ import LoadingSpinner from './LoadingSpinner'
 import PaginationBar from './PaginationBar'
 import RefreshSpinner from './RefreshSpinner'
 
+// sort and remove duplicates
+const buildSizes = (sizes = [], pageSize = 25) => sortNumericArray([...new Set([...sizes, pageSize])])
+
 /**
  * PaginationContainer component.
  *
@@ -62,25 +65,27 @@ class PaginationContainer extends Component {
 
     this.state = {
       // default status variables
+      initialSizes: props.sizes,
+      initialPageSize: props.pageSize,
       isLoading: true,
+      sizes: buildSizes(props.sizes, props.pageSize),
       pageSize: props.pageSize || 25,
-      page: 1,
-      sizes: this.buildSizes(props.sizes, props.pageSize)
+      page: 1
     }
   }
 
-  buildSizes (sizes = [], pageSize = 25) {
-    return sortNumericArray([...new Set([...sizes, pageSize])]) // sort and remove duplicates
-  }
-
-  componentWillReceiveProps (nextProps) {
-    this.setState({
-      sizes: this.buildSizes(nextProps.sizes, nextProps.pageSize)
-    }, () => {
-      if (nextProps.pageSize !== this.state.pageSize) {
-        this.setState({ pageSize: nextProps.pageSize, page: 1 })
+  static getDerivedStateFromProps (props, state) {
+    if (props.sizes !== state.initialSizes) {
+      const pageSize = (props.pageSize !== state.initialPageSize) ? props.pageSize : state.pageSize
+      return {
+        initialSizes: props.sizes,
+        initialPageSize: props.pageSize,
+        sizes: buildSizes(props.sizes, pageSize),
+        pageSize,
+        page: (props.pageSize !== state.initialPageSize) ? 1 : state.page
       }
-    })
+    }
+    return null
   }
 
   componentDidMount () {
