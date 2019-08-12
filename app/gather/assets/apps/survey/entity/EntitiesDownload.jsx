@@ -166,9 +166,9 @@ class EntitiesDownload extends Component {
       this.setState({ [event.target.name]: event.target.value })
     }
 
-    const onKeyPress = (event) => {
+    const onKeyUp = (event) => {
       // change to TAB if the input value is "t" or "T" and key pressed is Ctrl+Enter
-      if (['t', 'T'].indexOf(this.state[event.target.name]) > -1 && event.ctrlKey && event.charCode === 13) {
+      if (['t', 'T'].indexOf(this.state[event.target.name]) > -1 && event.ctrlKey && event.key === 'Enter') {
         event.preventDefault()
         this.setState({ [event.target.name]: 'TAB' })
       }
@@ -248,7 +248,7 @@ class EntitiesDownload extends Component {
                 maxLength={1}
                 value={this.state.csvSeparator || ''}
                 onChange={onInputChange}
-                onKeyPress={onKeyPress}
+                onKeyUp={onKeyUp}
               />
             </div>
             <div className='form-group mr-5'>
@@ -288,8 +288,10 @@ class EntitiesDownload extends Component {
       }
     ]
 
+    const close = () => { this.setState({ open: false }) }
+
     return (
-      <Portal>
+      <Portal onEscape={close} onEnter={download}>
         <div className='modal show'>
           <div className='modal-dialog modal-dialog-centered modal-lg'>
             <div className='modal-content modal-options'>
@@ -303,7 +305,7 @@ class EntitiesDownload extends Component {
                   data-qa='confirm-button-close'
                   type='button'
                   className='close'
-                  onClick={() => { this.setState({ open: false }) }}>
+                  onClick={close}>
                   &times;
                 </button>
               </div>
@@ -442,7 +444,7 @@ class EntitiesDownload extends Component {
                     <button
                       type='button'
                       className='btn btn-cancel btn-block'
-                      onClick={() => { this.setState({ open: false }) }}>
+                      onClick={close}>
                       <FormattedMessage
                         id='entities.download.cancel'
                         defaultMessage='Cancel' />
@@ -498,8 +500,10 @@ class EntitiesDownload extends Component {
       return ''
     }
 
+    const close = () => { this.setState({ error: null }) }
+
     return (
-      <Portal>
+      <Portal onEscape={close} onEnter={close}>
         <div className='modal show'>
           <div className='modal-dialog modal-md'>
             <div className='modal-content'>
@@ -513,7 +517,7 @@ class EntitiesDownload extends Component {
                   data-qa='confirm-button-close'
                   type='button'
                   className='close'
-                  onClick={() => { this.setState({ error: null }) }}>
+                  onClick={close}>
                   &times;
                 </button>
               </div>
