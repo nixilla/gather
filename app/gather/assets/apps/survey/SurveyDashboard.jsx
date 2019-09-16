@@ -33,7 +33,7 @@ const SurveyDashboard = props => (
         id='survey.no.dashboard.help-2'
         defaultMessage='When you activate the dashboard, data will be sent to Elastic Search.' />
       <button
-        onClick={() => {}}
+        onClick={props.toggle}
         role='button'
         className='btn btn-secondary btn-lg mt-4'>
         <FormattedMessage

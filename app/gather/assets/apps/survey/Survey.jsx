@@ -224,6 +224,7 @@ class Survey extends Component {
               survey={survey}
               consumerState={this.state.isConsumerActive}
               url={this.props.settings.ES_CONSUMER_URL}
+              toggle={this.toggleConsumer}
             />
             : <PaginationContainer
               pageSize={viewMode === SINGLE_VIEW ? 1 : TABLE_SIZES[0]}
