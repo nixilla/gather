@@ -21,9 +21,7 @@ services:
     environment:
       MINIO_ACCESS_KEY: ${MINIO_STORAGE_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_STORAGE_SECRET_KEY}
-    command: minio server --quiet --address minio:9000 /data
-    ports:
-      - 9000:9000
+    command: minio server --quiet --address minio:9090 /data
 
 
   # ---------------------------------
@@ -44,7 +42,6 @@ services:
       - ./.persistent_data/static:/static
     ports:
       - 80:80
-      - 8443:8443
     healthcheck:
       test: nginx -t
       interval: 5s
@@ -57,19 +54,22 @@ services:
   # ---------------------------------
 
   kernel-base:
-    image: ehealthafrica/aether-kernel:${AETHER_VERSION:-latest}
+    image: ehealthafrica/aether-kernel:${AETHER_VERSION:-alpha}
     environment:
       CSRF_COOKIE_DOMAIN: aether.local
       DJANGO_SECRET_KEY: ${KERNEL_DJANGO_SECRET_KEY}
+
+      LOGGING_FORMATTER: verbose
+      HTML_SELECT_CUTOFF: 10
+      PROFILING_ENABLED: "true"
 
       BUCKET_NAME: kernel
       DJANGO_STORAGE_BACKEND: minio
       MINIO_STORAGE_ACCESS_KEY: ${MINIO_STORAGE_ACCESS_KEY}
       MINIO_STORAGE_SECRET_KEY: ${MINIO_STORAGE_SECRET_KEY}
-      MINIO_STORAGE_ENDPOINT: minio:9000
-      # Use these settings to make it accessible via browser
+      MINIO_STORAGE_ENDPOINT: minio:9090
       MINIO_STORAGE_MEDIA_USE_PRESIGNED: null
-      MINIO_STORAGE_MEDIA_URL: http://localhost:9000/kernel
+      MINIO_STORAGE_MEDIA_URL: http://minio:9090/kernel
       MINIO_STORAGE_AUTO_CREATE_MEDIA_BUCKET: "true"
       MINIO_STORAGE_AUTO_CREATE_MEDIA_POLICY: "true"
 
@@ -107,8 +107,6 @@ services:
     volumes:
       - ./.persistent_data/backups/kernel:/backups
       - ./.persistent_data/static/kernel:/var/www/static
-    ports:
-      - 8100:8100
     command: start
 
 
@@ -117,19 +115,22 @@ services:
   # ---------------------------------
 
   odk-base:
-    image: ehealthafrica/aether-odk:${AETHER_VERSION:-latest}
+    image: ehealthafrica/aether-odk:${AETHER_VERSION:-alpha}
     environment:
       CSRF_COOKIE_DOMAIN: aether.local
       DJANGO_SECRET_KEY: ${ODK_DJANGO_SECRET_KEY}
+
+      LOGGING_FORMATTER: verbose
+      HTML_SELECT_CUTOFF: 10
+      PROFILING_ENABLED: "true"
 
       BUCKET_NAME: odk
       DJANGO_STORAGE_BACKEND: minio
       MINIO_STORAGE_ACCESS_KEY: ${MINIO_STORAGE_ACCESS_KEY}
       MINIO_STORAGE_SECRET_KEY: ${MINIO_STORAGE_SECRET_KEY}
-      MINIO_STORAGE_ENDPOINT: minio:9000
-      # Use these settings to make it accessible via browser
+      MINIO_STORAGE_ENDPOINT: minio:9090
       MINIO_STORAGE_MEDIA_USE_PRESIGNED: null
-      MINIO_STORAGE_MEDIA_URL: http://localhost:9000/odk
+      MINIO_STORAGE_MEDIA_URL: http://minio:9090/odk
       MINIO_STORAGE_AUTO_CREATE_MEDIA_BUCKET: "true"
       MINIO_STORAGE_AUTO_CREATE_MEDIA_POLICY: "true"
 
@@ -158,9 +159,6 @@ services:
     volumes:
       - ./.persistent_data/backups/odk:/backups
       - ./.persistent_data/static/odk:/var/www/static
-    ports:
-      # behind ngnix
-      - 8102:8102
     command: start
 
 
@@ -169,10 +167,14 @@ services:
   # ---------------------------------
 
   ui-base:
-    image: ehealthafrica/aether-ui:${AETHER_VERSION:-latest}
+    image: ehealthafrica/aether-ui:${AETHER_VERSION:-alpha}
     environment:
       CSRF_COOKIE_DOMAIN: aether.local
       DJANGO_SECRET_KEY: ${UI_DJANGO_SECRET_KEY}
+
+      LOGGING_FORMATTER: verbose
+      HTML_SELECT_CUTOFF: 10
+      PROFILING_ENABLED: "true"
 
       APP_NAME: Aether
       STATIC_URL: /static/ui/
@@ -197,8 +199,6 @@ services:
     volumes:
       - ./.persistent_data/backups/ui:/backups
       - ./.persistent_data/static/ui:/var/www/static
-    ports:
-      - 8104:8104
     command: start
 
 
@@ -217,6 +217,10 @@ services:
       CSRF_COOKIE_DOMAIN: gather.local
       DJANGO_SECRET_KEY: ${GATHER_DJANGO_SECRET_KEY}
 
+      LOGGING_FORMATTER: verbose
+      HTML_SELECT_CUTOFF: 10
+      PROFILING_ENABLED: "true"
+
       APP_NAME: Gather
 
       MULTITENANCY: ${MULTITENANCY}
@@ -232,7 +236,7 @@ services:
       AETHER_KERNEL_URL: http://aether.local/kernel
 
       AETHER_ODK_TOKEN: ${ODK_ADMIN_TOKEN}
-      AETHER_ODK_URL: http://aether.local:8443/odk
+      AETHER_ODK_URL: http://aether.local/odk
 
       DB_NAME: gather
       PGHOST: db # This matches the DB service name
@@ -253,8 +257,6 @@ services:
 
       - ./.persistent_data/backups/gather:/backups
       - ./.persistent_data/static/gather:/var/www/static
-    ports:
-      - 8105:8105
     command: start_dev
 
   # ---------------------------------
@@ -280,6 +282,4 @@ services:
       - ./app/gather/assets/css:/code/css
       - ./app/gather/assets/tests:/code/tests
       - ./app/gather/assets/package.json:/code/package.json
-    ports:
-      - 3005:3005
     command: start_dev

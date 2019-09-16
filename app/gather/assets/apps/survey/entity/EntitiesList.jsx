@@ -21,6 +21,7 @@
 import React, { Component } from 'react'
 import { FormattedMessage } from 'react-intl'
 
+import { attachmentsToLinks } from './utils'
 import { flatten, inflate, getLabel } from '../../utils/types'
 import { JSONViewer, LinksList } from '../../components'
 
@@ -36,9 +37,9 @@ export default class EntitiesList extends Component {
       <div data-qa='entities-list' className='x-0'>
         <div className='survey-content'>
           <table className='table table-sm'>
-            { this.renderHeader() }
+            {this.renderHeader()}
             <tbody>
-              { list.map((entity, index) => this.renderEntity(entity, index)) }
+              {list.map((entity, index) => this.renderEntity(entity, index))}
             </tbody>
           </table>
         </div>
@@ -99,12 +100,14 @@ export default class EntitiesList extends Component {
           <th rowSpan={rows || 1}>
             <FormattedMessage
               id='entity.list.table.status'
-              defaultMessage='Status' />
+              defaultMessage='Status'
+            />
           </th>
           <th rowSpan={rows || 1}>
             <FormattedMessage
               id='entity.list.table.attachments'
-              defaultMessage='Attachments' />
+              defaultMessage='Attachments'
+            />
           </th>
 
           {
@@ -116,8 +119,9 @@ export default class EntitiesList extends Component {
                     key={row[column].key}
                     title={row[column].path}
                     rowSpan={row[column].isLeaf ? rows : 1}
-                    colSpan={row[column].siblings}>
-                    { getLabel(row[column].path, labels) }
+                    colSpan={row[column].siblings}
+                  >
+                    {getLabel(row[column].path, labels)}
                   </th>
                 ))
               ))
@@ -135,8 +139,9 @@ export default class EntitiesList extends Component {
                       key={row[column].key}
                       title={row[column].path}
                       rowSpan={row[column].isLeaf ? (rows - index - 1) : 1}
-                      colSpan={row[column].siblings}>
-                      { getLabel(row[column].path, labels) }
+                      colSpan={row[column].siblings}
+                    >
+                      {getLabel(row[column].path, labels)}
                     </th>
                   ))
                 }
@@ -150,6 +155,7 @@ export default class EntitiesList extends Component {
   renderEntity (entity, index) {
     const { paths, labels } = this.props
     const flattenPayload = flatten({ ...entity.payload })
+    const attachments = attachmentsToLinks(entity.attachments)
 
     return (
       <tr data-qa={`entity-row-${entity.id}`} key={entity.id}>
@@ -158,7 +164,7 @@ export default class EntitiesList extends Component {
           {entity.status}
         </td>
         <td>
-          <LinksList list={entity.attachments} />
+          <LinksList list={attachments} />
         </td>
 
         {
@@ -168,7 +174,7 @@ export default class EntitiesList extends Component {
                 data={flattenPayload[key]}
                 labels={labels}
                 labelRoot={key + '.'}
-                links={entity.attachments}
+                links={attachments}
               />
             </td>
           ))

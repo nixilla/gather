@@ -33,6 +33,9 @@ import LoadingSpinner from './LoadingSpinner'
 import PaginationBar from './PaginationBar'
 import RefreshSpinner from './RefreshSpinner'
 
+// sort and remove duplicates
+const buildSizes = (sizes = [], pageSize = 25) => sortNumericArray([...new Set([...sizes, pageSize])])
+
 /**
  * PaginationContainer component.
  *
@@ -52,6 +55,7 @@ import RefreshSpinner from './RefreshSpinner'
  *   `showXxx`:           Indicates if the button `Xxx` (`First` , `Previous`, `Next`, `Last`)
  *                        is shown in the pagination bar.
  *   `extras`:            An object that passes directly to the listComponent.
+ *   `mapResponse`:       Function that maps the list of results.
  *
  */
 
@@ -61,25 +65,27 @@ class PaginationContainer extends Component {
 
     this.state = {
       // default status variables
+      initialSizes: props.sizes,
+      initialPageSize: props.pageSize,
       isLoading: true,
+      sizes: buildSizes(props.sizes, props.pageSize),
       pageSize: props.pageSize || 25,
-      page: 1,
-      sizes: this.buildSizes(props.sizes, props.pageSize)
+      page: 1
     }
   }
 
-  buildSizes (sizes = [], pageSize = 25) {
-    return sortNumericArray([...new Set([...sizes, pageSize])]) // sort and remove duplicates
-  }
-
-  componentWillReceiveProps (nextProps) {
-    this.setState({
-      sizes: this.buildSizes(nextProps.sizes, nextProps.pageSize)
-    }, () => {
-      if (nextProps.pageSize !== this.state.pageSize) {
-        this.setState({ pageSize: nextProps.pageSize, page: 1 })
+  static getDerivedStateFromProps (props, state) {
+    if (props.sizes !== state.initialSizes) {
+      const pageSize = (props.pageSize !== state.initialPageSize) ? props.pageSize : state.pageSize
+      return {
+        initialSizes: props.sizes,
+        initialPageSize: props.pageSize,
+        sizes: buildSizes(props.sizes, pageSize),
+        pageSize,
+        page: (props.pageSize !== state.initialPageSize) ? 1 : state.page
       }
-    })
+    }
+    return null
   }
 
   componentDidMount () {
@@ -137,28 +143,31 @@ class PaginationContainer extends Component {
       return <FetchErrorAlert error={this.state.error} />
     }
 
+    const { mapResponse } = this.props
     const position = this.props.position || 'bottom'
     const { count, results } = this.state.list
     const ListComponent = this.props.listComponent
+    const list = mapResponse ? mapResponse(results) : results
 
     return (
       <div data-qa='data-loaded'>
-        { this.state.isRefreshing && <RefreshSpinner /> }
+        {this.state.isRefreshing && <RefreshSpinner />}
 
-        { (position === 'top') && this.renderPaginationBar() }
+        {(position === 'top') && this.renderPaginationBar()}
 
-        { count === 0 && this.renderEmptyWarning() }
+        {count === 0 && this.renderEmptyWarning()}
 
-        { count > 0 &&
-          <ListComponent
-            {...this.props.extras}
-            list={results}
-            total={count}
-            start={this.state.pageSize * (this.state.page - 1) + 1}
-          />
+        {
+          count > 0 &&
+            <ListComponent
+              {...this.props.extras}
+              list={list}
+              total={count}
+              start={this.state.pageSize * (this.state.page - 1) + 1}
+            />
         }
 
-        { (position === 'bottom') && this.renderPaginationBar() }
+        {(position === 'bottom') && this.renderPaginationBar()}
       </div>
     )
   }

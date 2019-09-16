@@ -22,6 +22,8 @@ services:
       service: gather-base
     environment:
       TESTING: "true"
+      # disable profiling
+      PROFILING_ENABLED: null
 
       # set to 1 to disable parallel execution
       TEST_PARALLEL: null
@@ -52,8 +54,6 @@ services:
     volumes:
       # volumes in tests
       - ./tmp/test/gather/static:/var/www/static
-    ports:
-      - 9105:9105
     depends_on:
       db-test:
         condition: service_healthy

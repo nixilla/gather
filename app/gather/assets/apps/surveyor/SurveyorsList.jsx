@@ -36,7 +36,8 @@ export default class SurveyorsList extends Component {
         <h4 className='title'>
           <FormattedMessage
             id='surveyor.list.title'
-            defaultMessage='Surveyors' />
+            defaultMessage='Surveyors'
+          />
         </h4>
 
         <div className='surveyors'>
@@ -49,7 +50,8 @@ export default class SurveyorsList extends Component {
                   <a
                     href={getSurveyorsPath({ action: 'edit', id: surveyor.id })}
                     role='button'
-                    className='btn btn-sm btn-secondary icon-only float-right'>
+                    className='btn btn-sm btn-secondary icon-only float-right'
+                  >
                     <i className='fas fa-pencil-alt' />
                   </a>
                 </div>

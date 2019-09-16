@@ -38,14 +38,32 @@ class ConfirmButton extends Component {
   }
 
   render () {
+    const onCancel = () => {
+      this.props.cancelable && this.setState({ open: false })
+    }
+    const execute = () => {
+      this.setState({ open: false }, this.props.onConfirm)
+    }
+    const onClick = () => {
+      // if there is a condition but it is not satisfied
+      if (this.props.condition && !this.props.condition()) {
+        execute()
+        return
+      }
+
+      // show modal
+      this.setState({ open: true })
+    }
+
     const button = (
       <button
         data-qa='confirm-button'
         type='button'
         disabled={this.state.open}
         className={this.props.className || 'btn btn-primary'}
-        onClick={this.onClick.bind(this)}>
-        { this.props.buttonLabel || this.props.title }
+        onClick={onClick}
+      >
+        {this.props.buttonLabel || this.props.title}
       </button>
     )
 
@@ -54,25 +72,27 @@ class ConfirmButton extends Component {
     }
 
     return (
-      <React.Fragment>
-        { /* show disabled button */ }
-        { button }
+      <>
+        {/* show disabled button */}
+        {button}
 
-        <Portal>
+        <Portal onEscape={onCancel} onEnter={execute}>
           <div data-qa='confirm-button-window' className='confirmation-container'>
             <div className='modal show'>
               <div className='modal-dialog modal-md'>
                 <div className='modal-content'>
                   <div className='modal-header'>
                     <h5 className='modal-title'>{this.props.title}</h5>
-                    { this.props.cancelable &&
-                      <button
-                        data-qa='confirm-button-close'
-                        type='button'
-                        className='close'
-                        onClick={this.onCancel.bind(this)}>
-                        &times;
-                      </button>
+                    {
+                      this.props.cancelable &&
+                        <button
+                          data-qa='confirm-button-close'
+                          type='button'
+                          className='close'
+                          onClick={onCancel}
+                        >
+                          &times;
+                        </button>
                     }
                   </div>
 
@@ -81,26 +101,31 @@ class ConfirmButton extends Component {
                   </div>
 
                   <div className='modal-footer'>
-                    { this.props.cancelable &&
-                      <button
-                        data-qa='confirm-button-cancel'
-                        type='button'
-                        className='btn btn-default'
-                        onClick={this.onCancel.bind(this)}>
-                        <FormattedMessage
-                          id='confirm.button.action.cancel'
-                          defaultMessage='No' />
-                      </button>
+                    {
+                      this.props.cancelable &&
+                        <button
+                          data-qa='confirm-button-cancel'
+                          type='button'
+                          className='btn btn-default'
+                          onClick={onCancel}
+                        >
+                          <FormattedMessage
+                            id='confirm.button.action.cancel'
+                            defaultMessage='No'
+                          />
+                        </button>
                     }
 
                     <button
                       data-qa='confirm-button-confirm'
                       type='button'
                       className='btn btn-secondary'
-                      onClick={this.execute.bind(this)}>
+                      onClick={execute}
+                    >
                       <FormattedMessage
                         id='confirm.button.action.confirm'
-                        defaultMessage='Yes' />
+                        defaultMessage='Yes'
+                      />
                     </button>
                   </div>
                 </div>
@@ -108,27 +133,8 @@ class ConfirmButton extends Component {
             </div>
           </div>
         </Portal>
-      </React.Fragment>
+      </>
     )
-  }
-
-  onCancel () {
-    this.props.cancelable && this.setState({ open: false })
-  }
-
-  onClick () {
-    // if there is a condition but it is not satisfied
-    if (this.props.condition && !this.props.condition()) {
-      this.execute()
-      return
-    }
-
-    // show modal
-    this.setState({ open: true })
-  }
-
-  execute () {
-    this.setState({ open: false }, this.props.onConfirm)
   }
 }
 

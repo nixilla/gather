@@ -35,7 +35,7 @@ import {
 
 class Foo extends React.Component {
   render () {
-    return 'foo'
+    return `foo: [${this.props.list}]`
   }
 }
 
@@ -175,7 +175,7 @@ describe('PaginationContainer', () => {
       expect(component.find(PaginationBar).exists()).toBeTruthy()
       expect(component.find(EmptyAlert).exists()).toBeFalsy()
       expect(component.find(Foo).exists()).toBeTruthy()
-      expect(component.text()).toEqual('foo')
+      expect(component.text()).toEqual('foo: [1]')
     })
 
     it('should render the list component', () => {
@@ -184,8 +184,8 @@ describe('PaginationContainer', () => {
       component.setState({
         ...BLANK_STATE,
         list: {
-          count: 1,
-          results: [1]
+          count: 2,
+          results: [1, 2]
         }
       })
 
@@ -196,7 +196,7 @@ describe('PaginationContainer', () => {
       expect(component.find(PaginationBar).exists()).toBeTruthy()
       expect(component.find(EmptyAlert).exists()).toBeFalsy()
       expect(component.find(Foo).exists()).toBeTruthy()
-      expect(component.text()).toEqual('foo')
+      expect(component.text()).toEqual('foo: [1,2]')
     })
 
     it('should change current page to 1 if pageSize is changed', () => {
@@ -204,22 +204,44 @@ describe('PaginationContainer', () => {
 
       nock('http://localhost')
         .get('/paginate-page-size')
-        .query({ page: 14, page_size: 100 })
+        .query({ page: 14, page_size: 50 })
+        .reply(200, {
+          count: 1500,
+          results: global.range(0, 50)
+        })
+
+      component.setState({ page: 14, pageSize: 50 })
+      expect(component.state('page')).toEqual(14)
+      expect(component.state('pageSize')).toEqual(50)
+      // change state does not update sizes
+      expect(component.state('sizes')).toEqual([25])
+
+      nock('http://localhost')
+        .get('/paginate-page-size')
+        .query({ page: 1, page_size: 100 })
         .reply(200, {
           count: 1500,
           results: global.range(0, 100)
         })
 
-      component.setState({ page: 14, pageSize: 100 })
-      expect(component.state('page')).toEqual(14)
-      expect(component.state('pageSize')).toEqual(100)
-      // change state does not update sizes
-      expect(component.state('sizes')).toEqual([25])
-
       component.setProps({ pageSize: 100, sizes: [1] })
-      expect(component.state('page')).toEqual(14)
+      expect(component.state('page')).toEqual(1)
       expect(component.state('pageSize')).toEqual(100)
       expect(component.state('sizes')).toEqual([1, 100])
+
+      nock('http://localhost')
+        .get('/paginate-page-size')
+        .query({ page: 12, page_size: 100 })
+        .reply(200, {
+          count: 1500,
+          results: global.range(0, 100)
+        })
+
+      component.setState({ page: 12 })
+      component.setProps({ sizes: [100] })
+      expect(component.state('page')).toEqual(12)
+      expect(component.state('pageSize')).toEqual(100)
+      expect(component.state('sizes')).toEqual([100])
 
       nock('http://localhost')
         .get('/paginate-page-size')
@@ -228,10 +250,6 @@ describe('PaginationContainer', () => {
           count: 1500,
           results: global.range(0, 10)
         })
-
-      component.setProps({ sizes: [100] })
-      expect(component.state('pageSize')).toEqual(100)
-      expect(component.state('sizes')).toEqual([100])
 
       component.setProps({ pageSize: 10, sizes: [100] })
       expect(component.state('page')).toEqual(1)
@@ -252,6 +270,7 @@ describe('PaginationContainer', () => {
           listComponent={Foo}
           url={url + '?'}
           position='top'
+          mapResponse={(list) => list.map(a => a + 1)}
         />
       )
 
@@ -344,7 +363,7 @@ describe('PaginationContainer', () => {
       expect(component.find(PaginationBar).exists()).toBeTruthy()
       expect(component.find(EmptyAlert).exists()).toBeFalsy()
       expect(component.find(Foo).exists()).toBeTruthy()
-      expect(component.text()).toEqual('foo')
+      expect(component.text()).toEqual('foo: [2]')
     })
   })
 
@@ -427,7 +446,7 @@ describe('PaginationContainer', () => {
         })
 
       input.simulate('change', { target: { name: 'search', value: 'something' } })
-      input.simulate('keypress', { charCode: 13 })
+      input.simulate('keyup', { key: 'Enter' })
 
       expect(component.state('page')).toEqual(1)
       expect(component.state('search')).toEqual('something')
@@ -489,7 +508,7 @@ describe('PaginationContainer', () => {
       const component = mountWithIntl(
         <PaginationContainer
           listComponent={Foo}
-          url={'/unmounted'}
+          url='/unmounted'
           sizes={[25]}
         />
       )

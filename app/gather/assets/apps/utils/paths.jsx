@@ -21,7 +21,7 @@
 import { KERNEL_APP, ODK_APP, COUCHDB_SYNC_APP, GATHER_APP } from './constants'
 
 const API_PREFIX = '/api'
-const APPS = [ KERNEL_APP, ODK_APP, COUCHDB_SYNC_APP, GATHER_APP ]
+const APPS = [KERNEL_APP, ODK_APP, COUCHDB_SYNC_APP, GATHER_APP]
 
 const getAppPath = () => (document.getElementById('__gather_url__') || {}).value || ''
 
@@ -88,6 +88,15 @@ export const getMediaFileAPIPath = ({ id, ...params }) => {
 }
 
 /**
+ * Returns the API url to get the Media File content data
+ *
+ * @param {number}  id          - Media file id
+ */
+export const getMediaFileContentPath = ({ id }) => {
+  return buildAPIPath(ODK_APP, 'media-files', id, { format: '', action: 'content' })
+}
+
+/**
  * Returns the API url to get the Entities data by Survey
  *
  * @param {number}  id          - Entity id
@@ -104,6 +113,16 @@ export const getEntitiesAPIPath = ({ id, ...params }) => {
  */
 export const getMappingTopicsAPIPath = ({ id }) => {
   return buildAPIPath(KERNEL_APP, 'mappings', id, { action: 'topics', format: '' })
+
+}
+
+/**
+ * Returns the API url to get the Attachment content data
+ *
+ * @param {string}  id          - Attachment id
+ */
+export const getAttachmentContentPath = ({ id }) => {
+  return buildAPIPath(KERNEL_APP, 'attachments', id, { format: '', action: 'content' })
 }
 
 /**

@@ -29,8 +29,8 @@ import {
   getEntitiesAPIPath,
   getMappingTopicsAPIPath
 } from '../utils/paths'
-import { cleanJsonPaths } from '../utils/types'
 import { fetchUrls } from '../utils/request'
+import { cleanJsonPaths, reorderObjectKeys } from '../utils/types'
 
 import SurveyDetail from './SurveyDetail'
 import SurveyDashboard from './SurveyDashboard'
@@ -125,7 +125,7 @@ class Survey extends Component {
 
         <SurveyDetail survey={survey} />
 
-        { this.renderEntities() }
+        {this.renderEntities()}
       </div>
     )
   }
@@ -135,14 +135,24 @@ class Survey extends Component {
       return ''
     }
 
-    const { survey } = this.props
+    const { skeleton, survey } = this.props
     const { viewMode } = this.state
     const listComponent = (viewMode === SINGLE_VIEW ? EntityItem : EntitiesList)
     const extras = {
       labels: this.state.labels,
       paths: this.state.selectedPaths
     }
-    const filename = this.props.skeleton.name || survey.name
+    const filename = skeleton.name || survey.name
+
+    // Postgres uses JSONB type to store the payload value and
+    // this breaks the keys order that we need to maintain to display each Entity.
+    // Hence, we are trying to rebuild each payload with the correct keys order.
+    const mapResponse = (list) => list.map(
+      entity => ({
+        ...entity,
+        payload: reorderObjectKeys(entity.payload, skeleton.jsonpaths)
+      })
+    )
 
     return (
       <div className='survey-data'>
@@ -171,7 +181,8 @@ class Survey extends Component {
                 <i className='fas fa-th-list mr-2' />
                 <FormattedMessage
                   id='survey.view.action.table'
-                  defaultMessage='Table' />
+                  defaultMessage='Table'
+                />
               </button>
             </li>
             <li>
@@ -184,7 +195,8 @@ class Survey extends Component {
                 <i className='fas fa-file mr-2' />
                 <FormattedMessage
                   id='survey.view.action.single'
-                  defaultMessage='Single' />
+                  defaultMessage='Single'
+                />
               </button>
             </li>
             <li>
@@ -222,6 +234,7 @@ class Survey extends Component {
               showPrevious
               showNext
               extras={extras}
+              mapResponse={mapResponse}
             />
         }
       </div>
@@ -252,12 +265,13 @@ class Survey extends Component {
       }
     ]
 
-    return <FetchUrlsContainer
-      urls={urls}
-      handleResponse={handleResponse}
-      targetComponent={SurveyMasks}
-
-    />
+    return (
+      <FetchUrlsContainer
+        urls={urls}
+        handleResponse={handleResponse}
+        targetComponent={SurveyMasks}
+      />
+    )
   }
 }
 

@@ -61,6 +61,10 @@ const MESSAGES = defineMessages({
   }
 })
 
+const getNumberOfPages = (props) => {
+  return Math.ceil(props.records / props.pageSize)
+}
+
 /**
  * PaginationBar component.
  *
@@ -80,14 +84,19 @@ class PaginationBar extends Component {
     super(props)
 
     this.state = {
+      initialPage: props.currentPage,
       currentPage: props.currentPage
     }
   }
 
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.currentPage !== this.state.currentPage) {
-      this.setState({ currentPage: Math.min(Math.max(1, nextProps.currentPage), this.getNumberOfPages()) })
+  static getDerivedStateFromProps (props, state) {
+    if (props.currentPage !== state.initialPage) {
+      return {
+        initialPage: props.currentPage,
+        currentPage: Math.min(Math.max(1, props.currentPage), getNumberOfPages(props))
+      }
     }
+    return null
   }
 
   render () {
@@ -116,26 +125,22 @@ class PaginationBar extends Component {
 
     return (
       <nav data-qa='data-pagination' className='pagination-bar'>
-        { /* render SEARCH */ }
-        { this.props.search && this.renderSearchBar() }
-        { /* render NAVIGATION BUTTONS and CURRENT PAGE input */ }
-        { showNavigationButtons && this.renderNavigationButtons() }
-        { /* render PAGE SIZE options */ }
-        { showPageSizesSelect && this.renderPageSizes() }
+        {/* render SEARCH */}
+        {this.props.search && this.renderSearchBar()}
+        {/* render NAVIGATION BUTTONS and CURRENT PAGE input */}
+        {showNavigationButtons && this.renderNavigationButtons()}
+        {/* render PAGE SIZE options */}
+        {showPageSizesSelect && this.renderPageSizes()}
       </nav>
     )
-  }
-
-  getNumberOfPages () {
-    return Math.ceil(this.props.records / this.props.pageSize)
   }
 
   renderSearchBar () {
     const onChange = (event) => {
       this.setState({ [event.target.name]: event.target.value })
     }
-    const onKeyPress = (event) => {
-      if (event.charCode === 13) { // Enter
+    const onKeyUp = (event) => {
+      if (event.key === 'Enter') {
         this.props.onSearch(this.state.search)
         this.state.currentSearch = this.state.search
       }
@@ -151,7 +156,7 @@ class PaginationBar extends Component {
           value={this.state.search || ''}
           className={(this.state.search ? 'value' : '')}
           onChange={onChange}
-          onKeyPress={onKeyPress}
+          onKeyUp={onKeyUp}
         />
       </div>
     )
@@ -160,13 +165,13 @@ class PaginationBar extends Component {
   renderNavigationButtons () {
     return (
       <ul data-qa='data-pagination-buttons' className='pagination'>
-        { /* go to FIRST page */}
-        { this.renderLinkToPage('first') }
+        {/* go to FIRST page */}
+        {this.renderLinkToPage('first')}
 
-        { /* go to PREVIOUS page */}
-        { this.renderLinkToPage('previous') }
+        {/* go to PREVIOUS page */}
+        {this.renderLinkToPage('previous')}
 
-        { /* CURRENT page */}
+        {/* CURRENT page */}
         <li className='page-item disabled'>
           <FormattedMessage
             {...MESSAGES[(this.props.pageSize === 1 ? 'record' : 'page')]}
@@ -177,11 +182,11 @@ class PaginationBar extends Component {
           />
         </li>
 
-        { /* go to NEXT page */}
-        { this.renderLinkToPage('next') }
+        {/* go to NEXT page */}
+        {this.renderLinkToPage('next')}
 
-        { /* go to LAST page */}
-        { this.renderLinkToPage('last') }
+        {/* go to LAST page */}
+        {this.renderLinkToPage('last')}
       </ul>
     )
   }
@@ -189,13 +194,13 @@ class PaginationBar extends Component {
   renderNumberOfPages () {
     return (
       <span data-qa='data-pagination-total'>
-        <FormattedNumber value={this.getNumberOfPages()} />
+        <FormattedNumber value={getNumberOfPages(this.props)} />
       </span>
     )
   }
 
   renderCurrentPage () {
-    const numberOfPages = this.getNumberOfPages()
+    const numberOfPages = getNumberOfPages(this.props)
 
     // indicates if the value in the input reflects the current page or
     // if it is still pending.
@@ -213,8 +218,8 @@ class PaginationBar extends Component {
       }
     }
 
-    const onKeyPress = (event) => {
-      if (event.charCode === 13) { // Enter
+    const onKeyUp = (event) => {
+      if (event.key === 'Enter') {
         onBlurPage()
       }
     }
@@ -222,7 +227,8 @@ class PaginationBar extends Component {
     return (
       <span
         data-qa='data-pagination-page'
-        className={`current-page ${isPending ? 'pending' : ''}`}>
+        className={`current-page ${isPending ? 'pending' : ''}`}
+      >
         <input
           type='number'
           name='currentPage'
@@ -231,7 +237,7 @@ class PaginationBar extends Component {
           min={1}
           max={numberOfPages}
           onChange={onChangePage}
-          onKeyPress={onKeyPress}
+          onKeyUp={onKeyUp}
           onBlur={onBlurPage}
         />
       </span>
@@ -241,7 +247,7 @@ class PaginationBar extends Component {
   renderLinkToPage (pageName) {
     const { formatMessage } = this.props.intl
     const { currentPage } = this.props
-    const numberOfPages = this.getNumberOfPages()
+    const numberOfPages = getNumberOfPages(this.props)
     let newPage = currentPage
 
     switch (pageName) {
@@ -288,7 +294,8 @@ class PaginationBar extends Component {
           type='button'
           className='page-link'
           onClick={() => this.props.goToPage(newPage)}
-          aria-label={formatMessage(MESSAGES[pageName])}>
+          aria-label={formatMessage(MESSAGES[pageName])}
+        >
           <FormattedMessage {...MESSAGES[pageName]} />
         </button>
       </li>
@@ -311,14 +318,17 @@ class PaginationBar extends Component {
           defaultMessage='Choose size'
         />
         <select value={this.props.pageSize} onChange={onChange}>
-          { this.props.sizes.map(size => (
-            <option
-              key={size}
-              value={size}
-              data-qa={`data-pagination-size-${size}`}>
-              {size}
-            </option>
-          )) }
+          {
+            this.props.sizes.map(size => (
+              <option
+                key={size}
+                value={size}
+                data-qa={`data-pagination-size-${size}`}
+              >
+                {size}
+              </option>
+            ))
+          }
         </select>
       </div>
     )

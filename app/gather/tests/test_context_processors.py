@@ -16,8 +16,6 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from unittest import mock
-
 from django.test import RequestFactory, override_settings
 from aether.sdk.unittest import UrlsTestCase
 
@@ -41,9 +39,10 @@ class ContextProcessorsTests(UrlsTestCase):
         self.assertIn('odk_url', context)
         self.assertIn('couchdb_sync_url', context)
 
-    @mock.patch('gather.context_processors.settings.AETHER_APPS', ['kernel'])
-    @mock.patch('gather.context_processors.settings.EXTERNAL_APPS',
-                {'aether-kernel': {'test': {'url': 'http://localhost'}}})
+    @override_settings(
+        AETHER_APPS=['kernel'],
+        EXTERNAL_APPS={'aether-kernel': {'test': {'url': 'http://localhost'}}},
+    )
     def test_gather_context__mocked(self):
         request = RequestFactory().get('/')
         context = gather_context(request)
