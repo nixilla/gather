@@ -19,17 +19,15 @@
  */
 
 import React, { Component } from 'react'
-import { FormattedMessage, defineMessages, injectIntl } from 'react-intl'
+import { FormattedMessage, injectIntl } from 'react-intl'
 
 import { FetchUrlsContainer, PaginationContainer } from '../components'
 import { GATHER_APP } from '../utils/constants'
 import {
   getSurveysPath,
   getSurveysAPIPath,
-  getEntitiesAPIPath,
-  getMappingTopicsAPIPath
+  getEntitiesAPIPath
 } from '../utils/paths'
-import { fetchUrls } from '../utils/request'
 import { cleanJsonPaths, reorderObjectKeys } from '../utils/types'
 
 import SurveyDetail from './SurveyDetail'
@@ -44,17 +42,6 @@ const SINGLE_VIEW = 'single'
 const DASHBOARD_VIEW = 'dashboard'
 const TABLE_SIZES = [10, 25, 50, 100]
 
-const MESSAGES = defineMessages({
-  activate: {
-    id: 'survey.button.activate',
-    defaultMessage: 'Activate Survey'
-  },
-  deactivate: {
-    id: 'survey.button.deactivate',
-    defaultMessage: 'Deactivate Survey'
-  }
-})
-
 class Survey extends Component {
   constructor (props) {
     super(props)
@@ -66,52 +53,18 @@ class Survey extends Component {
       labels: props.skeleton.docs,
       allPaths: paths,
       selectedPaths: paths,
-      isConsumerActive: false,
       activationError: null
     }
-    this.handleToggleConsumer = this.handleToggleConsumer.bind(this)
-  }
-
-  toggleConsumer () {
-    const xform = this.props.xform && this.props.xform.results.length && this.props.xform.results[0]
-    const url = getMappingTopicsAPIPath({ id: xform ? xform.kernel_id : '' })
-
-    // get list of survey topics from kernel
-    fetchUrls([{ name: 'topics', url }])
-      .then(() => {
-        // TODO: Check consumer state
-        // if off, register topics and start consumer job
-        // if on, unregister topics and stop consumer job
-        this.setState({
-          isConsumerActive: !this.state.isConsumerActive,
-          activationError: null
-        })
-      })
-      .catch(error => {
-        this.setState({
-          activationError: error
-        })
-      })
   }
 
   render () {
     const { survey } = this.props
-    const { formatMessage } = this.props.intl
 
     return (
       <div data-qa={`survey-item-${survey.id}`} className='survey-view'>
         <div className='survey-header'>
           <h2>{survey.name}</h2>
           <div className='header-actions'>
-            <button
-              onClick={this.handleToggleConsumer}
-              role='button'
-              style={{ marginRight: '15px' }}
-              className='btn btn-secondary btn-icon'
-            >
-              <i className={`fas mr-3 ${this.state.isConsumerActive ? 'fa-pause-circle' : 'fa-play-circle'}`} />
-              {formatMessage(MESSAGES[this.state.isConsumerActive ? 'deactivate' : 'activate'])}
-            </button>
             <a
               href={getSurveysPath({ action: 'edit', id: survey.id })}
               role='button'
@@ -225,12 +178,7 @@ class Survey extends Component {
         {
           this.state.viewMode === DASHBOARD_VIEW
             ? (
-              <SurveyDashboard
-                survey={survey}
-                consumerState={this.state.isConsumerActive}
-                url={this.props.settings.ES_CONSUMER_URL}
-                toggle={this.toggleConsumer}
-              />
+              <SurveyDashboard />
             )
             : (
               <PaginationContainer

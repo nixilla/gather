@@ -21,17 +21,7 @@
 import React from 'react'
 import { FormattedMessage } from 'react-intl'
 
-const renderIframe = props => (
-  <div className='survey-content dashboard'>
-    <iframe src={props.url} />
-  </div>
-)
-
-const handleToggle = props => {
-  props.toggle()
-}
-
-const renderEmpty = props => (
+const SurveyDashboard = () => (
   <div className='survey-content no-dashboard'>
     <h4 className='headline'>
       <FormattedMessage
@@ -43,21 +33,7 @@ const renderEmpty = props => (
       id='survey.no.dashboard.help-2'
       defaultMessage='When you activate the dashboard, data will be sent to Elastic Search.'
     />
-    <button
-      onClick={handleToggle.bind(this, props)}
-      role='button'
-      className='btn btn-secondary btn-lg mt-4'
-    >
-      <FormattedMessage
-        id='survey.no.dashboard.activate'
-        defaultMessage='Activate Dashboard Now'
-      />
-    </button>
   </div>
-)
-
-const SurveyDashboard = props => (
-  !props.consumerState ? renderEmpty(props) : renderIframe(props)
 )
 
 export default SurveyDashboard
