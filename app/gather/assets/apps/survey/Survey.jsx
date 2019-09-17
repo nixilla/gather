@@ -69,7 +69,7 @@ class Survey extends Component {
       isConsumerActive: false,
       activationError: null
     }
-    this.toggleConsumer = this.toggleConsumer.bind(this)
+    this.handleToggleConsumer = this.handleToggleConsumer.bind(this)
   }
 
   toggleConsumer () {
@@ -104,21 +104,24 @@ class Survey extends Component {
           <h2>{survey.name}</h2>
           <div className='header-actions'>
             <button
-              onClick={this.toggleConsumer}
+              onClick={this.handleToggleConsumer}
               role='button'
               style={{ marginRight: '15px' }}
-              className='btn btn-secondary btn-icon'>
-              <i className={`fas mr-3 ${this.state.isConsumerActive ? 'fa-pause-circle' : 'fa-play-circle'}`}/>
-              { formatMessage(MESSAGES[this.state.isConsumerActive ? 'deactivate' : 'activate']) }
+              className='btn btn-secondary btn-icon'
+            >
+              <i className={`fas mr-3 ${this.state.isConsumerActive ? 'fa-pause-circle' : 'fa-play-circle'}`} />
+              {formatMessage(MESSAGES[this.state.isConsumerActive ? 'deactivate' : 'activate'])}
             </button>
             <a
               href={getSurveysPath({ action: 'edit', id: survey.id })}
               role='button'
-              className='btn btn-primary btn-icon'>
+              className='btn btn-primary btn-icon'
+            >
               <i className='fas fa-pen invert mr-3' />
               <FormattedMessage
                 id='survey.view.action.edit'
-                defaultMessage='Edit survey' />
+                defaultMessage='Edit survey'
+              />
             </a>
           </div>
         </div>
@@ -168,7 +171,8 @@ class Survey extends Component {
                 <i className='fas fa-chart-area mr-2' />
                 <FormattedMessage
                   id='survey.view.action.dashboard'
-                  defaultMessage='Dashboard' />
+                  defaultMessage='Dashboard'
+                />
               </button>
             </li>
             <li>
@@ -212,7 +216,7 @@ class Survey extends Component {
             {
               this.state.viewMode !== DASHBOARD_VIEW &&
                 <li className='toolbar-filter'>
-                  { this.renderMaskButton() }
+                  {this.renderMaskButton()}
                 </li>
             }
 
@@ -220,25 +224,27 @@ class Survey extends Component {
         </div>
         {
           this.state.viewMode === DASHBOARD_VIEW
-          ?
-            <SurveyDashboard
-              survey={survey}
-              consumerState={this.state.isConsumerActive}
-              url={this.props.settings.ES_CONSUMER_URL}
-              toggle={this.toggleConsumer}
-            />
-          :
-            <PaginationContainer
-              pageSize={viewMode === SINGLE_VIEW ? 1 : TABLE_SIZES[0]}
-              sizes={viewMode === SINGLE_VIEW ? [] : TABLE_SIZES}
-              url={getEntitiesAPIPath({ project: survey.id })}
-              position='top'
-              listComponent={listComponent}
-              showPrevious
-              showNext
-              extras={extras}
-              mapResponse={mapResponse}
-            />
+            ? (
+              <SurveyDashboard
+                survey={survey}
+                consumerState={this.state.isConsumerActive}
+                url={this.props.settings.ES_CONSUMER_URL}
+                toggle={this.toggleConsumer}
+              />
+            )
+            : (
+              <PaginationContainer
+                pageSize={viewMode === SINGLE_VIEW ? 1 : TABLE_SIZES[0]}
+                sizes={viewMode === SINGLE_VIEW ? [] : TABLE_SIZES}
+                url={getEntitiesAPIPath({ project: survey.id })}
+                position='top'
+                listComponent={listComponent}
+                showPrevious
+                showNext
+                extras={extras}
+                mapResponse={mapResponse}
+              />
+            )
         }
       </div>
     )
