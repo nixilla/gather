@@ -23,10 +23,15 @@ import { FormattedMessage } from 'react-intl'
 
 import { FetchUrlsContainer, PaginationContainer } from '../components'
 import { GATHER_APP } from '../utils/constants'
-import { getSurveysPath, getSurveysAPIPath, getEntitiesAPIPath } from '../utils/paths'
+import {
+  getSurveysPath,
+  getSurveysAPIPath,
+  getEntitiesAPIPath
+} from '../utils/paths'
 import { cleanJsonPaths, reorderObjectKeys } from '../utils/types'
 
 import SurveyDetail from './SurveyDetail'
+import SurveyDashboard from './SurveyDashboard'
 import SurveyMasks from './mask/SurveyMasks'
 import EntitiesList from './entity/EntitiesList'
 import EntityItem from './entity/EntityItem'
@@ -34,9 +39,10 @@ import EntitiesDownload from './entity/EntitiesDownload'
 
 const TABLE_VIEW = 'table'
 const SINGLE_VIEW = 'single'
+const DASHBOARD_VIEW = 'dashboard'
 const TABLE_SIZES = [10, 25, 50, 100]
 
-export default class Survey extends Component {
+class Survey extends Component {
   constructor (props) {
     super(props)
 
@@ -46,7 +52,8 @@ export default class Survey extends Component {
       total: props.survey.entities_count,
       labels: props.skeleton.docs,
       allPaths: paths,
-      selectedPaths: paths
+      selectedPaths: paths,
+      activationError: null
     }
   }
 
@@ -57,17 +64,19 @@ export default class Survey extends Component {
       <div data-qa={`survey-item-${survey.id}`} className='survey-view'>
         <div className='survey-header'>
           <h2>{survey.name}</h2>
-          <a
-            href={getSurveysPath({ action: 'edit', id: survey.id })}
-            role='button'
-            className='btn btn-primary btn-icon'
-          >
-            <i className='fas fa-pencil-alt invert mr-3' />
-            <FormattedMessage
-              id='survey.view.action.edit'
-              defaultMessage='Edit survey'
-            />
-          </a>
+          <div className='header-actions'>
+            <a
+              href={getSurveysPath({ action: 'edit', id: survey.id })}
+              role='button'
+              className='btn btn-primary btn-icon'
+            >
+              <i className='fas fa-pen invert mr-3' />
+              <FormattedMessage
+                id='survey.view.action.edit'
+                defaultMessage='Edit survey'
+              />
+            </a>
+          </div>
         </div>
 
         <SurveyDetail survey={survey} />
@@ -105,6 +114,20 @@ export default class Survey extends Component {
       <div className='survey-data'>
         <div className='survey-data-toolbar'>
           <ul className='survey-data-tabs'>
+            <li className='dashboard-tab'>
+              <button
+                type='button'
+                disabled={viewMode === DASHBOARD_VIEW}
+                className={`tab ${viewMode === DASHBOARD_VIEW ? 'active' : ''}`}
+                onClick={() => { this.setState({ viewMode: DASHBOARD_VIEW }) }}
+              >
+                <i className='fas fa-chart-area mr-2' />
+                <FormattedMessage
+                  id='survey.view.action.dashboard'
+                  defaultMessage='Dashboard'
+                />
+              </button>
+            </li>
             <li>
               <button
                 type='button'
@@ -143,22 +166,34 @@ export default class Survey extends Component {
                 filename={filename}
               />
             </li>
-            <li className='toolbar-filter'>
-              {this.renderMaskButton()}
-            </li>
+            {
+              this.state.viewMode !== DASHBOARD_VIEW &&
+                <li className='toolbar-filter'>
+                  {this.renderMaskButton()}
+                </li>
+            }
+
           </ul>
         </div>
-        <PaginationContainer
-          pageSize={viewMode === SINGLE_VIEW ? 1 : TABLE_SIZES[0]}
-          sizes={viewMode === SINGLE_VIEW ? [] : TABLE_SIZES}
-          url={getEntitiesAPIPath({ project: survey.id })}
-          position='top'
-          listComponent={listComponent}
-          showPrevious
-          showNext
-          extras={extras}
-          mapResponse={mapResponse}
-        />
+        {
+          this.state.viewMode === DASHBOARD_VIEW
+            ? (
+              <SurveyDashboard />
+            )
+            : (
+              <PaginationContainer
+                pageSize={viewMode === SINGLE_VIEW ? 1 : TABLE_SIZES[0]}
+                sizes={viewMode === SINGLE_VIEW ? [] : TABLE_SIZES}
+                url={getEntitiesAPIPath({ project: survey.id })}
+                position='top'
+                listComponent={listComponent}
+                showPrevious
+                showNext
+                extras={extras}
+                mapResponse={mapResponse}
+              />
+            )
+        }
       </div>
     )
   }
@@ -196,3 +231,5 @@ export default class Survey extends Component {
     )
   }
 }
+
+export default Survey

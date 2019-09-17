@@ -30,6 +30,10 @@
     font-weight: 400;
     margin: 0 0 .5rem;
   }
+
+  .header-actions {
+    display: flex;
+  }
 }
 
 .survey-detail {
@@ -51,7 +55,6 @@
 
 .survey-dates {
   flex: 2;
-  margin-right: 2rem;
 }
 
 .survey-records {
@@ -84,10 +87,8 @@
 
 .survey-data-toolbar {
   background: $action-color;
-  padding: 1.5rem 5vw 1.1rem;
   box-shadow: 0 1px 2px rgba($text-color, .5) inset, 0 1px 2px rgba($text-color, .5);
   position: sticky;
-  height: $toolbar-height;
   top: 0;
   z-index: 101;
 }
@@ -99,10 +100,44 @@
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
+
+  .tab {
+    padding: 1.4rem 0 1.1rem;
+    height: $toolbar-height;
+  }
+
+  li:first-child .tab {
+    padding-left: 5vw;
+  }
+
+  .dashboard-tab + li .tab {
+    margin-left: 1.2rem;
+  }
+
+  .dashboard-tab {
+    background: rgba($white, .2);
+    border-right: 1px solid $white;
+
+    .tab {
+      margin-right: 1.2rem;
+    }
+  }
 }
 
 .toolbar-filter {
   margin-left: auto;
+  padding-right: 5vw;
+
+  .alert {
+    background: none;
+    color: $white;
+    font-size: $font-size-s;
+  }
+
+  .loading-spinner {
+    border-top-color: lighten($action-color, 30);
+    border-right-color: lighten($action-color, 30);
+  }
 }
 
 .tab {
@@ -110,7 +145,6 @@
   background: none;
   color: $white;
   margin-right: 2.2rem;
-  padding: 0;
   font-size: $font-size-s;
   letter-spacing: 0;
 
@@ -320,6 +354,28 @@
   }
 }
 
+.survey-content.no-dashboard {
+  display: flex;
+  flex-direction: column;
+  padding: 10vh 20vw;
+  align-items: center;
+  text-align: center;
+
+  .headline {
+    font-style: italic;
+    color: $light-grey;
+    font-size: $font-size-l;
+    margin-bottom: 1rem;
+  }
+}
+
+.survey-content.dashboard {
+  iframe {
+    width: 100%;
+    height: calc(100vh - #{$toolbar-height});
+  }
+}
+
 @media screen and (max-width: 576px) {
 
   .tab {
@@ -351,16 +407,24 @@
    }
   }
 
-  .survey-data-toolbar {
-    padding: 1rem 5vw;
-    height: $toolbar-height-mobile;
+  .survey-data-tabs {
+
+    .tab {
+      padding: 1rem 0;
+      height: $toolbar-height-mobile;
+    }
   }
 
   .toolbar-filter {
-    margin: .5rem 0 0;
     padding-top: .6rem;
+    padding-left: 5vw;
+    padding: .6rem 5vw .4rem;
     width: 100%;
     border-top: 1px solid rgba($white, .3);
+
+    .filter-toggles {
+      text-align: right;
+    }
   }
 
   .survey-data {

@@ -166,15 +166,16 @@
     &.active {
       background: $action-color;
       box-shadow: 1px 1px 2px $shadow-color inset;
-      padding-left: 2.2em;
+      padding-left: 2em;
       position: relative;
 
       &::before {
         content: '\f00c'; /* fa-check */
         position: absolute;
-        left: .4em;
+        left: .5em;
         font-family: $icon-font;
-        font-size: 1.3em;
+        font-size: 1em;
+        line-height: 1.3em;
         font-weight: 500;
         color: $white;
       }
@@ -248,6 +249,7 @@
 
     .marker {
       @include radio;
+      flex: 0 0 auto;
     }
 
     span::before {

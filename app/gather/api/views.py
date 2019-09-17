@@ -19,7 +19,6 @@
 from rest_framework.viewsets import ModelViewSet
 
 from aether.sdk.multitenancy.views import MtViewSetMixin
-
 from .models import Survey, Mask
 from .serializers import SurveySerializer, MaskSerializer
 
