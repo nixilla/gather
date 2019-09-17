@@ -52,8 +52,6 @@ TEMPLATES[0]['OPTIONS']['context_processors'] += [
 MULTITENANCY_MODEL = 'gather.Survey'
 MIGRATION_MODULES['gather'] = 'gather.api.migrations'
 
-ES_CONSUMER_URL = os.environ.get('ES_CONSUMER_URL', '')
-
 
 # Assets settings
 EXPORT_MAX_ROWS_SIZE = os.environ.get('EXPORT_MAX_ROWS_SIZE', '0')

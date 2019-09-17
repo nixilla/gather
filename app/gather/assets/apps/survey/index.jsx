@@ -22,7 +22,7 @@ import React, { Component } from 'react'
 import { hot } from 'react-hot-loader/root'
 
 import { FetchUrlsContainer, PaginationContainer } from '../components'
-import { getSurveyorsAPIPath, getSurveysAPIPath, getXFormsAPIPath } from '../utils/paths'
+import { getSurveyorsAPIPath, getSurveysAPIPath } from '../utils/paths'
 import { ODK_APP } from '../utils/constants'
 
 import Survey from './Survey'
@@ -106,10 +106,6 @@ class SurveyDispatcher extends Component {
           {
             name: 'skeleton',
             url: getSurveysAPIPath({ id: surveyId, action: 'schemas-skeleton' })
-          },
-          {
-            name: 'xform',
-            url: getXFormsAPIPath({ params: { project: surveyId } })
           }
         ]
 

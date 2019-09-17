@@ -19,7 +19,7 @@
  */
 
 import React, { Component } from 'react'
-import { FormattedMessage, injectIntl } from 'react-intl'
+import { FormattedMessage } from 'react-intl'
 
 import { FetchUrlsContainer, PaginationContainer } from '../components'
 import { GATHER_APP } from '../utils/constants'
@@ -232,4 +232,4 @@ class Survey extends Component {
   }
 }
 
-export default injectIntl(Survey)
+export default Survey

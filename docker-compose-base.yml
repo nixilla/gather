@@ -250,8 +250,6 @@ services:
 
       # Use this value with "HMR" otherwise you can comment it out
       WEBPACK_STATS_FILE: /code/gather/assets/bundles/webpack-stats.json
-
-      ES_CONSUMER_URL: ${ES_CONSUMER_URL}
     volumes:
       - ./app:/code
 

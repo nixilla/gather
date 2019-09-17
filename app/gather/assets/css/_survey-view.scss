@@ -127,11 +127,13 @@
 .toolbar-filter {
   margin-left: auto;
   padding-right: 5vw;
+
   .alert {
     background: none;
-    color: white;
+    color: $white;
     font-size: $font-size-s;
   }
+
   .loading-spinner {
     border-top-color: lighten($action-color, 30);
     border-right-color: lighten($action-color, 30);
@@ -408,7 +410,7 @@
   .survey-data-tabs {
 
     .tab {
-      padding: 1rem 0 1rem;
+      padding: 1rem 0;
       height: $toolbar-height-mobile;
     }
   }

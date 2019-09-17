@@ -107,15 +107,6 @@ export const getEntitiesAPIPath = ({ id, ...params }) => {
 }
 
 /**
- * Returns the API url to get the list of topics by Survey (Mapping)
- *
- * @param {number}  id          - Mapping id
- */
-export const getMappingTopicsAPIPath = ({ id }) => {
-  return buildAPIPath(KERNEL_APP, 'mappings', id, { action: 'topics', format: '' })
-}
-
-/**
  * Returns the API url to get the Attachment content data
  *
  * @param {string}  id          - Attachment id

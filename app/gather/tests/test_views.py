@@ -30,5 +30,4 @@ class ViewsTest(TestCase):
         self.assertEqual(response.json(), {
             'aether_apps': ['kernel', 'odk', 'couchdb-sync'],
             'export_max_rows_size': 1000,
-            'es_consumer_url': 'http://gather.local:5601',
         })

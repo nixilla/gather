@@ -34,8 +34,7 @@ import {
   getSurveysPath,
   getSyncUsersAPIPath,
   getSyncUsersPath,
-  getXFormsAPIPath,
-  getMappingTopicsAPIPath
+  getXFormsAPIPath
 } from './paths'
 
 describe('paths utils', () => {
@@ -258,13 +257,6 @@ describe('paths utils', () => {
       assert.strictEqual(getSyncUsersPath({ action: 'view' }), '/mobile-users/list', 'no "view" action available')
       assert.strictEqual(getSyncUsersPath({ action: 'edit', id: 1 }), '/mobile-users/list', 'no "edit" action available')
       assert.strictEqual(getSyncUsersPath({ action: 'add' }), '/mobile-users/add')
-    })
-  })
-
-  describe('getMappingTopicsAPIPath', () => {
-    const prefix = '/api/kernel/'
-    it('should return the kernel mapping topics path based on kernel_id', () => {
-      assert.strictEqual(getMappingTopicsAPIPath({ id: 2 }), prefix + 'mappings/2/topics/?passthrough=true')
     })
   })
 
