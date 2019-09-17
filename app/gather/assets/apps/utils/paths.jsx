@@ -113,7 +113,6 @@ export const getEntitiesAPIPath = ({ id, ...params }) => {
  */
 export const getMappingTopicsAPIPath = ({ id }) => {
   return buildAPIPath(KERNEL_APP, 'mappings', id, { action: 'topics', format: '' })
-
 }
 
 /**

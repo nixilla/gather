@@ -42,7 +42,7 @@ import EntitiesDownload from './entity/EntitiesDownload'
 const TABLE_VIEW = 'table'
 const SINGLE_VIEW = 'single'
 const DASHBOARD_VIEW = 'dashboard'
-const TABLE_SIZES = [ 10, 25, 50, 100 ]
+const TABLE_SIZES = [10, 25, 50, 100]
 
 const MESSAGES = defineMessages({
   activate: {
@@ -210,7 +210,7 @@ class Survey extends Component {
               />
             </li>
             {
-              this.state.viewMode != DASHBOARD_VIEW &&
+              this.state.viewMode !== DASHBOARD_VIEW &&
                 <li className='toolbar-filter'>
                   { this.renderMaskButton() }
                 </li>
@@ -220,13 +220,15 @@ class Survey extends Component {
         </div>
         {
           this.state.viewMode === DASHBOARD_VIEW
-            ? <SurveyDashboard
+          ?
+            <SurveyDashboard
               survey={survey}
               consumerState={this.state.isConsumerActive}
               url={this.props.settings.ES_CONSUMER_URL}
               toggle={this.toggleConsumer}
             />
-            : <PaginationContainer
+          :
+            <PaginationContainer
               pageSize={viewMode === SINGLE_VIEW ? 1 : TABLE_SIZES[0]}
               sizes={viewMode === SINGLE_VIEW ? [] : TABLE_SIZES}
               url={getEntitiesAPIPath({ project: survey.id })}
