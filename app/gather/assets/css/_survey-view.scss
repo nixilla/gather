@@ -376,6 +376,48 @@
   }
 }
 
+.config-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .content {
+    text-align: center;
+    width: 90%;
+    margin: 2rem;
+
+    .wrap {
+      padding: 5px;
+    }
+
+    .item-title {
+      list-style: none;
+      font-style: italic;
+      font-size: $font-size-s;
+
+      .row-item {
+        border-bottom: 1px solid $lighter-grey;
+      }
+
+      .label-col {
+        text-align: left;
+      }
+
+      .dropdown {
+        cursor: pointer;
+      }
+    }
+
+    .v-line {
+      border-right: 1px solid $grey;
+    }
+  }
+
+  .config-btn {
+    margin: 3rem;
+  }
+}
+
 @media screen and (max-width: 576px) {
 
   .tab {

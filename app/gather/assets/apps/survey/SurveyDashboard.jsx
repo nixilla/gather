@@ -18,10 +18,59 @@
  * under the License.
  */
 
-import React from 'react'
+import React, { useState } from 'react'
 import { FormattedMessage } from 'react-intl'
+import SurveyConfig from './mask/SurveyConfig'
 
-const SurveyDashboard = () => (
+const SurveyDashboard = ({
+  columns,
+  labels,
+  entitiesCount,
+  dashboardConfig,
+  saveDashboardConfig
+}) => {
+  const [showConfig, setShowConfig] = useState(false)
+  return (
+    <div>
+      {
+        entitiesCount > 0 && (
+          <p className='alert alert-info'>
+            <a href='#!' role='button' onClick={() => setShowConfig(!showConfig)}>
+              {
+                showConfig
+                  ? (
+                    <FormattedMessage
+                      id='alert.config.close'
+                      defaultMessage='Close'
+                    />
+                  )
+                  : (
+                    <FormattedMessage
+                      id='alert.config.dashboard'
+                      defaultMessage='Dashboard Configuration'
+                    />
+                  )
+              }
+            </a>
+          </p>
+        )
+      }
+      {
+        showConfig &&
+          <SurveyConfig
+            setShowConfig={setShowConfig}
+            dashboardConfig={dashboardConfig}
+            saveDashboardConfig={saveDashboardConfig}
+            columns={columns}
+            labels={labels}
+          />
+      }
+      {entitiesCount > 0 && !columns.length && !showConfig && renderNoDashboard(setShowConfig)}
+    </div>
+  )
+}
+
+const renderNoDashboard = setShowConfig => (
   <div className='survey-content no-dashboard'>
     <h4 className='headline'>
       <FormattedMessage
@@ -31,8 +80,19 @@ const SurveyDashboard = () => (
     </h4>
     <FormattedMessage
       id='survey.no.dashboard.help-2'
-      defaultMessage='When you activate the dashboard, data will be sent to Elastic Search.'
+      defaultMessage='You can configure data to be sent to Elastic Search and activate a Kibana Dashboard.'
     />
+    <br />
+    <button
+      type='button'
+      className='btn btn-primary btn-secondary'
+      onClick={() => { setShowConfig(true) }}
+    >
+      <FormattedMessage
+        id='survey.no.dashboard.button'
+        defaultMessage='Configure dashboard now'
+      />
+    </button>
   </div>
 )
 
