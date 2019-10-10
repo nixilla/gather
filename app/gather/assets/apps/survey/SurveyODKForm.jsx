@@ -23,8 +23,9 @@ import {
   defineMessages,
   injectIntl,
   FormattedMessage,
-  FormattedRelative
+  FormattedRelativeTime
 } from 'react-intl'
+import { selectUnit } from '@formatjs/intl-utils'
 
 import { clone, generateRandomId } from '../utils'
 import {
@@ -308,6 +309,16 @@ class XForm extends Component {
     const allErrors = []
     Object.keys(errors).forEach(key => { allErrors.push(errors[key]) })
 
+    const { value, unit } = selectUnit(new Date(xform.created_at))
+    const date = (xform.id
+      ? (
+        <small className='mr-4'>
+          (<FormattedRelativeTime value={value} unit={unit} />)
+        </small>
+      )
+      : ''
+    )
+
     const title = (
       <span title={xform.description} className='form-title'>
         <i className='fas fa-file mr-2' />
@@ -343,11 +354,6 @@ class XForm extends Component {
           />
         </small>
       )
-    )
-
-    const date = (xform.id
-      ? <small className='mr-4'>(<FormattedRelative value={xform.created_at} />)</small>
-      : ''
     )
 
     return (

@@ -21,14 +21,20 @@
 /* global describe, it, expect */
 
 import React from 'react'
-import { mountWithIntl } from 'enzyme-react-intl'
+import { mountWithIntl } from '../../tests/enzyme-helpers'
 import {
   FormattedDate,
-  FormattedRelative,
+  FormattedRelativeTime,
   FormattedTime
 } from 'react-intl'
 
 import FullDateTime from './FullDateTime'
+
+// Import intl-relativetimeformat polyfill for unsupported environments
+if (!window.Intl || !Object.keys(window.Intl).length) {
+  require('@formatjs/intl-relativetimeformat/polyfill')
+  require('@formatjs/intl-relativetimeformat/dist/locale-data/en')
+}
 
 describe('FullDateTime', () => {
   it('should render nothing without a date', () => {
@@ -36,7 +42,7 @@ describe('FullDateTime', () => {
 
     expect(component.find(FormattedDate).exists()).toBeFalsy()
     expect(component.find(FormattedTime).exists()).toBeFalsy()
-    expect(component.find(FormattedRelative).exists()).toBeFalsy()
+    expect(component.find(FormattedRelativeTime).exists()).toBeFalsy()
   })
 
   it('should render the full date time', () => {
@@ -44,6 +50,6 @@ describe('FullDateTime', () => {
 
     expect(component.find(FormattedDate).exists()).toBeTruthy()
     expect(component.find(FormattedTime).exists()).toBeTruthy()
-    expect(component.find(FormattedRelative).exists()).toBeTruthy()
+    expect(component.find(FormattedRelativeTime).exists()).toBeTruthy()
   })
 })
