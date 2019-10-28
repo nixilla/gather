@@ -69,6 +69,10 @@ AETHER_APPS = [
     if key.startswith(AETHER_PREFIX)
 ]
 
+# ElasticSearch consumer URL
+ES_CONSUMER_URL = os.environ.get('ES_CONSUMER_URL')
+
+
 # Upload files
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/2.2/ref/settings/#std:setting-DATA_UPLOAD_MAX_MEMORY_SIZE
