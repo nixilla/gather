@@ -25,7 +25,7 @@ import { clone } from '../utils'
 import { deleteData, postData, putData } from '../utils/request'
 import { getSurveyorsPath, getSurveyorsAPIPath } from '../utils/paths'
 
-import { ConfirmButton, ErrorAlert, WarningAlert } from '../components'
+import { ConfirmButton, ErrorAlert, WarningAlert, MultiSelect } from '../components'
 
 const MESSAGES = defineMessages({
   deleteButton: {
@@ -75,13 +75,22 @@ const MESSAGES = defineMessages({
 class SurveyorForm extends Component {
   constructor (props) {
     super(props)
-    this.state = { ...clone(props.surveyor), errors: {} }
+
+    const { surveyor, surveys: { results } } = props
+
+    this.state = {
+      surveyor: surveyor ? clone(surveyor) : {},
+      assignedSurveys: surveyor ? surveyor.projects : [],
+      availableSurveys: results.map(({ project_id: id, name }) => ({ id, name })),
+      errors: {},
+      showPasswordFields: false
+    }
   }
 
   render () {
-    const { formatMessage } = this.props.intl
-    const surveyor = this.state
-    const isNew = (surveyor.id === undefined)
+    const { surveyor, intl: { formatMessage } } = this.props
+    const { surveyor: { id, username }, errors } = this.state
+    const isNew = (id === undefined)
 
     const title = (isNew
       ? (
@@ -98,24 +107,24 @@ class SurveyorForm extends Component {
           />
           <span className='username ml-2'>
             <i className='fas fa-user mr-1' />
-            {this.props.surveyor.username}
+            {surveyor.username}
           </span>
         </span>
       )
     )
     const dataQA = (isNew
       ? 'surveyor-add'
-      : `surveyor-edit-${surveyor.id}`
+      : `surveyor-edit-${id}`
     )
 
     return (
       <div data-qa={dataQA} className='surveyor-edit'>
         <h3 className='page-title'>{title}</h3>
 
-        <ErrorAlert errors={surveyor.errors.generic} />
+        <ErrorAlert errors={errors.generic} />
 
         <form onSubmit={this.onSubmit.bind(this)}>
-          <div className={`form-group big-input ${surveyor.errors.username ? 'error' : ''}`}>
+          <div className={`form-group big-input ${errors.username ? 'error' : ''}`}>
             <label className='form-control-label title'>
               <FormattedMessage
                 id='surveyor.form.username'
@@ -127,55 +136,14 @@ class SurveyorForm extends Component {
               type='text'
               className='form-control'
               required
-              value={surveyor.username || ''}
+              value={username || ''}
               onChange={this.onInputChange.bind(this)}
             />
-            <ErrorAlert errors={surveyor.errors.username} />
+            <ErrorAlert errors={errors.username} />
           </div>
 
-          <div className={`form-group big-input ${surveyor.errors.password ? 'error' : ''}`}>
-            <label className='form-control-label title'>
-              <FormattedMessage
-                id='surveyor.form.password'
-                defaultMessage='Password'
-              />
-            </label>
-            <input
-              name='password_1'
-              type='password'
-              className='form-control'
-              required={isNew}
-              value={surveyor.password_1 || ''}
-              onChange={this.onInputChange.bind(this)}
-            />
-            <ErrorAlert errors={surveyor.errors.password} />
-
-            <WarningAlert
-              warnings={[
-                formatMessage(MESSAGES.passwordLengthWarning),
-                formatMessage(MESSAGES.passwordSimilarWarning),
-                formatMessage(MESSAGES.passwordCommonWarning),
-                formatMessage(MESSAGES.passwordNumericWarning)
-              ]}
-            />
-          </div>
-
-          <div className='form-group big-input'>
-            <label className='form-control-label title'>
-              <FormattedMessage
-                id='surveyor.form.password.repeat'
-                defaultMessage='Repeat password'
-              />
-            </label>
-            <input
-              name='password_2'
-              type='password'
-              className='form-control'
-              required={isNew || surveyor.password_1}
-              value={surveyor.password_2 || ''}
-              onChange={this.onInputChange.bind(this)}
-            />
-          </div>
+          {this.renderPassword(isNew)}
+          {this.renderSurveys()}
 
           <div className='actions'>
             <div>
@@ -188,7 +156,7 @@ class SurveyorForm extends Component {
                     title={
                       <span className='username'>
                         <i className='fas fa-user mr-1' />
-                        {this.props.surveyor.username}
+                        {surveyor.username}
                       </span>
                     }
                     message={formatMessage(MESSAGES.deleteConfirm)}
@@ -222,17 +190,114 @@ class SurveyorForm extends Component {
     )
   }
 
+  renderPassword (isNew) {
+    const { intl: { formatMessage } } = this.props
+    const {
+      surveyor: { password, confirmPassword },
+      errors,
+      showPasswordFields
+    } = this.state
+
+    const show = () => {
+      this.setState({ showPasswordFields: true })
+    }
+
+    if (!isNew && !showPasswordFields) {
+      return (
+        <div className='password-reset'>
+          <a href='#!' onClick={show}>Reset Password</a>
+        </div>
+      )
+    }
+
+    return (
+      <>
+        <div className={`form-group big-input ${errors.password ? 'error' : ''}`}>
+          <label className='form-control-label title'>
+            <FormattedMessage
+              id='surveyor.form.password'
+              defaultMessage='Password'
+            />
+          </label>
+          <input
+            name='password'
+            type='password'
+            className='form-control'
+            required={isNew}
+            value={password || ''}
+            onChange={this.onInputChange.bind(this)}
+          />
+          <ErrorAlert errors={errors.password} />
+
+          <WarningAlert
+            warnings={[
+              formatMessage(MESSAGES.passwordLengthWarning),
+              formatMessage(MESSAGES.passwordSimilarWarning),
+              formatMessage(MESSAGES.passwordCommonWarning),
+              formatMessage(MESSAGES.passwordNumericWarning)
+            ]}
+          />
+        </div>
+
+        <div className='form-group big-input'>
+          <label className='form-control-label title'>
+            <FormattedMessage
+              id='surveyor.form.password.repeat'
+              defaultMessage='Repeat password'
+            />
+          </label>
+          <input
+            name='confirmPassword'
+            type='password'
+            className='form-control'
+            required={isNew || password}
+            value={confirmPassword || ''}
+            onChange={this.onInputChange.bind(this)}
+          />
+        </div>
+      </>
+    )
+  }
+
+  renderSurveys () {
+    const { assignedSurveys, availableSurveys } = this.state
+    const selectedSurveys = availableSurveys.filter(survey => assignedSurveys.indexOf(survey.id) > -1)
+
+    const onChange = (surveys) => {
+      this.setState({ assignedSurveys: surveys.map(survey => survey.id) })
+    }
+
+    return (
+      <div className='form-group'>
+        <label className='form-control-label title'>
+          <FormattedMessage
+            id='surveyorForm.surveyor.surveys'
+            defaultMessage='Assigned Surveys'
+          />
+        </label>
+        <MultiSelect
+          selected={selectedSurveys}
+          options={availableSurveys}
+          onChange={onChange}
+        />
+      </div>
+    )
+  }
+
   onInputChange (event) {
     event.preventDefault()
-    this.setState({ [event.target.name]: event.target.value })
+
+    const { name, value } = event.target
+    this.setState({ surveyor: { ...this.state.surveyor, [name]: value } })
   }
 
   validatePassword () {
     const { formatMessage } = this.props.intl
+    const { id, password, confirmPassword } = this.state.surveyor
 
-    if (!this.state.id || this.state.password_1) {
+    if (!id || password) {
       // validate password
-      if (this.state.password_1 !== this.state.password_2) {
+      if (password !== confirmPassword) {
         this.setState({
           errors: {
             password: [formatMessage(MESSAGES.passwordRepeatedError)]
@@ -241,7 +306,7 @@ class SurveyorForm extends Component {
         return false
       }
 
-      if (this.state.password_1.length < 10) {
+      if (password.length < 10) {
         this.setState({
           errors: {
             password: [formatMessage(MESSAGES.passwordShortError)]
@@ -262,17 +327,22 @@ class SurveyorForm extends Component {
     event.preventDefault()
     this.setState({ errors: {} })
 
-    if (!this.validatePassword()) {
-      return
-    }
+    if (!this.validatePassword()) return
+
+    const { id, password: oldPassword } = this.props.surveyor || {}
+    const {
+      surveyor: { username, password },
+      assignedSurveys
+    } = this.state
 
     const surveyor = {
-      username: this.state.username,
-      password: this.state.password_1 || this.props.surveyor.password
+      username: username,
+      password: oldPassword || password,
+      projects: assignedSurveys
     }
 
-    const saveMethod = (this.state.id ? putData : postData)
-    const url = getSurveyorsAPIPath({ id: this.props.surveyor.id })
+    const saveMethod = (id ? putData : postData)
+    const url = getSurveyorsAPIPath({ id })
 
     return saveMethod(url, surveyor)
       .then(this.goBack)
@@ -291,7 +361,7 @@ class SurveyorForm extends Component {
       this.setState({ errors: error.content })
     } else {
       const { formatMessage } = this.props.intl
-      const surveyor = this.state
+      const { surveyor } = this.state
       const generic = [formatMessage(MESSAGES[action], { ...surveyor })]
 
       this.setState({ errors: { generic } })

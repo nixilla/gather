@@ -22,7 +22,8 @@ import React, { Component } from 'react'
 import { hot } from 'react-hot-loader/root'
 
 import { FetchUrlsContainer, PaginationContainer } from '../components'
-import { getSurveyorsAPIPath } from '../utils/paths'
+import { getSurveyorsAPIPath, getSurveysAPIPath } from '../utils/paths'
+import { ODK_APP } from '../utils/constants'
 
 import SurveyorForm from './SurveyorForm'
 import SurveyorsList from './SurveyorsList'
@@ -32,14 +33,26 @@ class SurveyorDispatcher extends Component {
     const { action, surveyorId } = this.props
 
     switch (action) {
-      case 'add':
-        return <SurveyorForm surveyor={{}} />
+      case 'add': {
+        const addUrls = [
+          {
+            name: 'surveys',
+            url: getSurveysAPIPath({ app: ODK_APP, fields: ['project_id', 'name'].join(',') })
+          }
+        ]
+
+        return <FetchUrlsContainer urls={addUrls} targetComponent={SurveyorForm} />
+      }
 
       case 'edit': {
         const editUrls = [
           {
             name: 'surveyor',
             url: getSurveyorsAPIPath({ id: surveyorId })
+          },
+          {
+            name: 'surveys',
+            url: getSurveysAPIPath({ app: ODK_APP, fields: ['project_id', 'name'].join(',') })
           }
         ]
 
