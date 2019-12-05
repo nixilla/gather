@@ -91,3 +91,7 @@ if [ -z "$TRAVIS_TAG" ]; then
 fi
 
 docker logout
+
+if [ "$TRAVIS_BRANCH" == 'develop' ]; then
+    push-app-version --project gather-alpha --version $TRAVIS_COMMIT
+fi
