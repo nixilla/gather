@@ -30,7 +30,7 @@ matrix:
     - name: "Gather release"
       stage: deploy
       script: ./scripts/release.sh
-
+      install: pip install -q google-cloud-storage push-app-version
       # release only in:
       #   - branch   develop
       #   - branch   release-#.#

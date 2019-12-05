@@ -91,3 +91,8 @@ if [ -z "$TRAVIS_TAG" ]; then
 fi
 
 docker logout
+
+if [ "$TRAVIS_BRANCH" == 'develop' ]; then
+    openssl aes-256-cbc -K $encrypted_422343ef1cd5_key -iv $encrypted_422343ef1cd5_iv -in gcs_key.json.enc -out gcs_key.json -d
+    push-app-version --project gather-alpha --version $TRAVIS_COMMIT
+fi
