@@ -100,7 +100,6 @@ if [[ ${VERSION} = "alpha" ]]; then
     docker login -u _json_key -p "$(cat gcs_key.json)" $GCR_REPO_URL
     docker_push ${VERSION} ${IMAGE_REPO} true
     push-app-version --project gather-alpha --version $TRAVIS_COMMIT
-
     docker logout
 
     # Login in docker hub
