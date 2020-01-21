@@ -35,9 +35,9 @@ if [[ ${TRAVIS_TAG} =~ ^[0-9]+(\.[0-9]+){2}$ ]]; then
 
     DOCKER_VERSION=${TRAVIS_TAG}
     GCR_VERSION=${TRAVIS_TAG}
-    GCS_PROJECT="eha-data"
+    GCS_PROJECT="gather"
     GCR_PROJECT="production-228613"
-    export RELEASE_BUCKET="gather-releases"
+    export RELEASE_BUCKET="eha-software-releases"
 
     openssl aes-256-cbc \
         -K $encrypted_17d8de6bf835_key \
@@ -59,9 +59,9 @@ elif [[ ${TRAVIS_BRANCH} =~ ^release\-[0-9]+\.[0-9]+$ ]]; then
     GCR_VERSION="${DOCKER_VERSION}-${TRAVIS_COMMIT}"
 
     # deploy release candidates in ???
-    GCS_PROJECT="alpha"
+    GCS_PROJECT="gather-rc"
     GCR_PROJECT="development-223016"
-    export RELEASE_BUCKET="gather-releases-dev"
+    export RELEASE_BUCKET="eha-software-releases-dev"
 
     openssl aes-256-cbc \
         -K $encrypted_17d8de6bf835_key \
@@ -74,9 +74,9 @@ else
 
     DOCKER_VERSION="alpha"
     GCR_VERSION=${TRAVIS_COMMIT}
-    GCS_PROJECT="alpha"
+    GCS_PROJECT="gather"
     GCR_PROJECT="development-223016"
-    export RELEASE_BUCKET="gather-releases-dev"
+    export RELEASE_BUCKET="eha-software-releases-dev"
 
     openssl aes-256-cbc \
         -K $encrypted_17d8de6bf835_key \
