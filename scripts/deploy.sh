@@ -40,8 +40,8 @@ if [[ ${TRAVIS_TAG} =~ ^[0-9]+(\.[0-9]+){2}$ ]]; then
     export RELEASE_BUCKET="eha-software-releases"
 
     openssl aes-256-cbc \
-        -K $encrypted_17d8de6bf835_key \
-        -iv $encrypted_17d8de6bf835_iv \
+        -K $encrypted_422343ef1cd5_key \
+        -iv $encrypted_422343ef1cd5_iv \
         -in prod.json.enc \
         -out gcs_key.json \
         -d
@@ -64,11 +64,10 @@ elif [[ ${TRAVIS_BRANCH} =~ ^release\-[0-9]+\.[0-9]+$ ]]; then
     export RELEASE_BUCKET="eha-software-releases-dev"
 
     openssl aes-256-cbc \
-        -K $encrypted_17d8de6bf835_key \
-        -iv $encrypted_17d8de6bf835_iv \
+        -K $encrypted_422343ef1cd5_key \
+        -iv $encrypted_422343ef1cd5_iv \
         -in dev.json.enc \
-        -out gcs_key.json \
-        -d
+        -out gcs_key.json -d
 
 else
 
@@ -79,11 +78,10 @@ else
     export RELEASE_BUCKET="eha-software-releases-dev"
 
     openssl aes-256-cbc \
-        -K $encrypted_17d8de6bf835_key \
-        -iv $encrypted_17d8de6bf835_iv \
+        -K $encrypted_422343ef1cd5_key \
+        -iv $encrypted_422343ef1cd5_iv \
         -in dev.json.enc \
-        -out gcs_key.json \
-        -d
+        -out gcs_key.json -d
 fi
 
 echo "${LINE}"
