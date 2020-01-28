@@ -21,7 +21,7 @@
 import React, { Component } from 'react'
 import { hot } from 'react-hot-loader/root'
 
-import { FetchUrlsContainer, PaginationContainer } from '../components'
+import { FetchUrlsContainer } from '../components'
 import { getSurveyorsAPIPath, getSurveysAPIPath } from '../utils/paths'
 import { ODK_APP } from '../utils/constants'
 
@@ -119,17 +119,7 @@ class SurveyDispatcher extends Component {
       }
 
       default:
-        return (
-          <PaginationContainer
-            pageSize={12}
-            url={getSurveysAPIPath({ withStats: true })}
-            position='top'
-            listComponent={SurveysList}
-            search
-            showPrevious
-            showNext
-          />
-        )
+        return <SurveysList />
     }
   }
 }
