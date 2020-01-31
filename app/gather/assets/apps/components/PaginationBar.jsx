@@ -25,7 +25,6 @@ import {
   FormattedMessage,
   FormattedNumber
 } from 'react-intl'
-import { hot } from 'react-hot-loader/root'
 
 const MESSAGES = defineMessages({
   first: {
@@ -337,6 +336,4 @@ class PaginationBar extends Component {
   }
 }
 
-// Include this to enable `this.props.intl` for this component.
-// Include this to enable HMR for this module
-export default hot(injectIntl(PaginationBar))
+export default injectIntl(PaginationBar)

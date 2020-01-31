@@ -56,25 +56,6 @@ describe('JSONViewer', () => {
       expect(componentDecimal.text()).toEqual('1.500000')
     })
 
-    it('should render string values', () => {
-      const componentString = mountWithIntl(
-        <JSONViewer data='something' links={[{ name: 'image.png', url: '/image' }]} />
-      )
-      expect(componentString.text()).toEqual('something')
-    })
-
-    it('should render string values with links', () => {
-      const componentStringLinks = mountWithIntl(
-        <JSONViewer data='image.png' links={[{ name: 'image.png', url: '/image' }]} />
-      )
-      expect(componentStringLinks.text()).toEqual('image.png')
-
-      const link = componentStringLinks.find('a')
-      expect(link.exists()).toBeTruthy()
-      expect(link.props().href).toEqual('/image')
-      expect(link.text()).toEqual('image.png')
-    })
-
     it('should render boolean values', () => {
       const yes = true
       const componentTrue = mountWithIntl(<JSONViewer data={yes} />)
@@ -94,6 +75,25 @@ describe('JSONViewer', () => {
 
       const componentDateTime = mountWithIntl(<JSONViewer data='2018-01-02T13:24:16.000Z' />)
       expect(componentDateTime.text()).toEqual(`January 2, 2018 ${DASH} 13:24:16 UTC`)
+    })
+
+    it('should render string values', () => {
+      const componentString = mountWithIntl(
+        <JSONViewer data='something' links={[{ name: 'image.png', url: '/image' }]} />
+      )
+      expect(componentString.text()).toEqual('something')
+    })
+
+    it('should render string values with links', () => {
+      const componentStringLinks = mountWithIntl(
+        <JSONViewer data='image.png' links={[{ name: 'image.png', url: '/image' }]} />
+      )
+      expect(componentStringLinks.text()).toEqual('image.png')
+
+      const link = componentStringLinks.find('a')
+      expect(link.exists()).toBeTruthy()
+      expect(link.props().href).toEqual('/image')
+      expect(link.text()).toEqual('image.png')
     })
   })
 
