@@ -46,6 +46,13 @@ services:
     networks:
       - local
 
+  redis:
+    extends:
+      file: ${AETHER_PATH:-../aether}/docker-compose-base.yml
+      service: redis-base
+    networks:
+      - local
+
 
   # ---------------------------------
   # NGINX
@@ -85,6 +92,10 @@ services:
         condition: service_healthy
       minio:
         condition: service_started
+      redis:
+        condition: service_started
+      exm:
+        condition: service_started
     networks:
       - local
     extra_hosts:
@@ -122,6 +133,19 @@ services:
       - aether.local:192.168.33.10
       - gather.local:192.168.33.10
 
+
+  # ---------------------------------
+  # Aether EXM module
+  # ---------------------------------
+
+  exm:
+    extends:
+      file: ${AETHER_PATH:-../aether}/docker-compose-base.yml
+      service: exm-base
+    environment:
+      AETHER_KERNEL_URL: http://aether.local/kernel
+    networks:
+      - local
 
   # ---------------------------------
   # Aether UI

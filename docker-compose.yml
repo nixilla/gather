@@ -36,6 +36,13 @@ services:
     networks:
       - gather_net
 
+  redis:
+    extends:
+      file: ./docker-compose-base.yml
+      service: redis-base
+    networks:
+      - gather_net
+
   # ---------------------------------
   # NGINX
   # ---------------------------------
@@ -71,6 +78,20 @@ services:
     extra_hosts:
       - aether.local:192.168.3.10
       - gather.local:192.168.3.10
+
+
+  # ---------------------------------
+  # Entity Extractor
+  # ---------------------------------
+  exm:
+    extends:
+      file: ./docker-compose-base.yml
+      service: exm-base
+    depends_on:
+      redis:
+        condition: service_started
+    networks:
+      - gather_net
 
   # ---------------------------------
   # Aether ODK module
