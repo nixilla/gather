@@ -22,15 +22,15 @@ branches:
 jobs:
   fast_finish: true
   include:
-    - name: "Tests"
+    - name: "Test gather application"
       stage: test
       script: ./scripts/test.sh
 
-    - name: "Test Councourse deployment"
+    - name: "Test concourse deployment"
       stage: test
       script: docker build --pull --file gather.Dockerfile .
 
-    - name: "Publish container in Docker Hub"
+    - name: "Publish gather container in Docker Hub"
       stage: deploy
       script: ./scripts/release.sh
       if: |
